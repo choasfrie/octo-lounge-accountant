@@ -1,0 +1,6 @@
+@octo_lounge_accountant_api_HostAddress = http://localhost:5116
+
+GET {{octo_lounge_accountant_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
