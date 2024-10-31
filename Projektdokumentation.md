@@ -132,7 +132,7 @@ Octo-lounge-accountant is a browser application which is designed to support esp
 | 14.B | 27.11.2023 | Timo        | Frontend:<br> Develop the accounts dashboard page and integrate with backend (User Story<br> 14)                    | 4 hours               |
 | 14.C | 27.11.2023 | Samuel      | UI/UX: Design<br> the accounts dashboard for clear presentation of account information (User<br> Story 14)          | 3 hours               |
 | 15.A | 28.11.2023 | Julius      | Backend:<br> Prepare data endpoints for graphing account data (User Story 15)                                       | 4 hours               |
-| 15.B | 28.11.2023 | Timo        | Frontend:<br> Implement graphing functionality using vis.js library (User Story 15)                             | 6 hours               |
+| 15.B | 28.11.2023 | Timo        | Frontend:<br> Implement graphing functionality using vis.js library (User Story 15)                                 | 6 hours               |
 | 15.C | 28.11.2023 | Samuel      | UI/UX: Design<br> graph layouts and interactions (User Story 15)                                                    | 3 hours               |
 | 15.D | 28.11.2023 | Alberto     | Assist Frontend:<br> Help Timo with advanced graphing features and performance optimization (User<br> Story 15)     | 5 hours               |
 | 16.A | 30.11.2023 | Alberto     | Testing:<br> Perform testing and bug fixing across the application (All User Stories)                               | 10 hours              |
