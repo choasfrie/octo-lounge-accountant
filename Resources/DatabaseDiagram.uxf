@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="15.0.0">
-  <zoom_level>17</zoom_level>
+<diagram program="umlet" version="15.1">
+  <zoom_level>11</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>238</x>
-      <y>255</y>
-      <w>357</w>
-      <h>221</h>
+      <x>0</x>
+      <y>143</y>
+      <w>231</w>
+      <h>143</h>
     </coordinates>
     <panel_attributes>*Profile*
 --
@@ -16,7 +16,7 @@ string: Username
 string: Email
 string: PasswordHash
 string: JWT
-datetime: TimeCreated
+datetime: CreatedAt
 
 </panel_attributes>
     <additional_attributes/>
@@ -24,34 +24,34 @@ datetime: TimeCreated
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>816</x>
-      <y>255</y>
-      <w>357</w>
-      <h>170</h>
+      <x>374</x>
+      <y>143</y>
+      <w>231</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>*Account*
 --
 PK:Int: Id
 string: Name
 int: Type
-FK:int: ProfileId
+FK:int: OwnderId
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>816</x>
-      <y>561</y>
-      <w>357</w>
-      <h>221</h>
+      <x>374</x>
+      <y>341</y>
+      <w>231</w>
+      <h>143</h>
     </coordinates>
     <panel_attributes>*Records*
 --
 PK:int: Id
 int: Amount
 string: Description
-DateTime: TimeCreated
+DateTime: CreatedAt
 FK:Int: CreditorId
 FK:Int: DebitorId
 </panel_attributes>
@@ -60,10 +60,10 @@ FK:Int: DebitorId
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>578</x>
-      <y>323</y>
-      <w>272</w>
-      <h>85</h>
+      <x>220</x>
+      <y>187</y>
+      <w>176</w>
+      <h>55</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -74,10 +74,10 @@ m2=0..n
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>986</x>
-      <y>408</y>
-      <w>85</w>
-      <h>187</h>
+      <x>484</x>
+      <y>242</y>
+      <w>55</w>
+      <h>121</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=2
