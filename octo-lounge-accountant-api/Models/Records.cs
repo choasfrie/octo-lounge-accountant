@@ -8,7 +8,5 @@
         public required int CreditorId { get; set; }
         public required int DebtorId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        
-
     }
 }
