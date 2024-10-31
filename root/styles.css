@@ -10,6 +10,29 @@ a {
     text-decoration: none;
 }
 
+.side-panel {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background-color: rgba(102, 0, 204, 0.5);
+    padding: 10px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.side-panel a {
+    color: #fff;
+    font-size: 24px;
+}
+
+.side-panel a:hover {
+    color: #ccc;
+}
+
 header {
     background-color: #6600cc;
     padding: 20px;
