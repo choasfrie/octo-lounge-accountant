@@ -1,0 +1,33 @@
+
+# 2024-10-31 13:12:34.664512
++/add root/Style1
+
+# 2024-10-31 13:12:40.518677
++no
+
+# 2024-10-31 13:12:44.720098
++/add Style1
+
+# 2024-10-31 13:13:44.846426
++create the folder Style2 and Style3 and create different looking websites but it's about the same thing as Style1, keep the dark and 6600cc colors too but you can add other colors that might be complementary
+
+# 2024-10-31 13:15:50.121499
++yes
+
+# 2024-10-31 13:15:57.790658
++no
+
+# 2024-10-31 13:18:10.767405
++add 2 more different styles, you can also add or remove things like the side panel with the socials or different texts but you can defintiely add buttons and thigns like that, also add some javascript to all styles to make it more user friendly, you choose what to add and remove
+
+# 2024-10-31 13:24:34.285231
++yes
+
+# 2024-10-31 13:24:38.497034
++ye
+
+# 2024-10-31 13:24:42.112891
++yes
+
+# 2024-10-31 13:25:29.366087
++/run start Style1\index.html && start Style2\index.html && start Style3\index.html && start Style4\index.html && start Style5\index.html
