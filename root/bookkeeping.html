@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookkeeping Services - Octo Lounge Accountant</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/4c39a50c7e.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1>Bookkeeping Services</h1>
+        </header>
+
+        <main>
+            <section id="bookkeeping-overview">
+                <h2>Account Management Dashboard <a href="chartofaccounts.html" data-tooltip="View Chart of Accounts" class="section-icon"><i class="fas fa-book"></i></a></h2>
+                <div class="account-grid">
+                    <div class="account-item">
+                        <i class="fas fa-wallet"></i>
+                        <h3>Current Assets</h3>
+                        <div class="account-details">
+                            <p>Kasse (1000): CHF 25,000  </p>
+                            <p>Debitoren (1100): CHF 15,000  </p>
+                            <p>Informatik Hardware (1410): CHF 45,000  </p>
+                        </div>
+                    </div>
+                    <div class="account-item">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <h3>Liabilities</h3>
+                        <div class="account-details">
+                            <p>Kreditoren (2000): CHF 18,000  </p>
+                            <p>Mehrwertsteuer (2200): CHF 30,000  </p>
+                            <p>Eigenkapital (2800): CHF 75,000  </p>
+                        </div>
+                    </div>
+                    <div class="account-item">
+                        <i class="fas fa-chart-pie"></i>
+                        <h3>Equity</h3>
+                        <div class="account-details">
+                            <p>Eigenkapital (2800): CHF 100,000  </p>
+                            <p>Privat (2891): CHF 35,000  </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="recent-transactions">
+                <h2>Recent Transactions</h2>
+                <div class="transaction-list">
+                    <div class="transaction">
+                        <span class="date">2024-01-15</span>
+                        <span class="description">Office Supplies Purchase</span>
+                        <span class="amount expense">-$250.00</span>
+                    </div>
+                    <div class="transaction">
+                        <span class="date">2024-01-14</span>
+                        <span class="description">Client Payment - Invoice #1234</span>
+                        <span class="amount income">+$1,500.00</span>
+                    </div>
+                    <div class="transaction">
+                        <span class="date">2024-01-13</span>
+                        <span class="description">Utility Bill Payment</span>
+                        <span class="amount expense">-$180.00</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="t-accounts">
+                <h2>T-Accounts View</h2>
+                <div class="t-account-grid">
+                    <div class="t-account">
+                        <h3>FLL</h3>
+                        <div class="t-account-content">
+                            <div class="debit-side">
+                                <h4>Debit (+)</h4>
+                                <div class="entry">
+                                    <span>$5,000 - Initial deposit  </span>
+                                </div>
+                                <div class="entry">
+                                    <span>$3,000 - Sales revenue  </span>
+                                </div>
+                            </div>
+                            <div class="credit-side">
+                                <h4>Credit (-)</h4>
+                                <div class="entry">
+                                    <span>$1,500 - Rent payment  </span>
+                                </div>
+                                <div class="entry">
+                                    <span>$800 - Utilities  </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="t-account">
+                        <h3>VLL</h3>
+                        <div class="t-account-content">
+                            <div class="debit-side">
+                                <h4>Debit (+)</h4>
+                                <div class="entry">
+                                    <span>$2,500 - Invoice #123  </span>
+                                </div>
+                                <div class="entry">
+                                    <span>$1,800 - Invoice #124  </span>
+                                </div>
+                            </div>
+                            <div class="credit-side">
+                                <h4>Credit (-)</h4>
+                                <div class="entry">
+                                    <span>$2,000 - Payment received  </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <aside class="side-panel">
+            <nav>
+                <ul>
+                    <li><a href="index.html#home"><i class="fa-solid fa-house"></i> Home</a></li>
+                    <li><a href="index.html#services"><i class="fa-solid fa-wrench"></i> Services</a></li>
+                    <li><a href="index.html#about"><i class="fa-solid fa-circle-info"></i> About</a></li>
+                    <li><a href="index.html#contact"><i class="fa-solid fa-headset"></i> Contact</a></li>
+                </ul>
+            </nav>
+            <div class="social-links">
+                <a href="https://github.com/sprudello/octo-lounge-accountant" target="_blank" data-tooltip="GitHub Repository"><i class="fab fa-github"></i></a>
+                <a href="https://github.com/sprudello/octo-lounge-accountant/blob/main/Projektdokumentation.md" target="_blank" data-tooltip="Documentation"><i class="fas fa-book"></i></a>
+                <a href="#" data-tooltip="User Profile"><i class="fas fa-user"></i></a>
+            </div>
+        </aside>
+
+        <footer>
+            <p>&copy; 2024 octo-lounge-accountant. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

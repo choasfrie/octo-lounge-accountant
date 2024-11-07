@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart of Accounts - Octo Lounge Accountant</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/4c39a50c7e.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1>Chart of Accounts</h1>
+        </header>
+
+        <main>
+            <section id="chart-overview">
+                <h2>Chart of Accounts Overview</h2>
+                <div class="download-section">
+                    <p>Download the standard chart of accounts template:</p>
+                    <a href="https://www.kmu.admin.ch/dam/kmu/de/dokumente/savoir-pratique/Finances/240812%20Schulkontenrahmen%20VEB%20-%20DE.pdf.download.pdf/240812%20Schulkontenrahmen%20VEB%20-%20DE.pdf" 
+                       class="download-button" 
+                       target="_blank">
+                        <i class="fas fa-file-pdf"></i> Download VEB Kontenrahmen (PDF)
+                    </a>
+                </div>
+                
+                <div class="account-categories">
+                    <div class="category">
+                        <h3>1 - Aktiven</h3>
+                        <div class="account-list">
+                            <p><strong>10 - Flüssige Mittel</strong></p>
+                            <ul>
+                                <li>1000 - Kasse</li>
+                                <li>1020 - Bank</li>
+                                <li>1021 - PayPal</li>
+                                <li>1030 - Post</li>
+                                <li>1040 - Kreditkarten</li>
+                            </ul>
+                            
+                            <p><strong>11 - Forderungen</strong></p>
+                            <ul>
+                                <li>1100 - Debitoren</li>
+                                <li>1109 - Delkredere</li>
+                                <li>1140 - Vorschüsse und Darlehen</li>
+                                <li>1170 - Vorsteuer</li>
+                                <li>1176 - Verrechnungssteuer</li>
+                                <li>1180 - Kurzfristige Forderungen gegenüber Sozialversicherungen</li>
+                                <li>1190 - Sonstige kurzfristige Forderungen</li>
+                            </ul>
+
+                            <p><strong>12 - Vorräte und nicht fakturierte Dienstleistungen</strong></p>
+                            <ul>
+                                <li>1200 - Handelswaren</li>
+                                <li>1210 - Rohstoffe</li>
+                                <li>1220 - Hilfs- und Verbrauchsmaterial</li>
+                                <li>1230 - Angefangene Arbeiten</li>
+                                <li>1250 - Fertige Erzeugnisse</li>
+                                <li>1270 - Nicht fakturierte Dienstleistungen</li>
+                                <li>1280 - Wertberichtigungen</li>
+                            </ul>
+
+                            <p><strong>13 - Aktive Rechnungsabgrenzungen</strong></p>
+                            <ul>
+                                <li>1300 - Bezahlte Aufwände des Folgejahres</li>
+                                <li>1301 - Noch nicht erhaltene Erträge</li>
+                            </ul>
+
+                            <p><strong>14 - Mobile Sachanlagen</strong></p>
+                            <ul>
+                                <li>1400 - Mobiliar und Einrichtungen</li>
+                                <li>1410 - Informatik Hardware</li>
+                                <li>1420 - Maschinen und Apparate</li>
+                                <li>1430 - Werkzeuge und Geräte</li>
+                                <li>1440 - Fahrzeuge</li>
+                                <li>1480 - Wertberichtigungen mobile Sachanlagen</li>
+                            </ul>
+
+                            <p><strong>15 - Immobile Sachanlagen</strong></p>
+                            <ul>
+                                <li>1500 - Geschäftsliegenschaften</li>
+                                <li>1509 - Wertberichtigungen Geschäftsliegenschaften</li>
+                            </ul>
+
+                            <p><strong>16 - Immaterielle Werte</strong></p>
+                            <ul>
+                                <li>1600 - Patente, Know-how, Lizenzen, Rechte, Entwicklungen</li>
+                                <li>1680 - Wertberichtigungen immaterielle Werte</li>
+                            </ul>
+
+                            <p><strong>17 - Finanzanlagen</strong></p>
+                            <ul>
+                                <li>1700 - Beteiligungen</li>
+                                <li>1710 - Langfristige Forderungen</li>
+                                <li>1720 - Wertschriften</li>
+                                <li>1780 - Wertberichtigungen Finanzanlagen</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>2 - Passiven</h3>
+                        <div class="account-list">
+                            <p><strong>20 - Kurzfristige Verbindlichkeiten aus Lieferungen und Leistungen</strong></p>
+                            <ul>
+                                <li>2000 - Kreditoren</li>
+                                <li>2030 - Anzahlungen von Kunden</li>
+                            </ul>
+
+                            <p><strong>21 - Kurzfristige verzinsliche Verbindlichkeiten</strong></p>
+                            <ul>
+                                <li>2100 - Bank</li>
+                                <li>2120 - Leasingverbindlichkeiten</li>
+                                <li>2140 - Privat</li>
+                            </ul>
+
+                            <p><strong>22 - Andere kurzfristige Verbindlichkeiten</strong></p>
+                            <ul>
+                                <li>2200 - Mehrwertsteuer</li>
+                                <li>2201 - Abrechnungskonto MWST</li>
+                                <li>2210 - Sozialversicherungen</li>
+                                <li>2270 - Quellensteuer</li>
+                                <li>2279 - Übrige kurzfristige Verbindlichkeiten</li>
+                            </ul>
+
+                            <p><strong>23 - Passive Rechnungsabgrenzungen und kurzfristige Rückstellungen</strong></p>
+                            <ul>
+                                <li>2300 - Erhaltene Erträge des Folgejahres</li>
+                                <li>2301 - Noch nicht bezahlte Aufwände</li>
+                                <li>2330 - Kurzfristige Rückstellungen</li>
+                            </ul>
+
+                            <p><strong>24 - Langfristige verzinsliche Verbindlichkeiten</strong></p>
+                            <ul>
+                                <li>2400 - Bankschulden</li>
+                                <li>2420 - Leasingverbindlichkeiten</li>
+                                <li>2450 - Übrige langfristige verzinsliche Verbindlichkeiten</li>
+                            </ul>
+
+                            <p><strong>25 - Andere langfristige Verbindlichkeiten</strong></p>
+                            <ul>
+                                <li>2500 - Übrige langfristige Verbindlichkeiten</li>
+                            </ul>
+
+                            <p><strong>28 - Eigenkapital</strong></p>
+                            <ul>
+                                <li>2800 - Eigenkapital</li>
+                                <li>2820 - Reserven</li>
+                                <li>2891 - Privat</li>
+                                <li>2892 - Privatanteile</li>
+                                <li>2893 - Privatsteuern</li>
+                            </ul>
+
+                            <p><strong>29 - Gewinn/Verlust</strong></p>
+                            <ul>
+                                <li>2979 - Jahresgewinn oder Jahresverlust</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>3 - Betriebsertrag</h3>
+                        <div class="account-list">
+                            <p><strong>30 - Produktionsertrag</strong></p>
+                            <ul>
+                                <li>3000 - Warenertrag</li>
+                                <li>3200 - Dienstleistungsertrag</li>
+                                <li>3400 - Beratungsertrag</li>
+                                <li>3600 - Übrige Erträge</li>
+                                <li>3800 - Eigenleistungen</li>
+                                <li>3900 - Bestandesänderungen</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>4 - Aufwand für Material, Waren und Dienstleistungen</h3>
+                        <div class="account-list">
+                            <p><strong>40 - Material- und Warenaufwand</strong></p>
+                            <ul>
+                                <li>4000 - Materialaufwand</li>
+                                <li>4200 - Handelswarenaufwand</li>
+                                <li>4400 - Aufwand für Drittleistungen</li>
+                                <li>4500 - Energieaufwand zur Leistungserstellung</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>5 - Personalaufwand</h3>
+                        <div class="account-list">
+                            <p><strong>50 - Personalaufwand</strong></p>
+                            <ul>
+                                <li>5000 - Löhne</li>
+                                <li>5700 - Sozialversicherungsaufwand</li>
+                                <li>5800 - Übriger Personalaufwand</li>
+                                <li>5900 - Leistungen Dritter</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>6 - Übriger Betriebsaufwand</h3>
+                        <div class="account-list">
+                            <p><strong>60 - Raumaufwand</strong></p>
+                            <ul>
+                                <li>6000 - Mietaufwand</li>
+                                <li>6100 - Unterhalt, Reparaturen, Ersatz</li>
+                                <li>6105 - Leasing Mobilien</li>
+                                <li>6200 - Fahrzeugaufwand</li>
+                                <li>6300 - Versicherungsaufwand</li>
+                                <li>6400 - Energie- und Entsorgungsaufwand</li>
+                                <li>6500 - Verwaltungsaufwand</li>
+                                <li>6600 - Werbeaufwand</li>
+                                <li>6700 - Sonstiger Betriebsaufwand</li>
+                                <li>6800 - Abschreibungen</li>
+                                <li>6900 - Finanzaufwand</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>7 - Betrieblicher Nebenerfolg</h3>
+                        <div class="account-list">
+                            <p><strong>70 - Erfolg aus Nebenbetrieb</strong></p>
+                            <ul>
+                                <li>7000 - Ertrag aus Nebenbetrieb</li>
+                                <li>7010 - Aufwand aus Nebenbetrieb</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>8 - Betriebsfremder, ausserordentlicher Erfolg</h3>
+                        <div class="account-list">
+                            <p><strong>80 - Betriebsfremder Erfolg</strong></p>
+                            <ul>
+                                <li>8000 - Betriebsfremder Ertrag</li>
+                                <li>8010 - Betriebsfremder Aufwand</li>
+                            </ul>
+
+                            <p><strong>85 - Ausserordentlicher Erfolg</strong></p>
+                            <ul>
+                                <li>8500 - Ausserordentlicher Ertrag</li>
+                                <li>8510 - Ausserordentlicher Aufwand</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="category">
+                        <h3>9 - Abschluss</h3>
+                        <div class="account-list">
+                            <p><strong>90 - Abschluss</strong></p>
+                            <ul>
+                                <li>9000 - Eröffnungsbuchungen</li>
+                                <li>9100 - Abschlussbuchungen</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <aside class="side-panel">
+            <nav>
+                <ul>
+                    <li><a href="index.html#home"><i class="fa-solid fa-house"></i> Home</a></li>
+                    <li><a href="index.html#services"><i class="fa-solid fa-wrench"></i> Services</a></li>
+                    <li><a href="index.html#about"><i class="fa-solid fa-circle-info"></i> About</a></li>
+                    <li><a href="index.html#contact"><i class="fa-solid fa-headset"></i> Contact</a></li>
+                </ul>
+            </nav>
+            <div class="social-links">
+                <a href="https://github.com/sprudello/octo-lounge-accountant" target="_blank" data-tooltip="GitHub Repository"><i class="fab fa-github"></i></a>
+                <a href="https://github.com/sprudello/octo-lounge-accountant/blob/main/Projektdokumentation.md" target="_blank" data-tooltip="Documentation"><i class="fas fa-book"></i></a>
+                <a href="#" data-tooltip="User Profile"><i class="fas fa-user"></i></a>
+            </div>
+        </aside>
+
+        <footer>
+            <p>&copy; 2024 octo-lounge-accountant. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
