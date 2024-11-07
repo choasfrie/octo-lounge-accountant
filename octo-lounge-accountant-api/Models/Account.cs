@@ -6,5 +6,7 @@
         public required string Name { get; set; }
         public required int Type { get; set; }
         public required int OwnerId { get; set; }
+
+        public Profile Owner { get; set; }
     }
 }
