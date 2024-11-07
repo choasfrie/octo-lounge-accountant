@@ -1,16 +1,16 @@
-# Projekt-Dokumentation
+# Project-documentation
 
 Burlet, Goedertier, Manser, Lucena
 
-| Datum | Version | Zusammenfassung                                                                                                           |
+| Date | Version | Summary                                                                                                           |
 | ----- | ------- | ------------------------------------------------------------------------------------------------------------------------- |
 |       | 0.0.1   | We started working on plans such as the Database Model we've also initialized the ASP.Net Project and the front-end part. |
 |       | ...     |                                                                                                                           |
 |       | 1.0.0   |                                                                                                                           |
 
-## 1 Informieren
+## 1 Inform
 
-### 1.1 Ihr Projekt
+### 1.1 Our project
 
 Octo-lounge-accountant is a browser application which is designed to support especially smaller businesses in accounting. We offer a baseplatform to create accounts and records. This is, to make it easy to track expenses and inspect the finances of the company. To increase the workflow there is an AI feature to add the Records. 
 
@@ -82,11 +82,11 @@ Octo-lounge-accountant is a browser application which is designed to support esp
 | **15.1** | User is logged in; accounts have transaction history                  | Navigates to the 'Graphs' page; selects accounts to graph                       | Graphs are generated displaying account balances over time or other relevant metrics                     |
 | **15.2** | User is logged in; accounts have no transaction history               | Tries to generate graphs                                                        | Message indicating insufficient data to generate graphs; prompted to add records                         |
 
-### 1.4 Diagramme
+### 1.4 Diagramms
 
 ✍️ Hier können Sie PAPs, Use Case- und Gantt-Diagramme oder Ähnliches einfügen.
 
-## 2 Planen
+## 2 Plan
 
 | AP-№ | Deadline   | Responsible | Description                                                                                                         | Adjusted Planned Time |
 | ---- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- |
@@ -138,39 +138,39 @@ Octo-lounge-accountant is a browser application which is designed to support esp
 | 16.A | 30.11.2023 | Alberto     | Testing:<br> Perform testing and bug fixing across the application (All User Stories)                               | 10 hours              |
 | 16.B | 30.11.2023 | All         | Integration Testing: Final integration testing and deployment preparation                                           | 12 hours              |
 
-## 3 Entscheiden
+## 3 Decide
 
 ✍️ Dokumentieren Sie hier Ihre Entscheidungen und Annahmen, die Sie im Bezug auf Ihre User Stories und die Implementierung getroffen haben.
 
 ## 4 Realisieren
 
-| AP-№ | Datum | Zuständig | geplante Zeit | tatsächliche Zeit |
+| AP-№ | Date | Responsible | Planed time | Actual time |
 | ---- | ----- | --------- | ------------- | ----------------- |
 | 1.A  |       |           |               |                   |
 | ...  |       |           |               |                   |
 
 ✍️ Tragen Sie jedes Mal, wenn Sie ein Arbeitspaket abschließen, hier ein, wie lang Sie effektiv dafür hatten.
 
-## 5 Kontrollieren
+## 5 Controll
 
-### 5.1 Testprotokoll
+### 5.1 Testprotocoll
 
-| TC-№ | Datum | Resultat | Tester |
+| TC-№ | Date | Result | Tester |
 | ---- | ----- | -------- | ------ |
 | 1.1  |       |          |        |
 | ...  |       |          |        |
 
 ✍️ Vergessen Sie nicht, ein Fazit hinzuzufügen, welches das Test-Ergebnis einordnet.
 
-### 5.2 Exploratives Testen
+### 5.2 Explorativ testing
 
-| BR-№ | Ausgangslage | Eingabe | Erwartete Ausgabe | Tatsächliche Ausgabe |
+| BR-№ | Initial situation | Input | Expected output | Actual output |
 | ---- | ------------ | ------- | ----------------- | -------------------- |
 | I    |              |         |                   |                      |
 | ...  |              |         |                   |                      |
 
 ✍️ Verwenden Sie römische Ziffern für Ihre Bug Reports, also I, II, III, IV etc.
 
-## 6 Auswerten
+## 6 Evaluate
 
 ✍️ Fügen Sie hier eine Verknüpfung zu Ihrem Lern-Bericht ein.
