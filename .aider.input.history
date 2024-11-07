@@ -31,3 +31,39 @@
 
 # 2024-10-31 13:25:29.366087
 +/run start Style1\index.html && start Style2\index.html && start Style3\index.html && start Style4\index.html && start Style5\index.html
+
+# 2024-11-07 11:32:28.339146
++/add Style1 Style2 Style3 Style4 Style5
+
+# 2024-11-07 11:33:00.402071
++we want to use style3 as base style but change these things:
+
+# 2024-11-07 11:35:35.037398
++we want to use style3 as base style but change these things: put the header items into the sidebar, remove the togglelayout function, add the 'our services' with the box style from style5 into style3, in the sidebar add a small socials section where the items are horizontally layed out
+
+# 2024-11-07 11:36:20.756924
++no
+
+# 2024-11-07 11:37:43.770859
++the box style in style 3 isnt a box, make it so you can see the boxes
+
+# 2024-11-07 11:38:06.312185
++no
+
+# 2024-11-07 11:38:36.500798
++remove the other styles, keep style3
+
+# 2024-11-07 11:38:44.438642
++yes
+
+# 2024-11-07 11:38:44.456838
++/run rmdir /s /q Style1
+
+# 2024-11-07 11:38:45.346867
++/run rmdir /s /q Style2
+
+# 2024-11-07 11:38:45.954316
++/run rmdir /s /q Style4
+
+# 2024-11-07 11:38:46.495779
++/run rmdir /s /q Style5
