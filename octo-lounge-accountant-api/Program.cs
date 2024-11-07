@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using octo_lounge_accountant_api.Data;
+using Microsoft.EntityFrameworkCore.SqlServer;
 
 namespace octo_lounge_accountant_api
 {
@@ -8,11 +11,14 @@ namespace octo_lounge_accountant_api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // Add DbContext with SQL Server provider
+            builder.Services.AddDbContext<DataContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
@@ -26,7 +32,6 @@ namespace octo_lounge_accountant_api
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
