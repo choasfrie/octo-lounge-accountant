@@ -10,4 +10,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    const data = new vis.DataSet([
+        {x: '2024-01-01', y: 10},
+        {x: '2024-02-01', y: 25},
+        {x: '2024-03-01', y: 30},
+    ]);
+
+    const options = {
+        start: '2024-01-01',
+        end: '2024-04-01',
+        drawPoints: true,
+        dataAxis: {
+            left: {title: {text: 'Values (Y Axis)'}},
+        },
+        timeAxis: {title: {text: 'Dates (X Axis)'}},
+    };
+
+    new vis.Graph2d(document.getElementById('visualization'), data, options);
 });
