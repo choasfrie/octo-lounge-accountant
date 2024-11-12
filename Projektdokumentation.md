@@ -99,60 +99,58 @@ Octo-lounge-accountant is a browser application which is designed to support esp
 
 ## 2 Plan
 
-| AP-№ | Deadline   | Responsible | Description                                                                                                         | Adjusted Planned Time |
-| ---- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| 1.A  | 07.11.2023 | Julius      | Backend:<br> Implement company registration functionality, including data validation and<br> storage (User Story 1) | 6 hours               |
-| 1.B  | 07.11.2023 | Timo        | Frontend:<br> Develop registration form and connect it to the backend API (User Story 1)                            | 4 hours               |
-| 1.C  | 07.11.2023 | Samuel      | UI/UX: Design<br> the registration page for optimal user experience (User Story 1)                                  | 3 hours               |
-| 2.A  | 09.11.2023 | Julius      | Backend:<br> Implement login functionality with authentication and session management<br> (User Story 2)            | 6 hours               |
-| 2.B  | 09.11.2023 | Timo        | Frontend:<br> Develop the login page and integrate with the backend (User Story 2)                                  | 4 hours               |
-| 2.C  | 09.11.2023 | Samuel      | UI/UX: Design<br> the login interface for ease of use (User Story 2)                                                | 2 hours               |
-| 3.A  | 10.11.2023 | Julius      | Backend:<br> Implement automatic assignment of "standard account pack" upon<br> account creation (User Story 3)     | 4 hours               |
-| 4.A  | 12.11.2023 | Julius      | Backend:<br> Implement API endpoints for creating accounts (User Story 4)                                           | 4 hours               |
-| 4.B  | 12.11.2023 | Timo        | Frontend:<br> Develop account creation form and connect it to the backend (User Story 4)                            | 4 hours               |
-| 4.C  | 12.11.2023 | Samuel      | UI/UX: Design<br> the account creation interface for user friendliness (User Story 4)                               | 3 hours               |
-| 5.A  | 13.11.2023 | Julius      | Backend:<br> Implement API endpoints for editing accounts (User Story 5)                                            | 4 hours               |
-| 5.B  | 13.11.2023 | Timo        | Frontend:<br> Develop account editing interface and integrate with backend (User Story 5)                           | 4 hours               |
-| 5.C  | 13.11.2023 | Samuel      | UI/UX: Design<br> the account editing interface for intuitive use (User Story 5)                                    | 3 hours               |
-| 6.A  | 14.11.2023 | Julius      | Backend:<br> Implement account deletion with checks for existing entries (User Story 6)                             | 6 hours               |
-| 6.B  | 14.11.2023 | Timo        | Frontend:<br> Develop account deletion interface and confirmation dialogs (User Story 6)                            | 4 hours               |
-| 6.C  | 14.11.2023 | Samuel      | UI/UX: Design<br> the account deletion flow to prevent accidental deletions (User Story 6)                          | 3 hours               |
-| 7.A  | 16.11.2023 | Julius      | Backend:<br> Implement API endpoints for creating records (User Story 7)                                            | 4 hours               |
-| 7.B  | 16.11.2023 | Timo        | Frontend:<br> Develop record creation form and integrate with backend (User Story 7)                                | 4 hours               |
-| 7.C  | 16.11.2023 | Samuel      | UI/UX: Design<br> the record creation interface for ease of data entry (User Story 7)                               | 3 hours               |
-| 8.A  | 17.11.2023 | Julius      | Backend:<br> Implement API endpoints for editing records (User Story 8)                                             | 4 hours               |
-| 8.B  | 17.11.2023 | Timo        | Frontend:<br> Develop record editing interface and integrate with backend (User Story 8)                            | 4 hours               |
-| 8.C  | 17.11.2023 | Samuel      | UI/UX: Design<br> the record editing interface for consistency and usability (User Story 8)                         | 3 hours               |
-| 9.A  | 18.11.2023 | Julius      | Backend:<br> Implement record deletion functionality (User Story 9)                                                 | 4 hours               |
-| 9.B  | 18.11.2023 | Timo        | Frontend:<br> Develop record deletion interface and confirmation dialogs (User Story 9)                             | 4 hours               |
-| 9.C  | 18.11.2023 | Samuel      | UI/UX: Design<br> the record deletion flow to prevent accidental data loss (User Story 9)                           | 3 hours               |
-| 10.A | 20.11.2023 | Julius      | Backend:<br> Develop NLP service for parsing text into records (User Story 10)                                      | 8 hours               |
-| 10.B | 20.11.2023 | Timo        | Frontend:<br> Develop interface for text input and display parsing results (User Story 10)                          | 5 hours               |
-| 10.C | 20.11.2023 | Samuel      | UI/UX: Design<br> intuitive text input interface for automatic record creation (User Story 10)                      | 3 hours               |
-| 10.D | 20.11.2023 | Alberto     | Assist Backend:<br> Help Julius integrate external AI APIs (e.g., GPT) securely (User Story 10)                     | 5 hours               |
-| 11.A | 23.11.2023 | Julius      | Backend:<br> Implement API endpoints to retrieve the list of records (User Story 11)                                | 3 hours               |
-| 11.B | 23.11.2023 | Timo        | Frontend:<br> Develop the records list page and integrate with backend (User Story 11)                              | 4 hours               |
-| 11.C | 23.11.2023 | Samuel      | UI/UX: Design<br> the records list interface for readability and navigation (User Story 11)                         | 3 hours               |
-| 12.A | 24.11.2023 | Julius      | Backend:<br> Implement filtering functionality in API for records (User Story 12)                                   | 4 hours               |
-| 12.B | 24.11.2023 | Timo        | Frontend:<br> Develop filtering options in the records list page (User Story 12)                                    | 4 hours               |
-| 12.C | 24.11.2023 | Samuel      | UI/UX: Design<br> the filtering interface for ease of use (User Story 12)                                           | 3 hours               |
-| 13.A | 25.11.2023 | Julius      | Backend:<br> Implement payment processing integration for donations (User Story 13)                                 | 6 hours               |
-| 13.B | 25.11.2023 | Timo        | Frontend:<br> Develop the donation/support page and integrate payment processing (User<br> Story 13)                | 4 hours               |
-| 13.C | 25.11.2023 | Samuel      | UI/UX: Design<br> the donation page to encourage user support (User Story 13)                                       | 3 hours               |
-| 14.A | 27.11.2023 | Julius      | Backend:<br> Implement API endpoints to retrieve account summaries for dashboard (User<br> Story 14)                | 4 hours               |
-| 14.B | 27.11.2023 | Timo        | Frontend:<br> Develop the accounts dashboard page and integrate with backend (User Story<br> 14)                    | 4 hours               |
-| 14.C | 27.11.2023 | Samuel      | UI/UX: Design<br> the accounts dashboard for clear presentation of account information (User<br> Story 14)          | 3 hours               |
-| 15.A | 28.11.2023 | Julius      | Backend:<br> Prepare data endpoints for graphing account data (User Story 15)                                       | 4 hours               |
-| 15.B | 28.11.2023 | Timo        | Frontend:<br> Implement graphing functionality using vis.js library (User Story 15)                                 | 6 hours               |
-| 15.C | 28.11.2023 | Samuel      | UI/UX: Design<br> graph layouts and interactions (User Story 15)                                                    | 3 hours               |
-| 15.D | 28.11.2023 | Alberto     | Assist Frontend:<br> Help Timo with advanced graphing features and performance optimization (User<br> Story 15)     | 5 hours               |
-| 16.A | 29.11.2023 | Julius | Backend:  <br>Implement company type selection functionality, including data validation and account setup logic (User Story 16) | 5 hours |
-| 16.B | 29.11.2023 | Timo | Frontend:  <br>Develop the company type selection interface and integrate it with the backend (User Story 16) | 4 hours |
-| 16.C | 29.11.2023 | Samuel | UI/UX:  <br>Design the company type selection page for optimal user experience (User Story 16) | 3 hours |
-| 17.A | 30.11.2023 | Alberto     | Testing:<br> Perform testing and bug fixing across the application (All User Stories)                               | 10 hours              |
-| 17.B | 30.11.2023 | All         | Integration Testing: Final integration testing and deployment preparation                                           | 12 hours              |
-
-
+| AP-№ | Deadline   | Responsible | Description                                                                                                                     | Adjusted Planned Time |
+| ---- | ---------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.A  | 07.11.2023 | Julius      | Backend:<br> Implement company registration functionality, including data validation and<br> storage (User Story 1)             | 6 hours               |
+| 1.B  | 07.11.2023 | Timo        | Frontend:<br> Develop registration form and connect it to the backend API (User Story 1)                                        | 4 hours               |
+| 1.C  | 07.11.2023 | Samuel      | UI/UX: Design<br> the registration page for optimal user experience (User Story 1)                                              | 3 hours               |
+| 2.A  | 09.11.2023 | Julius      | Backend:<br> Implement login functionality with authentication and session management<br> (User Story 2)                        | 6 hours               |
+| 2.B  | 09.11.2023 | Timo        | Frontend:<br> Develop the login page and integrate with the backend (User Story 2)                                              | 4 hours               |
+| 2.C  | 09.11.2023 | Samuel      | UI/UX: Design<br> the login interface for ease of use (User Story 2)                                                            | 2 hours               |
+| 3.A  | 10.11.2023 | Julius      | Backend:<br> Implement automatic assignment of "standard account pack" upon<br> account creation (User Story 3)                 | 4 hours               |
+| 4.A  | 12.11.2023 | Julius      | Backend:<br> Implement API endpoints for creating accounts (User Story 4)                                                       | 4 hours               |
+| 4.B  | 12.11.2023 | Timo        | Frontend:<br> Develop account creation form and connect it to the backend (User Story 4)                                        | 4 hours               |
+| 4.C  | 12.11.2023 | Samuel      | UI/UX: Design<br> the account creation interface for user friendliness (User Story 4)                                           | 3 hours               |
+| 5.A  | 13.11.2023 | Julius      | Backend:<br> Implement API endpoints for editing accounts (User Story 5)                                                        | 4 hours               |
+| 5.B  | 13.11.2023 | Timo        | Frontend:<br> Develop account editing interface and integrate with backend (User Story 5)                                       | 4 hours               |
+| 5.C  | 13.11.2023 | Samuel      | UI/UX: Design<br> the account editing interface for intuitive use (User Story 5)                                                | 3 hours               |
+| 6.A  | 14.11.2023 | Julius      | Backend:<br> Implement account deletion with checks for existing entries (User Story 6)                                         | 6 hours               |
+| 6.B  | 14.11.2023 | Timo        | Frontend:<br> Develop account deletion interface and confirmation dialogs (User Story 6)                                        | 4 hours               |
+| 6.C  | 14.11.2023 | Samuel      | UI/UX: Design<br> the account deletion flow to prevent accidental deletions (User Story 6)                                      | 3 hours               |
+| 7.A  | 16.11.2023 | Julius      | Backend:<br> Implement API endpoints for creating records (User Story 7)                                                        | 4 hours               |
+| 7.B  | 16.11.2023 | Timo        | Frontend:<br> Develop record creation form and integrate with backend (User Story 7)                                            | 4 hours               |
+| 7.C  | 16.11.2023 | Samuel      | UI/UX: Design<br> the record creation interface for ease of data entry (User Story 7)                                           | 3 hours               |
+| 8.A  | 17.11.2023 | Julius      | Backend:<br> Implement API endpoints for editing records (User Story 8)                                                         | 4 hours               |
+| 8.B  | 17.11.2023 | Timo        | Frontend:<br> Develop record editing interface and integrate with backend (User Story 8)                                        | 4 hours               |
+| 8.C  | 17.11.2023 | Samuel      | UI/UX: Design<br> the record editing interface for consistency and usability (User Story 8)                                     | 3 hours               |
+| 9.A  | 18.11.2023 | Julius      | Backend:<br> Implement record deletion functionality (User Story 9)                                                             | 4 hours               |
+| 9.B  | 18.11.2023 | Timo        | Frontend:<br> Develop record deletion interface and confirmation dialogs (User Story 9)                                         | 4 hours               |
+| 9.C  | 18.11.2023 | Samuel      | UI/UX: Design<br> the record deletion flow to prevent accidental data loss (User Story 9)                                       | 3 hours               |
+| 10.A | 20.11.2023 | Julius      | Backend:<br> Develop NLP service for parsing text into records (User Story 10)                                                  | 8 hours               |
+| 10.B | 20.11.2023 | Timo        | Frontend:<br> Develop interface for text input and display parsing results (User Story 10)                                      | 5 hours               |
+| 10.C | 20.11.2023 | Samuel      | UI/UX: Design<br> intuitive text input interface for automatic record creation (User Story 10)                                  | 3 hours               |
+| 10.D | 20.11.2023 | Alberto     | Assist Backend:<br> Help Julius integrate external AI APIs (e.g., GPT) securely (User Story 10)                                 | 5 hours               |
+| 11.A | 23.11.2023 | Julius      | Backend:<br> Implement API endpoints to retrieve the list of records (User Story 11)                                            | 3 hours               |
+| 11.B | 23.11.2023 | Timo        | Frontend:<br> Develop the records list page and integrate with backend (User Story 11)                                          | 4 hours               |
+| 11.C | 23.11.2023 | Samuel      | UI/UX: Design<br> the records list interface for readability and navigation (User Story 11)                                     | 3 hours               |
+| 12.A | 24.11.2023 | Julius      | Backend:<br> Implement filtering functionality in API for records (User Story 12)                                               | 4 hours               |
+| 12.B | 24.11.2023 | Timo        | Frontend:<br> Develop filtering options in the records list page (User Story 12)                                                | 4 hours               |
+| 12.C | 24.11.2023 | Samuel      | UI/UX: Design<br> the filtering interface for ease of use (User Story 12)                                                       | 3 hours               |
+| 13.A | 25.11.2023 | Julius      | Backend:<br> Implement payment processing integration for donations (User Story 13)                                             | 6 hours               |
+| 13.B | 25.11.2023 | Timo        | Frontend:<br> Develop the donation/support page and integrate payment processing (User<br> Story 13)                            | 4 hours               |
+| 13.C | 25.11.2023 | Samuel      | UI/UX: Design<br> the donation page to encourage user support (User Story 13)                                                   | 3 hours               |
+| 14.A | 27.11.2023 | Julius      | Backend:<br> Implement API endpoints to retrieve account summaries for dashboard (User<br> Story 14)                            | 4 hours               |
+| 14.B | 27.11.2023 | Timo        | Frontend:<br> Develop the accounts dashboard page and integrate with backend (User Story<br> 14)                                | 4 hours               |
+| 14.C | 27.11.2023 | Samuel      | UI/UX: Design<br> the accounts dashboard for clear presentation of account information (User<br> Story 14)                      | 3 hours               |
+| 15.A | 28.11.2023 | Julius      | Backend:<br> Prepare data endpoints for graphing account data (User Story 15)                                                   | 4 hours               |
+| 15.B | 28.11.2023 | Timo        | Frontend:<br> Implement graphing functionality using vis.js library (User Story 15)                                             | 6 hours               |
+| 15.C | 28.11.2023 | Samuel      | UI/UX: Design<br> graph layouts and interactions (User Story 15)                                                                | 3 hours               |
+| 15.D | 28.11.2023 | Alberto     | Assist Frontend:<br> Help Timo with advanced graphing features and performance optimization (User<br> Story 15)                 | 5 hours               |
+| 16.A | 29.11.2023 | Julius      | Backend:  <br>Implement company type selection functionality, including data validation and account setup logic (User Story 16) | 5 hours               |
+| 16.B | 29.11.2023 | Timo        | Frontend:  <br>Develop the company type selection interface and integrate it with the backend (User Story 16)                   | 4 hours               |
+| 16.C | 29.11.2023 | Samuel      | UI/UX:  <br>Design the company type selection page for optimal user experience (User Story 16)                                  | 3 hours               |
+| 17.A | 30.11.2023 | Alberto     | Testing:<br> Perform testing and bug fixing across the application (All User Stories)                                           | 10 hours              |
+| 17.B | 30.11.2023 | All         | Integration Testing: Final integration testing and deployment preparation                                                       | 12 hours              |
 
 ## 3 Decide
 
