@@ -74,6 +74,10 @@ class TransactionManager {
                             <label for="new-transaction-amount">Amount (CHF)</label>
                             <input type="number" id="new-transaction-amount" name="amount" step="0.01" required>
                         </div>
+                        <div class="form-group">
+                            <label for="new-transaction-notes">Notes</label>
+                            <textarea id="new-transaction-notes" name="notes" rows="3"></textarea>
+                        </div>
                         <button type="submit" class="auth-button">Add Transaction</button>
                     </form>
 
@@ -200,9 +204,13 @@ class TransactionManager {
         const transactionList = document.querySelector('#records .transaction-list');
         const newTransaction = document.createElement('div');
         newTransaction.className = 'transaction';
+        const notes = form.notes.value;
         newTransaction.innerHTML = `
             <span class="date">${date}</span>
-            <span class="description">${fromAccount} → ${toAccount}</span>
+            <span class="description">
+                ${fromAccount} → ${toAccount}
+                ${notes ? `<i class="fas fa-book notes-icon" data-notes="${notes}"></i>` : ''}
+            </span>
             <span class="amount expense">${amount}</span>
         `;
         transactionList.insertBefore(newTransaction, transactionList.firstChild);
