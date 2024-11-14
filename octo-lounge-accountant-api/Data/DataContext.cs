@@ -10,6 +10,7 @@ namespace octo_lounge_accountant_api.Data
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Records> Records { get; set; }
+        public DbSet<AccountType> AccountTypes { get; set; } // Add DbSet for AccountType
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +31,12 @@ namespace octo_lounge_accountant_api.Data
                 .WithMany()
                 .HasForeignKey(a => a.OwnerId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Account>()
+                .HasOne(a => a.AccountType)
+                .WithMany()
+                .HasForeignKey(a => a.AccountTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Specify precision and scale for the Amount property
             modelBuilder.Entity<Records>()

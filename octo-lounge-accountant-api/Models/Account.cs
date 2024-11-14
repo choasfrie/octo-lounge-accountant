@@ -4,9 +4,11 @@
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public required int Type { get; set; }
+        public required char AccountBehaviour { get; set; }
+        public required int AccountTypeId { get; set; } 
         public required int OwnerId { get; set; }
 
         public Profile Owner { get; set; }
+        public AccountType AccountType { get; set; }
     }
 }
