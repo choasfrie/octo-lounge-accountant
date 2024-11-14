@@ -391,8 +391,8 @@ footer {
 }
 
 .graph-container {
-    background-color: #333;
-    padding: 15px;
+    background-color: #333333;
+    padding: 1px;
     border-radius: 8px;
     margin-top: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
