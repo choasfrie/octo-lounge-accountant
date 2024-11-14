@@ -167,7 +167,32 @@ class TAccountManager {
             ?.closest('.t-account');
 
         if (accountToDelete) {
-            accountToDelete.remove();
+            // Show confirmation modal
+            const confirmModal = document.createElement('div');
+            confirmModal.className = 'auth-modal';
+            confirmModal.innerHTML = `
+                <div class="auth-modal-content">
+                    <h2>Confirm Delete</h2>
+                    <p>Are you sure you want to delete the account "${accountName}"?</p>
+                    <div class="auth-error">Warning: This action cannot be undone!</div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button class="auth-button" id="confirm-delete">Delete</button>
+                        <button class="auth-button" id="cancel-delete">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmModal);
+            confirmModal.style.display = 'block';
+
+            // Handle confirmation
+            document.getElementById('confirm-delete').onclick = () => {
+                accountToDelete.remove();
+                confirmModal.remove();
+            };
+
+            document.getElementById('cancel-delete').onclick = () => {
+                confirmModal.remove();
+            };
         }
     }
 }

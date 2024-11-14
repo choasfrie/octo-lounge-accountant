@@ -43,13 +43,23 @@
                 </form>
 
                 <form id="register-form" class="auth-form">
-                    <h2>Register</h2>
+                    <h2>Registration</h2>
                     <div class="form-group">
                         <label for="register-username">Username</label>
                         <input type="text" id="register-username" name="username" required>
                     </div>
                     <div class="form-group">
-                        <label for="register-email">Email</label>
+                        <label>Account Package</label>
+                        <div class="package-buttons">
+                            <button type="button" class="package-button" data-package="none">None</button>
+                            <button type="button" class="package-button" data-package="llc">LLC</button>
+                            <button type="button" class="package-button" data-package="plc">PLC</button>
+                            <button type="button" class="package-button" data-package="sp">Sole Proprietorship</button>
+                        </div>
+                        <input type="hidden" id="selected-package" name="accountPackage" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Business Email</label>
                         <input type="email" id="register-email" name="email" required>
                     </div>
                     <div class="form-group">
@@ -57,7 +67,7 @@
                         <input type="password" id="register-password" name="password" required>
                     </div>
                     <div id="register-error" class="auth-error"></div>
-                    <button type="submit" class="auth-button">Register</button>
+                    <button type="submit" class="auth-button">Register Company</button>
                 </form>
             </div>
         </div>

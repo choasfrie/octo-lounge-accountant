@@ -154,6 +154,32 @@ header {
     color: white;
 }
 
+.package-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.package-button {
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.package-button:hover {
+    background-color: #444;
+}
+
+.package-button.selected {
+    background-color: #6600cc;
+    border-color: #7700ee;
+}
+
 .close-modal {
     position: absolute;
     right: 10px;
@@ -381,12 +407,17 @@ h2 {
     font-family: monospace;
 }
 
-.transaction .amount.income {
+#recent-transactions .transaction .amount.income {
     color: #4CAF50;
 }
 
-.transaction .amount.expense {
+#recent-transactions .transaction .amount.expense {
     color: #f44336;
+}
+
+#records .transaction .amount.income,
+#records .transaction .amount.expense {
+    color: #fbff00;
 }
 
 

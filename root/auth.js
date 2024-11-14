@@ -41,16 +41,39 @@ class AuthManager {
 
     async register(userData) {
         try {
-            const response = await fetch('/api/register', {
+            // User profile
+            const userResponse = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userData)
+                body: JSON.stringify({
+                    username: userData.username,
+                    email: userData.email,
+                    password: userData.password
+                })
             });
             
-            if (response.ok) {
-                this.currentUser = await response.json();
+            if (!userResponse.ok) {
+                return false;
+            }
+
+            const user = await userResponse.json();
+            
+            // Then add the package
+            const packageResponse = await fetch('/api/add-package', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: user.id,
+                    packageType: userData.accountPackage
+                })
+            });
+
+            if (packageResponse.ok) {
+                this.currentUser = user;
                 this.updateUserDisplay();
                 this.closeAuthModal();
                 return true;
@@ -95,6 +118,20 @@ class AuthManager {
 const authManager = new AuthManager();
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Package selection handling
+    const packageButtons = document.querySelectorAll('.package-button');
+    const selectedPackageInput = document.getElementById('selected-package');
+
+    packageButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove selected class from all buttons
+            packageButtons.forEach(btn => btn.classList.remove('selected'));
+            // Add selected class to clicked button
+            button.classList.add('selected');
+            // Update hidden input value
+            selectedPackageInput.value = button.dataset.package;
+        });
+    });
     const userIcon = document.querySelector('.user-menu-trigger');
     const userMenu = document.querySelector('.user-menu');
     
@@ -129,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(e.target);
         const success = await authManager.register({
             username: formData.get('username'),
+            accountPackage: formData.get('accountPackage'),
             email: formData.get('email'),
             password: formData.get('password')
         });
