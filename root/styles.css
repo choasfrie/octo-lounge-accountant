@@ -390,8 +390,18 @@ h2 {
 .transaction {
     display: grid;
     grid-template-columns: 100px 1fr 120px;
-    padding: 10px;
+    padding: 15px;
     border-bottom: 1px solid #444;
+    background-color: #2a2a2a;
+    margin: 8px 0;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.transaction:hover {
+    background-color: #383838;
+    transform: translateX(5px);
+    box-shadow: -5px 0 0 0 #6600cc;
 }
 
 .transaction:last-child {
@@ -399,12 +409,15 @@ h2 {
 }
 
 .transaction .date {
-    color: #888;
+    color: #00ccff;
+    font-weight: bold;
 }
 
 .transaction .amount {
     text-align: right;
     font-family: monospace;
+    font-size: 1.1em;
+    font-weight: bold;
 }
 
 #recent-transactions .transaction .amount.income {
@@ -429,11 +442,31 @@ h2 {
     position: relative;
 }
 
- .t-account-controls {
-     display: inline-flex;
-     gap: 10px;
-     margin-left:auto;
- }
+.records-controls {
+    display: flex;
+    gap: 15px;
+    margin-left: auto;
+    align-items: center;
+}
+
+.account-filter {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+}
+
+.account-filter:focus {
+    outline: none;
+    border-color: #6600cc;
+}
+
+.t-account-controls {
+    display: inline-flex;
+    gap: 10px;
+}
 
 .t-account-icon-button {
     background: none;
@@ -525,6 +558,35 @@ h2 {
     color: white;
     padding: 5px;
     border-radius: 4px;
+}
+
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.suggestions-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.suggestion-item:hover {
+    background-color: #444;
 }
 
 .entry:last-child {

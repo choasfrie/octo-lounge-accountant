@@ -2,6 +2,26 @@ class TransactionManager {
     constructor() {
         this.initializeButtons();
         this.initializeModal();
+        this.initializeFilter();
+    }
+
+    initializeFilter() {
+        const filter = document.getElementById('account-filter');
+        if (filter) {
+            filter.addEventListener('change', () => {
+                const selectedAccount = filter.value;
+                const transactions = document.querySelectorAll('#records .transaction');
+                
+                transactions.forEach(transaction => {
+                    const description = transaction.querySelector('.description').textContent;
+                    if (selectedAccount === 'all' || description.includes(selectedAccount)) {
+                        transaction.style.display = '';
+                    } else {
+                        transaction.style.display = 'none';
+                    }
+                });
+            });
+        }
     }
 
     formatAmount(amount) {
@@ -38,11 +58,17 @@ class TransactionManager {
                         </div>
                         <div class="form-group">
                             <label for="new-transaction-from">From Account</label>
-                            <input type="text" id="new-transaction-from" name="fromAccount" required>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="new-transaction-from" name="fromAccount" required>
+                                <div class="suggestions-list" id="from-suggestions"></div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="new-transaction-to">To Account</label>
-                            <input type="text" id="new-transaction-to" name="toAccount" required>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="new-transaction-to" name="toAccount" required>
+                                <div class="suggestions-list" id="to-suggestions"></div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="new-transaction-amount">Amount (CHF)</label>
@@ -93,6 +119,23 @@ class TransactionManager {
                 e.preventDefault();
                 this.addTransaction(e.target);
                 this.closeModal();
+            });
+
+            // Initialize autocomplete for account inputs
+            const fromInput = document.getElementById('new-transaction-from');
+            const toInput = document.getElementById('new-transaction-to');
+            
+            [fromInput, toInput].forEach(input => {
+                input.addEventListener('input', (e) => this.showSuggestions(e.target));
+                input.addEventListener('blur', () => {
+                    // Delay hiding suggestions to allow for clicks
+                    setTimeout(() => {
+                        const suggestionsList = input.nextElementSibling;
+                        if (suggestionsList) {
+                            suggestionsList.style.display = 'none';
+                        }
+                    }, 200);
+                });
             });
         }
 
@@ -257,6 +300,55 @@ class TransactionManager {
     removeDeleteIcons() {
         const deleteIcons = document.querySelectorAll('#records .delete-icon');
         deleteIcons.forEach(icon => icon.remove());
+    }
+
+    getAccountsList() {
+        // Get accounts from the chart of accounts
+        return [
+            // Assets (1000-1999)
+            'Kasse (1000)', 'Bank (1020)', 'PayPal (1021)', 'Post (1030)', 'Kreditkarten (1040)',
+            'Debitoren (1100)', 'Delkredere (1109)', 'Vorschüsse (1140)', 'Vorsteuer (1170)',
+            'Handelswaren (1200)', 'Rohstoffe (1210)',
+            // Liabilities (2000-2999)
+            'Kreditoren (2000)', 'Bank (2100)', 'Mehrwertsteuer (2200)', 'Sozialversicherungen (2210)',
+            // Equity (2800-2999)
+            'Eigenkapital (2800)', 'Privat (2891)',
+            // Revenue (3000-3999)
+            'Warenertrag (3000)', 'Dienstleistungsertrag (3200)',
+            // Expenses (4000-6999)
+            'Materialaufwand (4000)', 'Handelswarenaufwand (4200)', 'Löhne (5000)',
+            'Mietaufwand (6000)', 'Versicherungsaufwand (6300)'
+        ];
+    }
+
+    showSuggestions(input) {
+        const suggestionsList = input.nextElementSibling;
+        const accounts = this.getAccountsList();
+        const inputValue = input.value.toLowerCase();
+
+        // Filter accounts based on input
+        const filteredAccounts = accounts.filter(account => 
+            account.toLowerCase().includes(inputValue)
+        );
+
+        // Show/hide suggestions container
+        if (inputValue && filteredAccounts.length > 0) {
+            suggestionsList.innerHTML = filteredAccounts
+                .map(account => `<div class="suggestion-item">${account}</div>`)
+                .join('');
+            suggestionsList.style.display = 'block';
+
+            // Add click handlers to suggestions
+            const suggestions = suggestionsList.getElementsByClassName('suggestion-item');
+            Array.from(suggestions).forEach(suggestion => {
+                suggestion.addEventListener('click', () => {
+                    input.value = suggestion.textContent;
+                    suggestionsList.style.display = 'none';
+                });
+            });
+        } else {
+            suggestionsList.style.display = 'none';
+        }
     }
 }
 

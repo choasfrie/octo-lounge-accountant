@@ -80,7 +80,17 @@
             <section id="records">
                 <h2>
                     Transaction Records
-                    <span class="t-account-controls">
+                    <div class="records-controls">
+                        <select id="account-filter" class="account-filter">
+                            <option value="all">All Accounts</option>
+                            <option value="Kasse">Kasse</option>
+                            <option value="Bank">Bank</option>
+                            <option value="PayPal">PayPal</option>
+                            <option value="Debitoren">Debitoren</option>
+                            <option value="Kreditoren">Kreditoren</option>
+                            <option value="Mehrwertsteuer">Mehrwertsteuer</option>
+                        </select>
+                        <span class="t-account-controls">
                         <button class="t-account-icon-button" data-tooltip="Add Record">
                             <i class="fas fa-plus"></i>
                         </button>
@@ -95,17 +105,17 @@
                 <div class="transaction-list">
                     <div class="transaction">
                         <span class="date">2024-01-15</span>
-                        <span class="description">Kasse → Debitoren</span>
+                        <span class="description">Kasse → Debitoren: Payment received for Invoice #A123</span>
                         <span class="amount expense">CHF 1,500.00</span>
                     </div>
                     <div class="transaction">
                         <span class="date">2024-01-14</span>
-                        <span class="description">Bank → Kreditoren</span>
+                        <span class="description">Bank → Kreditoren: Monthly supplier payment for office supplies</span>
                         <span class="amount expense">CHF 2,800.00</span>
                     </div>
                     <div class="transaction">
                         <span class="date">2024-01-13</span>
-                        <span class="description">PayPal → Mehrwertsteuer</span>
+                        <span class="description">PayPal → Mehrwertsteuer: Quarterly VAT payment</span>
                         <span class="amount expense">CHF 350.00</span>
                     </div>
                 </div>
