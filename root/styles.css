@@ -466,6 +466,7 @@ h2 {
 .t-account-controls {
     display: inline-flex;
     gap: 10px;
+    margin-left:auto;
 }
 
 .t-account-icon-button {
