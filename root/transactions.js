@@ -25,11 +25,11 @@ class TransactionManager {
     }
 
     formatAmount(amount) {
-        // Convert to number and fix to 2 decimal places
+        // Convert to number and fix to 2 decimal
         const num = parseFloat(amount).toFixed(2);
-        // Split into whole and decimal parts
-        const [whole, decimal] = num.split('.');
-        // Add commas to whole number part
+        // Split whole and decimal parts
+        const [whole, decimal] = num.split('.');4
+        // Commas to whole number
         const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         return `CHF ${formattedWhole}.${decimal}`;
     }
