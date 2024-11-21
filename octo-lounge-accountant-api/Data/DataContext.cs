@@ -9,21 +9,21 @@ namespace octo_lounge_accountant_api.Data
 
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<Records> Records { get; set; }
+        public DbSet<Record> Records { get; set; }
         public DbSet<AccountType> AccountTypes { get; set; } // Add DbSet for AccountType
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Records>()
+            modelBuilder.Entity<Record>()
                 .HasOne(r => r.Creditor)
                 .WithMany()
                 .HasForeignKey(r => r.CreditorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Records>()
-                .HasOne(r => r.Debtor)
+            modelBuilder.Entity<Record>()
+                .HasOne(r => r.Debitor)
                 .WithMany()
-                .HasForeignKey(r => r.DebtorId)
+                .HasForeignKey(r => r.DebitorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Account>()
@@ -39,7 +39,7 @@ namespace octo_lounge_accountant_api.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Specify precision and scale for the Amount property
-            modelBuilder.Entity<Records>()
+            modelBuilder.Entity<Record>()
                 .Property(r => r.Amount)
                 .HasColumnType("decimal(18,2)");
         }
