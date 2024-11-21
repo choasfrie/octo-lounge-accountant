@@ -38,7 +38,157 @@ header {
     grid-column: 1 / -1;
     background-color: #6600cc;
     padding: 20px;
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-section {
+    position: relative;
+}
+
+.user-menu-trigger {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 5px;
+}
+
+.user-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 10px;
+    min-width: 200px;
+    display: none;
+    z-index: 1000;
+}
+
+.user-menu.show {
+    display: block;
+}
+
+.user-welcome {
+    color: white;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.auth-button {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    background-color: #6600cc;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.auth-button:hover {
+    background-color: #7700ee;
+}
+
+.auth-error {
+    color: #ff4444;
+    border-top: 2px solid #ff4444;
+    padding-top: 10px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    display: none;
+}
+
+.auth-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+}
+
+.auth-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 300px;
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+}
+
+.package-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.package-button {
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.package-button:hover {
+    background-color: #444;
+}
+
+.package-button.selected {
+    background-color: #6600cc;
+    border-color: #7700ee;
+}
+
+.close-modal {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2em;
 }
 
 h1 {
@@ -170,21 +320,30 @@ h2 {
 }
 
 .service-item {
+    display: block;
     background-color: #333;
     padding: 20px;
     border-radius: 8px;
     text-align: center;
     transition: transform 0.3s;
+    text-decoration: none;
+    color: inherit;
 }
 
 .service-item:hover {
     transform: translateY(-5px);
+    background-color: #383838;
 }
 
 .service-item i {
     font-size: 2em;
     color: #00ccff;
     margin-bottom: 15px;
+}
+
+.service-item h3 {
+    color: #00ccff;
+    margin: 10px 0;
 }
 
 .service-item h3 {
@@ -231,8 +390,18 @@ h2 {
 .transaction {
     display: grid;
     grid-template-columns: 100px 1fr 120px;
-    padding: 10px;
+    padding: 15px;
     border-bottom: 1px solid #444;
+    background-color: #2a2a2a;
+    margin: 8px 0;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.transaction:hover {
+    background-color: #383838;
+    transform: translateX(5px);
+    box-shadow: -5px 0 0 0 #6600cc;
 }
 
 .transaction:last-child {
@@ -240,20 +409,57 @@ h2 {
 }
 
 .transaction .date {
-    color: #888;
+    color: #00ccff;
+    font-weight: bold;
 }
 
 .transaction .amount {
     text-align: right;
     font-family: monospace;
+    font-size: 1.1em;
+    font-weight: bold;
 }
 
-.transaction .amount.income {
+#recent-transactions .transaction .amount.income {
     color: #4CAF50;
 }
 
-.transaction .amount.expense {
+#recent-transactions .transaction .amount.expense {
     color: #f44336;
+}
+
+#records .transaction .amount.income,
+#records .transaction .amount.expense {
+    color: #fbff00;
+}
+
+.notes-icon {
+    margin-left: 8px;
+    color: #00ccff;
+    cursor: pointer;
+    font-size: 0.9em;
+    position: relative;
+}
+
+.notes-icon:hover::after {
+    content: attr(data-notes);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background-color: #333;
+    color: white;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-transform: none;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid #444;
+    z-index: 1000;
+    font-weight: normal;
+    font-style: normal;
 }
 
 
@@ -262,6 +468,48 @@ h2 {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     margin-top: 20px;
+    position: relative;
+}
+
+.records-controls {
+    display: flex;
+    gap: 15px;
+    margin-left: auto;
+    align-items: center;
+}
+
+.account-filter {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+}
+
+.account-filter:focus {
+    outline: none;
+    border-color: #6600cc;
+}
+
+.t-account-controls {
+    display: inline-flex;
+    gap: 10px;
+    margin-left:auto;
+}
+
+.t-account-icon-button {
+    background: none;
+    border: none;
+    color: #00ccff;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9em;
+    transition: transform 0.2s;
+}
+
+.t-account-icon-button:hover {
+    transform: scale(1.2);
 }
 
 .t-account {
@@ -304,6 +552,71 @@ h2 {
     font-size: 0.9em;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.entry:hover {
+    background-color: #383838;
+}
+
+.entry .amount {
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.entry .date {
+    font-size: 0.8em;
+    color: #888;
+}
+
+.entry-form {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.entry-form label {
+    color: #00ccff;
+}
+
+.entry-form input {
+    background-color: #333;
+    border: 1px solid #444;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.suggestions-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.suggestion-item:hover {
+    background-color: #444;
 }
 
 .entry:last-child {
