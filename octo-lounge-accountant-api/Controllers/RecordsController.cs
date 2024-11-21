@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using octo_lounge_accountant_api.Data;
+using octo_lounge_accountant_api.Models;
+using octo_lounge_accountant_api.ModelsDTO;
 
 namespace octo_lounge_accountant_api.Controllers
 {
@@ -7,9 +10,7 @@ namespace octo_lounge_accountant_api.Controllers
     [ApiController]
     public class RecordsController : ControllerBase
     {
-<<<<<<< Updated upstream
-        
-=======
+
         private readonly DataContext _context;
 
         public RecordsController(DataContext context)
@@ -98,8 +99,5 @@ namespace octo_lounge_accountant_api.Controllers
 
             return Ok(record);
         }
-
-
->>>>>>> Stashed changes
     }
 }
