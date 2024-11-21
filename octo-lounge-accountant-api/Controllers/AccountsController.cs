@@ -114,15 +114,6 @@ namespace octo_lounge_accountant_api.Controllers
                     return BadRequest("Invalid company type.");
             }
 
-            // Validate AccountTypeId
-            /*foreach (var account in accounts)
-            {
-                if (!_context.AccountTypes.Any(at => at.Id == account.AccountTypeId))
-                {
-                    return BadRequest($"Invalid AccountTypeId: {account.AccountTypeId}");
-                }
-            }*/
-
             _context.Accounts.AddRange(accounts);
             _context.SaveChanges();
 
