@@ -12,12 +12,20 @@ namespace octo_lounge_accountant_api.Controllers
     {
 
         private readonly DataContext _context;
+        private readonly HttpClient _httpClient;
 
-        public RecordsController(DataContext context)
+        public RecordsController(DataContext context, HttpClient httpClient)
         {
             _context = context;
+            _httpClient = httpClient;
         }
 
+        [HttpPost("createRecordGPT")]
+        public IActionResult CreateRecordGPT(string input)
+        {
+
+            return Ok();
+        }
         [HttpPost("createRecord")]
         public IActionResult CreateRecord([FromBody] RecordDTO recordDto)
         {
