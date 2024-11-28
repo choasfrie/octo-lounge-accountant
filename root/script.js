@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                 e.preventDefault();
                 const targetId = this.getAttribute('href').slice(1);
                 const targetElement = document.getElementById(targetId);
-                targetElement.scrollIntoView({ behavior: 'smooth' });
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
             }
         });
     });
