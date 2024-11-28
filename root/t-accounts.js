@@ -1,7 +1,7 @@
 class TAccountManager {
     constructor() {
-        this.initializeButtons();
-        this.initializeModal();
+        this.initializeButtons(); // Setup action buttons
+        this.initializeModal(); // Setup modal dialogs
     }
 
     initializeButtons() {
@@ -109,7 +109,7 @@ class TAccountManager {
             document.getElementById('delete-account-select').innerHTML = options;
         }
 
-        // Show the appropriate form
+        // Show appropriate form
         if (type === 'add') addForm.style.display = 'block';
         else if (type === 'edit') editForm.style.display = 'block';
         else if (type === 'delete') deleteForm.style.display = 'block';
@@ -122,6 +122,7 @@ class TAccountManager {
         modal.style.display = 'none';
     }
 
+    // Create new T-Account entry
     addAccount(accountName) {
         if (!accountName) return;
 
@@ -197,7 +198,7 @@ class TAccountManager {
     }
 }
 
-// Initialize the T-Account manager when the document is loaded
+// Initialize T-Account manager when document is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new TAccountManager();
 });

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    // Load components
+    // Load and inject shared components
     const componentsResponse = await fetch('components.html');
     const componentsHtml = await componentsResponse.text();
     const parser = new DOMParser();

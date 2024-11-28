@@ -1,3 +1,4 @@
+// Sample Data
 const data = new vis.DataSet([
     { x: '2024-01-01', y: 10 },
     { x: '2024-01-15', y: 15 },
@@ -5,6 +6,7 @@ const data = new vis.DataSet([
     { x: '2024-02-15', y: 20 },
 ]);
 
+// Graph config
 const options = {
     start: '2024-01-01',
     end: '2024-04-15',

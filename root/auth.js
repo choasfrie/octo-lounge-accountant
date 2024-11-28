@@ -1,15 +1,17 @@
+// Handles user authentication
 class AuthManager {
     constructor() {
-        this.currentUser = null;
+        this.currentUser = null; // Current user session
         this.init();
     }
 
+    // Initialize user session
     async init() {
         try {
             const response = await fetch('/api/user-info');
             if (response.ok) {
-                this.currentUser = await response.json();
-                this.updateUserDisplay();
+                this.currentUser = await response.json(); // Store user data
+                this.updateUserDisplay(); // Update UI
             }
         } catch (error) {
             console.error('Error fetching user info:', error);
@@ -60,7 +62,7 @@ class AuthManager {
 
             const user = await userResponse.json();
             
-            // Then add the package
+            // Add the package
             const packageResponse = await fetch('/api/add-package', {
                 method: 'POST',
                 headers: {

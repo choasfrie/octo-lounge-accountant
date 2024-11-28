@@ -24,12 +24,10 @@ class TransactionManager {
         }
     }
 
+    // Format currency amount
     formatAmount(amount) {
-        // Convert to number and fix to 2 decimal
         const num = parseFloat(amount).toFixed(2);
-        // Split whole and decimal parts
-        const [whole, decimal] = num.split('.');4
-        // Commas to whole number
+        const [whole, decimal] = num.split('.');
         const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         return `CHF ${formattedWhole}.${decimal}`;
     }
@@ -125,14 +123,14 @@ class TransactionManager {
                 this.closeModal();
             });
 
-            // Initialize autocomplete for account inputs
+            // Initialize autocomplete
             const fromInput = document.getElementById('new-transaction-from');
             const toInput = document.getElementById('new-transaction-to');
             
             [fromInput, toInput].forEach(input => {
                 input.addEventListener('input', (e) => this.showSuggestions(e.target));
                 input.addEventListener('blur', () => {
-                    // Delay hiding suggestions to allow for clicks
+                    // Delay hiding suggestions
                     setTimeout(() => {
                         const suggestionsList = input.nextElementSibling;
                         if (suggestionsList) {
@@ -311,7 +309,7 @@ class TransactionManager {
     }
 
     getAccountsList() {
-        // Get accounts from the chart of accounts
+        // Get accounts from chart of accounts
         return [
             // Assets (1000-1999)
             'Kasse (1000)', 'Bank (1020)', 'PayPal (1021)', 'Post (1030)', 'Kreditkarten (1040)',
@@ -329,9 +327,10 @@ class TransactionManager {
         ];
     }
 
+    // Display autocomplete suggestions
     showSuggestions(input) {
         const suggestionsList = input.nextElementSibling;
-        const accounts = this.getAccountsList();
+        const accounts = this.getAccountsList(); 
         const inputValue = input.value.toLowerCase();
 
         // Filter accounts based on input
