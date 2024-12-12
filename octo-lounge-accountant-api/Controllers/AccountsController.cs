@@ -4,6 +4,7 @@ using octo_lounge_accountant_api.ModelsDTO;
 using octo_lounge_accountant_api.Models;
 using octo_lounge_accountant_api.Data;
 using octo_lounge_accountant_api.Handlers;
+using System.Collections.Generic;
 
 namespace octo_lounge_accountant_api.Controllers
 {
@@ -89,7 +90,48 @@ namespace octo_lounge_accountant_api.Controllers
 
             return Ok(accounts);
         }
+        [HttpGet("getAllAccountsAndRecords/{ownerId}")]
+        public IActionResult GetAllAccountsAndStatements(int ownerId)
+        {
+            var accounts = _context.Accounts.Where(a => a.OwnerId == ownerId).ToList();
 
+            if (accounts == null || !accounts.Any())
+            {
+                return NotFound("No accounts found for the specified owner.");
+            }
+
+            var accountWithRecordsList = new List<RecordInAccountDTO>();
+
+            foreach (var account in accounts)
+            {
+                var records = _context.Records
+                    .Where(r => r.CreditorId == account.Id)
+                    .Select(r => new RecordDTO
+                    {
+                        Date = r.Date,
+                        Amount = r.Amount,
+                        Description = r.Description,
+                        CreditorId = r.CreditorId,
+                        DebitorId = r.DebitorId
+                    })
+                    .ToList();
+
+                var accountWithRecords = new RecordInAccountDTO
+                {
+                    AccountId = account.Id,
+                    AccountName = account.Name,
+                    AccountBehaviour = account.AccountBehaviour,
+                    AccountTypeId = account.AccountTypeId,
+                    AccountNumber = account.AccountNumber,
+                    OwnerId = account.OwnerId,
+                    Records = records
+                };
+
+                accountWithRecordsList.Add(accountWithRecords);
+            }
+
+            return Ok(accountWithRecordsList);
+        }
         [HttpPost("createStandardPackage")]
         public IActionResult CreateStandardAccountPackage([FromBody] AccountPackDTO accountPackDto)
         {
@@ -128,8 +170,5 @@ namespace octo_lounge_accountant_api.Controllers
 
             return Ok(accounts);
         }
-
-
-
     }
 }
