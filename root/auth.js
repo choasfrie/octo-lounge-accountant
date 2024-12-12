@@ -44,7 +44,7 @@ class AuthManager {
     async register(userData) {
         try {
             // User profile
-            const userResponse = await fetch('/api/register', {
+            const userResponse = await fetch('https://localhost:7162/api/Profiles/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
