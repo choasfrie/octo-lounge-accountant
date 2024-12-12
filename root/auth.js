@@ -50,9 +50,9 @@ class AuthManager {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: userData.username,
-                    email: userData.email,
-                    password: userData.password
+                    Username: userData.username,
+                    Email: userData.email,
+                    PasswordHash: userData.password
                 })
             });
             
@@ -63,14 +63,13 @@ class AuthManager {
             const user = await userResponse.json();
             
             // Add the package
-            const packageResponse = await fetch('/api/add-package', {
+            const packageResponse = await fetch('https://localhost:7162/api/AccountTypes/createAccountType', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userId: user.id,
-                    packageType: userData.accountPackage
+                    Name: userData.accountPackage
                 })
             });
 
