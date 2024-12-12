@@ -7,30 +7,43 @@ class AuthManager {
 
     // Initialize user session
     async init() {
-        try {
-            const response = await fetch('/api/user-info');
-            if (response.ok) {
-                this.currentUser = await response.json(); // Store user data
-                this.updateUserDisplay(); // Update UI
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            this.currentUser = { username: storedUsername };
+            this.updateUserDisplay();
+            this.toggleAuthButtons();
+        } else {
+            try {
+                const response = await fetch('/api/user-info');
+                if (response.ok) {
+                    const userData = await response.json(); // Store user data
+                    this.currentUser = { username: userData.username || 'Guest' };
+                    localStorage.setItem('username', this.currentUser.username); // Save username in local storage
+                    this.updateUserDisplay();
+                    this.toggleAuthButtons();
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
             }
-        } catch (error) {
-            console.error('Error fetching user info:', error);
         }
     }
 
     async login(credentials) {
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('https://localhost:7162/api/Profiles/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(credentials)
             });
-            
+
             if (response.ok) {
-                this.currentUser = await response.json();
+                const userData = await response.json();
+                this.currentUser = { username: userData.username || 'Guest' };
+                localStorage.setItem('username', this.currentUser.username); // Save username
                 this.updateUserDisplay();
+                this.toggleAuthButtons();
                 this.closeAuthModal();
                 return true;
             }
@@ -43,7 +56,6 @@ class AuthManager {
 
     async register(userData) {
         try {
-            // User profile
             const userResponse = await fetch('https://localhost:7162/api/Profiles/register', {
                 method: 'POST',
                 headers: {
@@ -55,14 +67,11 @@ class AuthManager {
                     PasswordHash: userData.password
                 })
             });
-            
-            if (!userResponse.ok) {
-                return false;
-            }
+
+            if (!userResponse.ok) return false;
 
             const user = await userResponse.json();
-            
-            // Add the package
+
             const packageResponse = await fetch('https://localhost:7162/api/AccountTypes/createAccountType', {
                 method: 'POST',
                 headers: {
@@ -74,8 +83,10 @@ class AuthManager {
             });
 
             if (packageResponse.ok) {
-                this.currentUser = user;
+                this.currentUser = { username: user.username || 'Guest' };
+                localStorage.setItem('username', this.currentUser.username); // Save username
                 this.updateUserDisplay();
+                this.toggleAuthButtons();
                 this.closeAuthModal();
                 return true;
             }
@@ -86,12 +97,35 @@ class AuthManager {
         }
     }
 
+    logout() {
+        this.currentUser = null;
+        localStorage.removeItem('username'); // Clear user data from local storage
+        this.updateUserDisplay();
+        this.toggleAuthButtons();
+    }
+
     updateUserDisplay() {
         const welcomeText = document.querySelector('.user-welcome');
         if (welcomeText) {
-            welcomeText.textContent = this.currentUser ? 
-                `Welcome, ${this.currentUser.username}` : 
+            welcomeText.textContent = this.currentUser ?
+                `Welcome, ${this.currentUser.username}` :
                 'Welcome, Guest';
+        }
+    }
+
+    toggleAuthButtons() {
+        const loginButton = document.getElementById('login-button');
+        const registerButton = document.getElementById('register-button');
+        const logoutButton = document.getElementById('logout-button');
+
+        if (this.currentUser) {
+            loginButton.style.display = 'none';
+            registerButton.style.display = 'none';
+            logoutButton.style.display = 'block';
+        } else {
+            loginButton.style.display = 'block';
+            registerButton.style.display = 'block';
+            logoutButton.style.display = 'none';
         }
     }
 
@@ -99,7 +133,7 @@ class AuthManager {
         const modal = document.getElementById('auth-modal');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
-        
+
         modal.style.display = 'block';
         if (type === 'login') {
             loginForm.style.display = 'block';
@@ -116,36 +150,13 @@ class AuthManager {
     }
 }
 
+// Initialize AuthManager
 const authManager = new AuthManager();
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Package selection handling
-    const packageButtons = document.querySelectorAll('.package-button');
-    const selectedPackageInput = document.getElementById('selected-package');
-
-    packageButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove selected class from all buttons
-            packageButtons.forEach(btn => btn.classList.remove('selected'));
-            // Add selected class to clicked button
-            button.classList.add('selected');
-            // Update hidden input value
-            selectedPackageInput.value = button.dataset.package;
-        });
-    });
-    const userIcon = document.querySelector('.user-menu-trigger');
-    const userMenu = document.querySelector('.user-menu');
-    
-    userIcon.addEventListener('click', () => {
-        userMenu.classList.toggle('show');
-    });
-
-    document.getElementById('login-button').addEventListener('click', () => {
-        authManager.showAuthModal('login');
-    });
-
-    document.getElementById('register-button').addEventListener('click', () => {
-        authManager.showAuthModal('register');
+    // Event listener for logout
+    document.getElementById('logout-button').addEventListener('click', () => {
+        authManager.logout();
     });
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -176,5 +187,22 @@ document.addEventListener('DOMContentLoaded', () => {
             errorDiv.style.display = 'block';
             errorDiv.textContent = 'Registration failed. Please try again.';
         }
+    });
+
+    // Event listener for user menu trigger
+    const userMenuTrigger = document.querySelector('.user-menu-trigger');
+    const userMenu = document.querySelector('.user-menu');
+
+    userMenuTrigger.addEventListener('click', () => {
+        userMenu.classList.toggle('show');
+    });
+
+    // Event listeners for showing auth modal
+    document.getElementById('login-button').addEventListener('click', () => {
+        authManager.showAuthModal('login');
+    });
+
+    document.getElementById('register-button').addEventListener('click', () => {
+        authManager.showAuthModal('register');
     });
 });
