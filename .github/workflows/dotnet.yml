@@ -1,0 +1,58 @@
+name: continuous-integration
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+    - name: Restore dependencies for all projects
+      run: |
+        for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
+          echo "Restoring $csproj"
+          dotnet restore "$csproj"
+        done
+    - name: Build all projects
+      run: |
+        for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
+          echo "Building $csproj"
+          dotnet build "$csproj" --no-restore --configuration Release
+        done
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          **/bin/Release/
+          **/obj/Release/
+    - name: Run tests for all projects
+      run: |
+        for testproj in $(find . -name '*test.csproj' -type f | grep -v 'Backup'); do
+          echo "Testing $testproj"
+          dotnet test "$testproj" --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory $(pwd)/TestResults
+        done
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: '**/TestResults/*.trx'
+    - name: Upload code coverage results
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-coverage
+        path: '**/TestResults/**/*.xml'

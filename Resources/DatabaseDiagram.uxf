@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>80</x>
+      <y>240</y>
+      <w>168</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>*Profile*
+--
+PK:int: Id
+string: Username
+string: Email
+string: PasswordHash
+string: JWT
+datetime: CreatedAt
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>352</x>
+      <y>240</y>
+      <w>168</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>*Account*
+--
+PK:Int: Id
+string: Name
+char: Behaviour
+FK:int TypeId
+FK:int: OwnderId
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>352</x>
+      <y>384</y>
+      <w>168</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>*Records*
+--
+PK:int: Id
+int: Amount
+string: Description
+DateTime: Date
+DateTime: CreatedAt
+FK:Int: CreditorId
+FK:Int: DebitorId
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>272</y>
+      <w>128</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m1=1
+m2=0..n
+</panel_attributes>
+    <additional_attributes>10.0;20.0;140.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>432</x>
+      <y>320</y>
+      <w>40</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m1=2
+m2=0..n
+</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>640</x>
+      <y>248</y>
+      <w>168</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>*AccountTypes*
+--
+PK:int: Id
+string: Name</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>272</y>
+      <w>152</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m1=0..n
+m2=1</panel_attributes>
+    <additional_attributes>10.0;10.0;170.0;10.0</additional_attributes>
+  </element>
+</diagram>
