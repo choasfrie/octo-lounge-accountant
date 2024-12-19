@@ -1,38 +1,36 @@
-using OpenAI.Chat;
-using OpenAI.Models;
-using OpenAI.Assistants;
-using System.Threading.Tasks;
+using OpenAI_API;
 
 namespace octo_lounge_accountant_api.Services
 {
     public class OpenAIService
     {
         private readonly string _apiKey;
+        private readonly OpenAIAPI _openAiApi;
 
         public OpenAIService(string apiKey)
         {
             _apiKey = apiKey;
+            _openAiApi = new OpenAIAPI(_apiKey);
         }
-        
 
         public async Task<string> GetResponseFromOpenAI(string prompt)
         {
-            var openai = new OpenAIAPI(_apiKey);
+            var chat = _openAiApi.Chat.CreateConversation();
+            
+            // Configure the chat parameters
+            chat.Model = OpenAI_API.Models.Model.GPT4;
+            chat.RequestParameters.Temperature = 0.2;
+            chat.RequestParameters.MaxTokens = 500;
 
-            var completionRequest = new CompletionRequest
-            {
-                Prompt = prompt,
-                MaxTokens = 500,
-                Temperature = 0.2,
-                TopP = 1,
-                N = 1,
-                StopSequences = null,
-                FrequencyPenalty = 0,
-                PresencePenalty = 0
-            };
+            // Add the system message to set the context
+            chat.AppendSystemMessage("You are a helpful assistant that extracts transaction details from text and returns them in JSON format.");
+            
+            // Add the user's prompt
+            chat.AppendUserInput(prompt);
 
-            var result = await openai.Completions.CreateCompletionAsync(completionRequest);
-            return result.Completions[0].Text.Trim();
+            // Get the response
+            string response = await chat.GetResponseFromChatbotAsync();
+            return response.Trim();
         }
     }
 }
