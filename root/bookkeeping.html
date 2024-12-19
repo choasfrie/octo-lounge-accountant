@@ -213,7 +213,10 @@
     </div>
     <script src="script.js"></script>
     <script src="t-accounts.js"></script>
-    <script src="transactions.js"></script>
+    <script type="module">
+        import { TransactionManager } from './transactions.js';
+        document.addEventListener('DOMContentLoaded', () => TransactionManager.init());
+    </script>
     <script src="ai-sidebar.js"></script>
     <script src="donation.js"></script>
 </body>

@@ -1,4 +1,9 @@
 class TAccountManager {
+    getCurrentUserId() {
+        // Get the current user ID from your auth system
+        // This is just a placeholder - implement based on your auth system
+        return localStorage.getItem('userId') || 1;
+    }
     constructor() {
         this.initializeButtons(); // Setup action buttons
         this.initializeModal(); // Setup modal dialogs
@@ -123,51 +128,79 @@ class TAccountManager {
     }
 
     // Create new T-Account entry
-    addAccount(accountName) {
+    async addAccount(accountName) {
         if (!accountName) return;
 
-        const tAccountGrid = document.querySelector('.t-account-grid');
-        const newAccount = document.createElement('div');
-        newAccount.className = 't-account';
-        newAccount.innerHTML = `
-            <h3>${accountName}</h3>
-            <div class="t-account-content">
-                <div class="debit-side">
-                    <h4>Debit (+)</h4>
-                    <div class="entry">
-                        <span>Click to add entry</span>
+        try {
+            const accountData = {
+                name: accountName,
+                accountType: 1, // Default type
+                behaviour: 'D', // Default behavior
+                ownerId: this.getCurrentUserId() // You'll need to implement this method
+            };
+
+            const newAccount = await accountService.createAccount(accountData);
+            
+            const tAccountGrid = document.querySelector('.t-account-grid');
+            const accountElement = document.createElement('div');
+            accountElement.className = 't-account';
+            accountElement.dataset.accountId = newAccount.id;
+            accountElement.innerHTML = `
+                <h3>${newAccount.name}</h3>
+                <div class="t-account-content">
+                    <div class="debit-side">
+                        <h4>Debit (+)</h4>
+                        <div class="entry">
+                            <span>Click to add entry</span>
+                        </div>
+                    </div>
+                    <div class="credit-side">
+                        <h4>Credit (-)</h4>
+                        <div class="entry">
+                            <span>Click to add entry</span>
+                        </div>
                     </div>
                 </div>
-                <div class="credit-side">
-                    <h4>Credit (-)</h4>
-                    <div class="entry">
-                        <span>Click to add entry</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        tAccountGrid.appendChild(newAccount);
-    }
-
-    editAccount(oldName, newName) {
-        if (!oldName || !newName) return;
-
-        const accountToEdit = Array.from(document.querySelectorAll('.t-account h3'))
-            .find(h3 => h3.textContent === oldName);
-
-        if (accountToEdit) {
-            accountToEdit.textContent = newName;
+            `;
+            tAccountGrid.appendChild(accountElement);
+        } catch (error) {
+            console.error('Failed to add account:', error);
+            alert('Failed to create account. Please try again.');
         }
     }
 
-    deleteAccount(accountName) {
+    async editAccount(oldName, newName) {
+        if (!oldName || !newName) return;
+
+        const accountElement = Array.from(document.querySelectorAll('.t-account'))
+            .find(acc => acc.querySelector('h3').textContent === oldName);
+
+        if (accountElement) {
+            try {
+                const accountId = accountElement.dataset.accountId;
+                const accountData = {
+                    name: newName,
+                    accountType: 1, // Maintain existing type
+                    behaviour: 'D', // Maintain existing behavior
+                    ownerId: this.getCurrentUserId()
+                };
+
+                await accountService.editAccount(accountId, accountData);
+                accountElement.querySelector('h3').textContent = newName;
+            } catch (error) {
+                console.error('Failed to edit account:', error);
+                alert('Failed to update account. Please try again.');
+            }
+        }
+    }
+
+    async deleteAccount(accountName) {
         if (!accountName) return;
 
-        const accountToDelete = Array.from(document.querySelectorAll('.t-account h3'))
-            .find(h3 => h3.textContent === accountName)
-            ?.closest('.t-account');
+        const accountElement = Array.from(document.querySelectorAll('.t-account'))
+            .find(acc => acc.querySelector('h3').textContent === accountName);
 
-        if (accountToDelete) {
+        if (accountElement) {
             // Show confirmation modal
             const confirmModal = document.createElement('div');
             confirmModal.className = 'auth-modal';
@@ -186,9 +219,16 @@ class TAccountManager {
             confirmModal.style.display = 'block';
 
             // Handle confirmation
-            document.getElementById('confirm-delete').onclick = () => {
-                accountToDelete.remove();
-                confirmModal.remove();
+            document.getElementById('confirm-delete').onclick = async () => {
+                try {
+                    const accountId = accountElement.dataset.accountId;
+                    await accountService.deleteAccount(accountId);
+                    accountElement.remove();
+                    confirmModal.remove();
+                } catch (error) {
+                    console.error('Failed to delete account:', error);
+                    alert('Failed to delete account. Please try again.');
+                }
             };
 
             document.getElementById('cancel-delete').onclick = () => {

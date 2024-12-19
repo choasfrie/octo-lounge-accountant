@@ -1,8 +1,59 @@
-class TransactionManager {
+import { recordService } from './services/recordService.js';
+
+export class TransactionManager {
+    static init() {
+        try {
+            return new TransactionManager();
+        } catch (error) {
+            console.error('Error initializing TransactionManager:', error);
+        }
+    }
+
     constructor() {
-        this.initializeButtons();
-        this.initializeModal();
-        this.initializeFilter();
+        try {
+            this.initializeButtons();
+            this.initializeModal();
+            this.initializeFilter();
+            this.loadExistingRecords();
+        } catch (error) {
+            console.error('Error in TransactionManager constructor:', error);
+            throw error;
+        }
+    }
+
+    async loadExistingRecords() {
+        try {
+            // Load records for current user's accounts
+            const debitorRecords = await recordService.getRecordsByDebitorId(1); // TODO: Get actual user account ID
+            const creditorRecords = await recordService.getRecordsByCreditorId(1); // TODO: Get actual user account ID
+            
+            // Combine and sort records
+            const allRecords = [...debitorRecords, ...creditorRecords]
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Display records
+            this.displayRecords(allRecords);
+        } catch (error) {
+            console.error('Error loading records:', error);
+        }
+    }
+
+    displayRecords(records) {
+        const transactionList = document.querySelector('#records .transaction-list');
+        if (!transactionList) return;
+
+        transactionList.innerHTML = records.map(record => `
+            <div class="transaction" data-record-id="${record.id}">
+                <span class="date">${new Date(record.date).toLocaleDateString()}</span>
+                <span class="description">
+                    ${record.description}
+                    ${record.notes ? `<i class="fas fa-book notes-icon" data-notes="${record.notes}"></i>` : ''}
+                </span>
+                <span class="amount ${record.amount >= 0 ? 'income' : 'expense'}">
+                    ${this.formatAmount(record.amount)}
+                </span>
+            </div>
+        `).join('');
     }
 
     initializeFilter() {
@@ -193,41 +244,65 @@ class TransactionManager {
         modal.style.display = 'none';
     }
 
-    addTransaction(form) {
-        const date = form.date.value;
-        const fromAccount = form.fromAccount.value;
-        const toAccount = form.toAccount.value;
-        const amount = this.formatAmount(form.amount.value);
+    async addTransaction(form) {
+        try {
+            const recordData = {
+                date: new Date(form.date.value),
+                amount: parseFloat(form.amount.value),
+                description: `${form.fromAccount.value} → ${form.toAccount.value}`,
+                creditorId: 1, // TODO: Get actual account IDs
+                debitorId: 1,
+                notes: form.notes.value
+            };
 
-        const transactionList = document.querySelector('#records .transaction-list');
-        const newTransaction = document.createElement('div');
-        newTransaction.className = 'transaction';
-        const notes = form.notes.value;
-        newTransaction.innerHTML = `
-            <span class="date">${date}</span>
-            <span class="description">
-                ${fromAccount} → ${toAccount}
-                ${notes ? `<i class="fas fa-book notes-icon" data-notes="${notes}"></i>` : ''}
-            </span>
-            <span class="amount expense">${amount}</span>
-        `;
-        transactionList.insertBefore(newTransaction, transactionList.firstChild);
+            const newRecord = await recordService.createRecord(recordData);
+            
+            // Update UI
+            const transactionList = document.querySelector('#records .transaction-list');
+            const newTransaction = document.createElement('div');
+            newTransaction.className = 'transaction';
+            newTransaction.dataset.recordId = newRecord.id;
+            newTransaction.innerHTML = `
+                <span class="date">${new Date(newRecord.date).toLocaleDateString()}</span>
+                <span class="description">
+                    ${newRecord.description}
+                    ${recordData.notes ? `<i class="fas fa-book notes-icon" data-notes="${recordData.notes}"></i>` : ''}
+                </span>
+                <span class="amount expense">${this.formatAmount(newRecord.amount)}</span>
+            `;
+            transactionList.insertBefore(newTransaction, transactionList.firstChild);
+        } catch (error) {
+            console.error('Error adding transaction:', error);
+            alert('Failed to add transaction. Please try again.');
+        }
     }
 
-    editTransaction(form) {
-        const selectedIndex = form.transactionSelect.value;
-        const transactions = document.querySelectorAll('#records .transaction');
-        const transaction = transactions[selectedIndex];
+    async editTransaction(form) {
+        try {
+            const selectedIndex = form.transactionSelect.value;
+            const transactions = document.querySelectorAll('#records .transaction');
+            const transaction = transactions[selectedIndex];
 
-        if (transaction) {
-            const date = form.date.value;
-            const fromAccount = form.fromAccount.value;
-            const toAccount = form.toAccount.value;
-            const amount = this.formatAmount(form.amount.value);
+            if (transaction) {
+                const recordId = transaction.dataset.recordId;
+                const recordData = {
+                    date: new Date(form.date.value),
+                    amount: parseFloat(form.amount.value),
+                    description: `${form.fromAccount.value} → ${form.toAccount.value}`,
+                    creditorId: 1, // TODO: Get actual account IDs
+                    debitorId: 1
+                };
 
-            transaction.querySelector('.date').textContent = date;
-            transaction.querySelector('.description').textContent = `${fromAccount} → ${toAccount}`;
-            transaction.querySelector('.amount').textContent = amount;
+                const updatedRecord = await recordService.editRecord(recordId, recordData);
+
+                // Update UI
+                transaction.querySelector('.date').textContent = new Date(updatedRecord.date).toLocaleDateString();
+                transaction.querySelector('.description').textContent = updatedRecord.description;
+                transaction.querySelector('.amount').textContent = this.formatAmount(updatedRecord.amount);
+            }
+        } catch (error) {
+            console.error('Error editing transaction:', error);
+            alert('Failed to edit transaction. Please try again.');
         }
     }
 
@@ -250,7 +325,7 @@ class TransactionManager {
         form.amount.value = parseFloat(amount);
     }
 
-    deleteTransaction() {
+    async deleteTransaction() {
         const transactions = document.querySelectorAll('#records .transaction');
         if (transactions.length === 0) {
             alert('No transactions available to delete');
@@ -287,10 +362,17 @@ class TransactionManager {
                     confirmModal.style.display = 'block';
 
                     // Handle confirmation
-                    document.getElementById('confirm-delete').onclick = () => {
-                        transaction.remove();
-                        confirmModal.remove();
-                        this.removeDeleteIcons();
+                    document.getElementById('confirm-delete').onclick = async () => {
+                        try {
+                            const recordId = transaction.dataset.recordId;
+                            await recordService.deleteRecord(recordId);
+                            transaction.remove();
+                            confirmModal.remove();
+                            this.removeDeleteIcons();
+                        } catch (error) {
+                            console.error('Error deleting transaction:', error);
+                            alert('Failed to delete transaction. Please try again.');
+                        }
                     };
 
                     document.getElementById('cancel-delete').onclick = () => {
@@ -304,8 +386,12 @@ class TransactionManager {
     }
 
     removeDeleteIcons() {
-        const deleteIcons = document.querySelectorAll('#records .delete-icon');
-        deleteIcons.forEach(icon => icon.remove());
+        try {
+            const deleteIcons = document.querySelectorAll('#records .delete-icon');
+            deleteIcons.forEach(icon => icon.remove());
+        } catch (error) {
+            console.error('Error removing delete icons:', error);
+        }
     }
 
     getAccountsList() {
@@ -329,9 +415,10 @@ class TransactionManager {
 
     // Display autocomplete suggestions
     showSuggestions(input) {
-        const suggestionsList = input.nextElementSibling;
-        const accounts = this.getAccountsList(); 
-        const inputValue = input.value.toLowerCase();
+        try {
+            const suggestionsList = input.nextElementSibling;
+            const accounts = this.getAccountsList(); 
+            const inputValue = input.value.toLowerCase();
 
         // Filter accounts based on input
         const filteredAccounts = accounts.filter(account => 
@@ -359,6 +446,3 @@ class TransactionManager {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new TransactionManager();
-});

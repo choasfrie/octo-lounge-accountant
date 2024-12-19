@@ -1,3 +1,5 @@
+import { accountService } from './services/accountService.js';
+
 // Handles user authentication
 class AuthManager {
     constructor() {
@@ -8,7 +10,7 @@ class AuthManager {
     // Initialize user session
     async init() {
         try {
-            const response = await fetch('/api/user-info');
+            const response = await fetch('api/Profiles/current');
             if (response.ok) {
                 this.currentUser = await response.json(); // Store user data
                 this.updateUserDisplay(); // Update UI
@@ -44,7 +46,7 @@ class AuthManager {
     async register(userData) {
         try {
             // User profile
-            const userResponse = await fetch('/api/register', {
+            const userResponse = await fetch('api/Profiles/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -52,7 +54,7 @@ class AuthManager {
                 body: JSON.stringify({
                     username: userData.username,
                     email: userData.email,
-                    password: userData.password
+                    passwordHash: userData.password
                 })
             });
             
@@ -63,24 +65,25 @@ class AuthManager {
             const user = await userResponse.json();
             
             // Add the package
-            const packageResponse = await fetch('/api/add-package', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId: user.id,
-                    packageType: userData.accountPackage
-                })
-            });
+            // Map package types to company types
+            const packageTypeMap = {
+                'none': 'S',  // Sole proprietorship
+                'llc': 'L',   // Limited company
+                'plc': 'G',   // GmbH
+                'sp': 'S'     // Sole proprietorship
+            };
 
-            if (packageResponse.ok) {
-                this.currentUser = user;
-                this.updateUserDisplay();
-                this.closeAuthModal();
-                return true;
-            }
-            return false;
+            await accountService.createStandardPackage(
+                user.id,
+                packageTypeMap[userData.accountPackage] || 'S'
+            );
+
+            // If we get here, package creation was successful
+            this.currentUser = user;
+            this.updateUserDisplay();
+            this.closeAuthModal();
+            return true;
+
         } catch (error) {
             console.error('Registration error:', error);
             return false;
@@ -89,10 +92,28 @@ class AuthManager {
 
     updateUserDisplay() {
         const welcomeText = document.querySelector('.user-welcome');
+        const userMenu = document.querySelector('.user-menu');
         if (welcomeText) {
             welcomeText.textContent = this.currentUser ? 
                 `Welcome, ${this.currentUser.username}` : 
                 'Welcome, Guest';
+            
+            // Update menu buttons based on auth state
+            if (this.currentUser) {
+                userMenu.innerHTML = `
+                    <div class="user-welcome">Welcome, ${this.currentUser.username}</div>
+                    <button class="auth-button" id="logout-button">Logout</button>
+                `;
+                document.getElementById('logout-button').addEventListener('click', () => this.logout());
+            } else {
+                userMenu.innerHTML = `
+                    <div class="user-welcome">Welcome, Guest</div>
+                    <button class="auth-button" id="login-button">Login</button>
+                    <button class="auth-button" id="register-button">Register</button>
+                `;
+                document.getElementById('login-button').addEventListener('click', () => this.showAuthModal('login'));
+                document.getElementById('register-button').addEventListener('click', () => this.showAuthModal('register'));
+            }
         }
     }
 
@@ -100,6 +121,14 @@ class AuthManager {
         const modal = document.getElementById('auth-modal');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
+        
+        // Reset forms
+        loginForm.reset();
+        registerForm.reset();
+        
+        // Hide error messages
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('register-error').style.display = 'none';
         
         modal.style.display = 'block';
         if (type === 'login') {
@@ -113,7 +142,20 @@ class AuthManager {
 
     closeAuthModal() {
         const modal = document.getElementById('auth-modal');
-        modal.style.display = 'none';
+        if (modal) {
+            modal.style.display = 'none';
+            // Reset forms
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            if (loginForm) loginForm.reset();
+            if (registerForm) registerForm.reset();
+        }
+    }
+
+    async logout() {
+        this.currentUser = null;
+        this.updateUserDisplay();
+        // Additional logout logic (clear tokens etc) can be added here
     }
 }
 
