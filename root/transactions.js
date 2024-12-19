@@ -420,29 +420,35 @@ export class TransactionManager {
             const accounts = this.getAccountsList(); 
             const inputValue = input.value.toLowerCase();
 
-        // Filter accounts based on input
-        const filteredAccounts = accounts.filter(account => 
-            account.toLowerCase().includes(inputValue)
-        );
+            // Filter accounts based on input
+            const filteredAccounts = accounts.filter(account => 
+                account.toLowerCase().includes(inputValue)
+            );
 
-        // Show/hide suggestions container
-        if (inputValue && filteredAccounts.length > 0) {
-            suggestionsList.innerHTML = filteredAccounts
-                .map(account => `<div class="suggestion-item">${account}</div>`)
-                .join('');
-            suggestionsList.style.display = 'block';
+            // Show/hide suggestions container
+            if (inputValue && filteredAccounts.length > 0) {
+                suggestionsList.innerHTML = filteredAccounts
+                    .map(account => `<div class="suggestion-item">${account}</div>`)
+                    .join('');
+                suggestionsList.style.display = 'block';
 
-            // Add click handlers to suggestions
-            const suggestions = suggestionsList.getElementsByClassName('suggestion-item');
-            Array.from(suggestions).forEach(suggestion => {
-                suggestion.addEventListener('click', () => {
-                    input.value = suggestion.textContent;
-                    suggestionsList.style.display = 'none';
+                // Add click handlers to suggestions
+                const suggestions = suggestionsList.getElementsByClassName('suggestion-item');
+                Array.from(suggestions).forEach(suggestion => {
+                    suggestion.addEventListener('click', () => {
+                        input.value = suggestion.textContent;
+                        suggestionsList.style.display = 'none';
+                    });
                 });
-            });
-        } else {
-            suggestionsList.style.display = 'none';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error showing suggestions:', error);
+            // Hide suggestions list in case of error
+            if (input.nextElementSibling) {
+                input.nextElementSibling.style.display = 'none';
+            }
         }
     }
 }
-
