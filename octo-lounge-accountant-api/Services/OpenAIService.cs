@@ -1,5 +1,5 @@
-using OpenAI_API;
-using OpenAI_API.Completions;
+using OpenAI.Chat;
+using OpenAI.Models;
 using OpenAI.Assistants;
 using System.Threading.Tasks;
 
