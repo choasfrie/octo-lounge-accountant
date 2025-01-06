@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/4c39a50c7e.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1>Financial Analysis Dashboard</h1>
+        </header>
+
+        <main>
+            <section id="data-visualization">
+                <h2>Key Financial Metrics</h2>
+                <div id="visualization" class="graph-container"></div>
+            </section>
+        </main>
+
+        <aside class="side-panel">
+            <nav>
+                <ul>
+                    <li><a href="index.html#home"><i class="fa-solid fa-house"></i> Home</a></li>
+                    <li><a href="index.html#services"><i class="fa-solid fa-wrench"></i> Services</a></li>
+                    <li><a href="index.html#about"><i class="fa-solid fa-circle-info"></i> About</a></li>
+                    <li><a href="index.html#contact"><i class="fa-solid fa-headset"></i> Contact</a></li>
+                </ul>
+            </nav>
+            <div class="social-links">
+                <a href="https://github.com/sprudello/octo-lounge-accountant" target="_blank" data-tooltip="GitHub Repository"><i class="fab fa-github"></i></a>
+                <a href="https://github.com/sprudello/octo-lounge-accountant/blob/main/Projektdokumentation.md" target="_blank" data-tooltip="Documentation"><i class="fas fa-book"></i></a>
+                <a href="#" data-tooltip="User Profile"><i class="fas fa-user"></i></a>
+            </div>
+        </aside>
+
+        <footer>
+            <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="financialanalysis.js"></script>
+    <script src="donation.js"></script>
+</body>
+</html>

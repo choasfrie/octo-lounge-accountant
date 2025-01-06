@@ -1,0 +1,83 @@
+<!-- Navigation -->
+<nav>
+    <ul>
+        <li><a href="index.html#home"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="index.html#services"><i class="fa-solid fa-wrench"></i> Services</a></li>
+        <li class="service-submenu">
+            <button id="toggle-ai-sidebar" class="ai-toggle nav-button" data-tooltip="AI Assistant">
+                <i class="fa-solid fa-robot"></i> AI Assistant
+            </button>
+        </li>
+        <li><a href="index.html#about"><i class="fa-solid fa-circle-info"></i> About</a></li>
+        <li><a href="index.html#contact"><i class="fa-solid fa-headset"></i> Contact</a></li>
+    </ul>
+</nav>
+
+<!-- Social Links -->
+<div class="social-links">
+    <a href="https://github.com/sprudello/octo-lounge-accountant" target="_blank" data-tooltip="GitHub Repository"><i class="fab fa-github"></i></a>
+    <a href="https://github.com/sprudello/octo-lounge-accountant/blob/main/Projektdokumentation.md" target="_blank" data-tooltip="Documentation"><i class="fas fa-book"></i></a>
+    <button id="donate-button" class="social-link-button" data-tooltip="Buy us a coffee"><i class="fas fa-mug-hot"></i></button>
+</div>
+
+<!-- AI Chat Sidebar -->
+<aside class="ai-sidebar collapsed" id="ai-sidebar">
+    <div class="ai-content">
+        <div class="ai-header">
+            <h3><i class="fas fa-robot"></i> AI Assistant</h3>
+            <button class="close-ai-sidebar" data-tooltip="Close Assistant">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="ai-chat">
+            <div class="chat-messages" id="chat-messages" data-placeholder="How can I help you with your accounting?">
+                <!-- Messages appear here -->
+            </div>
+            <div class="chat-input">
+                <textarea 
+                    id="user-input" 
+                    placeholder="Ask me to complete your Business..."
+                    rows="3"
+                ></textarea>
+                <button id="send-message" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Donation Modal -->
+<div id="donation-modal" class="auth-modal">
+    <div class="auth-modal-content">
+        <button class="close-modal" id="close-donation">&times;</button>
+        <h2>Support Our Work</h2>
+        <p>Help us keep improving our services!</p>
+        
+        <div class="donation-options">
+            <button class="donation-amount" data-amount="5">CHF 5</button>
+            <button class="donation-amount" data-amount="10">CHF 10</button>
+            <button class="donation-amount" data-amount="20">CHF 20</button>
+            <div class="custom-amount">
+                <input type="number" id="custom-donation" placeholder="Custom amount" min="1" step="1">
+                <span>CHF</span>
+            </div>
+        </div>
+
+        <button id="complete-donation" class="auth-button">Donate</button>
+    </div>
+</div>
+
+<!-- Thank You Modal -->
+<div id="thank-you-modal" class="auth-modal">
+    <div class="auth-modal-content">
+        <h2>Thank You!</h2>
+        <p>Your generous donation means a lot to us!</p>
+        <p>We appreciate your support in helping us continue our work.</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 octo-lounge-accountant. All rights reserved.</p>
+</footer>
