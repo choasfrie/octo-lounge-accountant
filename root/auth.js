@@ -4,6 +4,7 @@ import { API_CONFIG } from './config.js';
 class AuthManager {
     constructor() {
         this.currentUser = null;
+        this.token = localStorage.getItem('jwt');
         this.init();
     }
 
@@ -42,8 +43,14 @@ class AuthManager {
 
             if (response.ok) {
                 const userData = await response.json();
-                this.currentUser = { username: userData.username || 'Guest' };
-                localStorage.setItem('username', this.currentUser.username); 
+                this.currentUser = { 
+                    username: userData.Username,
+                    id: userData.Id,
+                    email: userData.Email
+                };
+                this.token = userData.JWT;
+                localStorage.setItem('jwt', userData.JWT);
+                localStorage.setItem('username', userData.Username);
                 this.updateUserDisplay();
                 this.toggleAuthButtons();
                 this.closeAuthModal();
@@ -68,7 +75,8 @@ class AuthManager {
 
                     Username: userData.username,
                     Email: userData.email,
-                    PasswordHash: userData.password
+                    PasswordHash: userData.password,
+                    JWT: ""
                 })
             });
 

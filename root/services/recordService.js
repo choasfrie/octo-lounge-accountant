@@ -8,8 +8,15 @@ class RecordService {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
-                body: JSON.stringify(recordData)
+                body: JSON.stringify({
+                    Date: new Date(recordData.date).toISOString(),
+                    Amount: parseFloat(recordData.amount),
+                    Description: recordData.description,
+                    CreditorId: recordData.creditorId,
+                    DebitorId: recordData.debitorId
+                })
             });
             if (!response.ok) throw new Error('Failed to create record');
             return await response.json();

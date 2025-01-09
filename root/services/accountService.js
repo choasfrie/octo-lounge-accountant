@@ -8,8 +8,15 @@ class AccountService {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
-                body: JSON.stringify(accountData)
+                body: JSON.stringify({
+                    Name: accountData.name,
+                    AccountType: accountData.accountType,
+                    AccountNumber: accountData.accountNumber,
+                    Behaviour: accountData.behaviour,
+                    OwnerId: accountData.ownerId
+                })
             });
             if (!response.ok) throw new Error('Failed to create account');
             return await response.json();
