@@ -135,18 +135,35 @@ export class TransactionManager {
         }
     }
 
-    displayRecords(records) {
-        this.renderTAccounts(records);
+    displayRecords(accountsWithRecords) {
+        // Filter accounts with non-empty records
+        const accountsWithNonEmptyRecords = accountsWithRecords.filter(account => 
+            account.records && account.records.length > 0
+        );
+
+        // Flatten all records and add account names
+        const allRecords = accountsWithNonEmptyRecords.flatMap(account => 
+            account.records.map(record => ({
+                ...record,
+                creditorName: accountsWithRecords.find(a => a.accountId === record.creditorId)?.accountName || 'Unknown',
+                debitorName: accountsWithRecords.find(a => a.accountId === record.debitorId)?.accountName || 'Unknown'
+            }))
+        );
+
+        // Sort records by date
+        allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        this.renderTAccounts(accountsWithNonEmptyRecords);
         const transactionList = document.querySelector('#records .transaction-list');
         if (!transactionList) return;
 
-        transactionList.innerHTML = records.map(record => `
-            <div class="transaction" data-record-id="${record.id}">
+        transactionList.innerHTML = allRecords.map(record => `
+            <div class="transaction" data-record-id="${record.recordId}">
                 <span class="date">${new Date(record.date).toLocaleDateString()}</span>
                 <span class="description">
-                    ${record.Debitor?.Name || 'Unknown'} → ${record.Creditor?.Name || 'Unknown'}
-                    ${record.Description ? `: ${record.Description}` : ''}
-                    ${record.Notes ? `<i class="fas fa-book notes-icon" data-notes="${record.Notes}"></i>` : ''}
+                    ${record.debitorName} → ${record.creditorName}
+                    ${record.description ? `: ${record.description}` : ''}
+                    ${record.notes ? `<i class="fas fa-book notes-icon" data-notes="${record.notes}"></i>` : ''}
                 </span>
                 <span class="amount ${record.amount >= 0 ? 'income' : 'expense'}">
                     ${this.formatAmount(record.amount)}
@@ -198,68 +215,39 @@ export class TransactionManager {
     }
 
     // Format currency amount
-    renderTAccounts(records) {
+    renderTAccounts(accounts) {
         const tAccountsGrid = document.getElementById('t-accounts-grid');
         if (!tAccountsGrid) return;
 
-        // Group records by account
-        const accountsMap = new Map();
-        records.forEach(record => {
-            if (!accountsMap.has(record.DebitorId)) {
-                accountsMap.set(record.DebitorId, {
-                    name: record.Debitor?.Name || 'Unknown',
-                    debits: [],
-                    credits: []
-                });
-            }
-            if (!accountsMap.has(record.CreditorId)) {
-                accountsMap.set(record.CreditorId, {
-                    name: record.Creditor?.Name || 'Unknown',
-                    debits: [],
-                    credits: []
-                });
-            }
-
-            // Add to debitor's credits
-            accountsMap.get(record.DebitorId).credits.push({
-                amount: record.Amount,
-                date: record.Date,
-                description: record.Description
-            });
-
-            // Add to creditor's debits
-            accountsMap.get(record.CreditorId).debits.push({
-                amount: record.Amount,
-                date: record.Date,
-                description: record.Description
-            });
-        });
-
         // Render T-Accounts
         tAccountsGrid.innerHTML = '';
-        accountsMap.forEach((account, accountId) => {
+        accounts.forEach(account => {
             const tAccount = document.createElement('div');
             tAccount.className = 't-account';
             tAccount.innerHTML = `
-                <h3>${account.name}</h3>
+                <h3>${account.accountName} (${account.accountNumber})</h3>
                 <div class="t-account-content">
                     <div class="debit-side">
                         <h4>Debit (+)</h4>
-                        ${account.debits.map(entry => `
-                            <div class="entry">
-                                <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
-                                <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
-                            </div>
-                        `).join('')}
+                        ${account.records
+                            .filter(r => r.debitorId === account.accountId)
+                            .map(entry => `
+                                <div class="entry">
+                                    <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
+                                    <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                                </div>
+                            `).join('')}
                     </div>
                     <div class="credit-side">
                         <h4>Credit (-)</h4>
-                        ${account.credits.map(entry => `
-                            <div class="entry">
-                                <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
-                                <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
-                            </div>
-                        `).join('')}
+                        ${account.records
+                            .filter(r => r.creditorId === account.accountId)
+                            .map(entry => `
+                                <div class="entry">
+                                    <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
+                                    <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                                </div>
+                            `).join('')}
                     </div>
                 </div>
             `;
