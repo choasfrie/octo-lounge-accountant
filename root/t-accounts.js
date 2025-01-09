@@ -133,10 +133,10 @@ class TAccountManager {
 
         try {
             const accountData = {
-                name: accountName,
-                accountType: 1, // Default type
-                behaviour: 'D', // Default behavior
-                ownerId: this.getCurrentUserId() // You'll need to implement this method
+                Name: accountName,
+                AccountType: 1, // Default type
+                Behaviour: 'D', // Default behavior
+                OwnerId: this.getCurrentUserId()
             };
 
             const newAccount = await accountService.createAccount(accountData);
@@ -144,9 +144,9 @@ class TAccountManager {
             const tAccountGrid = document.querySelector('.t-account-grid');
             const accountElement = document.createElement('div');
             accountElement.className = 't-account';
-            accountElement.dataset.accountId = newAccount.id;
+            accountElement.dataset.accountId = newAccount.Id;
             accountElement.innerHTML = `
-                <h3>${newAccount.name}</h3>
+                <h3>${newAccount.Name}</h3>
                 <div class="t-account-content">
                     <div class="debit-side">
                         <h4>Debit (+)</h4>

@@ -10,7 +10,16 @@ class AuthManager {
     // Initialize user session
     async init() {
         try {
-            const response = await fetch('api/Profiles/current');
+            const response = await fetch('/api/Profiles/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: localStorage.getItem('username'),
+                    password: localStorage.getItem('password')
+                })
+            });
             if (response.ok) {
                 this.currentUser = await response.json(); // Store user data
                 this.updateUserDisplay(); // Update UI
@@ -22,7 +31,7 @@ class AuthManager {
 
     async login(credentials) {
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('/api/Profiles/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,7 +55,7 @@ class AuthManager {
     async register(userData) {
         try {
             // User profile
-            const userResponse = await fetch('api/Profiles/register', {
+            const userResponse = await fetch('/api/Profiles/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,7 +164,9 @@ class AuthManager {
     async logout() {
         this.currentUser = null;
         this.updateUserDisplay();
-        // Additional logout logic (clear tokens etc) can be added here
+        // Clear stored credentials
+        localStorage.removeItem('username');
+        localStorage.removeItem('password');
     }
 }
 
@@ -175,6 +186,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update hidden input value
             selectedPackageInput.value = button.dataset.package;
         });
+    });
+
+    // Store credentials on successful login
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+        if (e.target.checkValidity()) {
+            const formData = new FormData(e.target);
+            localStorage.setItem('username', formData.get('username'));
+            localStorage.setItem('password', formData.get('password'));
+        }
     });
     const userIcon = document.querySelector('.user-menu-trigger');
     const userMenu = document.querySelector('.user-menu');
@@ -220,4 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
             errorDiv.textContent = 'Registration failed. Please try again.';
         }
     });
+
+    // Add close modal event listener
+    const closeAuthModalBtn = document.getElementById('close-auth-modal');
+    if (closeAuthModalBtn) {
+        closeAuthModalBtn.addEventListener('click', () => authManager.closeAuthModal());
+    }
 });

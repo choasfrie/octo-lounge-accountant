@@ -23,18 +23,110 @@ export class TransactionManager {
 
     async loadExistingRecords() {
         try {
-            // Load records for current user's accounts
-            const debitorRecords = await recordService.getRecordsByDebitorId(1); // TODO: Get actual user account ID
-            const creditorRecords = await recordService.getRecordsByCreditorId(1); // TODO: Get actual user account ID
-            
-            // Combine and sort records
-            const allRecords = [...debitorRecords, ...creditorRecords]
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (!authManager.currentUser) {
+                console.error('No authenticated user');
+                return;
+            }
 
-            // Display records
+            // Load accounts and their records
+            const accountsResponse = await accountService.getAccountsByOwner(authManager.currentUser.id);
+            const accounts = accountsResponse.data;
+            
+            // Calculate balances and get records for each account
+            const accountBalances = new Map();
+            const allRecords = [];
+            
+            for (const account of accounts) {
+                // Get records where account is creditor or debitor
+                const [creditorRecords, debitorRecords] = await Promise.all([
+                    recordService.getRecordsByCreditorId(account.Id),
+                    recordService.getRecordsByDebitorId(account.Id)
+                ]);
+                
+                // Calculate balance
+                let balance = 0;
+                const accountRecords = [...creditorRecords.data, ...debitorRecords.data];
+                
+                accountRecords.forEach(record => {
+                    if (record.CreditorId === account.Id) {
+                        balance -= record.Amount;
+                    } else if (record.DebitorId === account.Id) {
+                        balance += record.Amount;
+                    }
+                });
+                
+                accountBalances.set(account.Id, {
+                    name: account.Name,
+                    number: account.AccountNumber,
+                    balance: balance,
+                    records: accountRecords
+                });
+                
+                allRecords.push(...accountRecords);
+            }
+
+            // Sort records by date
+            allRecords.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+
+            // Update UI
+            this.displayAccounts(accountBalances);
             this.displayRecords(allRecords);
         } catch (error) {
             console.error('Error loading records:', error);
+        }
+    }
+
+    displayAccounts(accountBalances) {
+        const accountGrid = document.getElementById('account-grid');
+        if (!accountGrid) return;
+
+        // Group accounts by category
+        const categories = new Map();
+        accountBalances.forEach((account, id) => {
+            const category = Math.floor(account.number / 1000) * 1000;
+            if (!categories.has(category)) {
+                categories.set(category, []);
+            }
+            categories.get(category).push(account);
+        });
+
+        // Create account items
+        accountGrid.innerHTML = '';
+        categories.forEach((accounts, category) => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'account-item';
+            
+            // Add icon based on category
+            let icon = 'fas fa-wallet';
+            if (category >= 2000 && category < 3000) icon = 'fas fa-file-invoice-dollar';
+            if (category >= 3000 && category < 4000) icon = 'fas fa-chart-line';
+            if (category >= 4000) icon = 'fas fa-chart-pie';
+            
+            categoryDiv.innerHTML = `
+                <i class="${icon}"></i>
+                <h3>${this.getCategoryName(category)}</h3>
+                <div class="account-details">
+                    ${accounts.map(acc => `
+                        <p>${acc.name} (${acc.number}): CHF ${this.formatAmount(acc.balance)}</p>
+                    `).join('')}
+                </div>
+            `;
+            accountGrid.appendChild(categoryDiv);
+        });
+    }
+
+    getCategoryName(category) {
+        switch(category) {
+            case 1000: return 'Current Assets';
+            case 2000: return 'Liabilities';
+            case 3000: return 'Revenue';
+            case 4000: return 'Expenses';
+            case 5000: return 'Personnel Expenses';
+            case 6000: return 'Other Operating Expenses';
+            case 7000: return 'Secondary Business Income';
+            case 8000: return 'Non-operating Results';
+            case 9000: return 'Closing';
+            default: return 'Other';
         }
     }
 
@@ -46,8 +138,9 @@ export class TransactionManager {
             <div class="transaction" data-record-id="${record.id}">
                 <span class="date">${new Date(record.date).toLocaleDateString()}</span>
                 <span class="description">
-                    ${record.description}
-                    ${record.notes ? `<i class="fas fa-book notes-icon" data-notes="${record.notes}"></i>` : ''}
+                    ${record.Debitor?.Name || 'Unknown'} → ${record.Creditor?.Name || 'Unknown'}
+                    ${record.Description ? `: ${record.Description}` : ''}
+                    ${record.Notes ? `<i class="fas fa-book notes-icon" data-notes="${record.Notes}"></i>` : ''}
                 </span>
                 <span class="amount ${record.amount >= 0 ? 'income' : 'expense'}">
                     ${this.formatAmount(record.amount)}
@@ -160,10 +253,13 @@ export class TransactionManager {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
         const modal = document.getElementById('transaction-modal');
-        const closeBtn = modal.querySelector('.close-modal');
+        const closeBtn = modal?.querySelector('.close-modal');
         
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.closeModal());
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.closeModal();
+            });
         }
         
         const addForm = document.getElementById('add-transaction-form');
@@ -246,13 +342,24 @@ export class TransactionManager {
 
     async addTransaction(form) {
         try {
+            const fromAccountName = form.fromAccount.value;
+            const toAccountName = form.toAccount.value;
+            
+            const accounts = await accountService.getAccountsByOwner(authManager.currentUser.id);
+            const fromAccount = accounts.find(acc => acc.name === fromAccountName);
+            const toAccount = accounts.find(acc => acc.name === toAccountName);
+
+            if (!fromAccount || !toAccount) {
+                throw new Error('Invalid accounts');
+            }
+
             const recordData = {
-                date: new Date(form.date.value),
-                amount: parseFloat(form.amount.value),
-                description: `${form.fromAccount.value} → ${form.toAccount.value}`,
-                creditorId: 1, // TODO: Get actual account IDs
-                debitorId: 1,
-                notes: form.notes.value
+                Date: new Date(form.date.value),
+                Amount: parseFloat(form.amount.value),
+                Description: `${fromAccountName} → ${toAccountName}`,
+                CreditorId: toAccount.Id,
+                DebitorId: fromAccount.Id,
+                Notes: form.notes.value
             };
 
             const newRecord = await recordService.createRecord(recordData);
@@ -263,12 +370,12 @@ export class TransactionManager {
             newTransaction.className = 'transaction';
             newTransaction.dataset.recordId = newRecord.id;
             newTransaction.innerHTML = `
-                <span class="date">${new Date(newRecord.date).toLocaleDateString()}</span>
+                <span class="date">${new Date(newRecord.Date).toLocaleDateString()}</span>
                 <span class="description">
-                    ${newRecord.description}
-                    ${recordData.notes ? `<i class="fas fa-book notes-icon" data-notes="${recordData.notes}"></i>` : ''}
+                    ${newRecord.Description}
+                    ${recordData.Notes ? `<i class="fas fa-book notes-icon" data-notes="${recordData.Notes}"></i>` : ''}
                 </span>
-                <span class="amount expense">${this.formatAmount(newRecord.amount)}</span>
+                <span class="amount expense">${this.formatAmount(newRecord.Amount)}</span>
             `;
             transactionList.insertBefore(newTransaction, transactionList.firstChild);
         } catch (error) {
@@ -285,12 +392,24 @@ export class TransactionManager {
 
             if (transaction) {
                 const recordId = transaction.dataset.recordId;
+                
+                const fromAccountName = form.fromAccount.value;
+                const toAccountName = form.toAccount.value;
+                
+                const accounts = await accountService.getAccountsByOwner(authManager.currentUser.id);
+                const fromAccount = accounts.find(acc => acc.name === fromAccountName);
+                const toAccount = accounts.find(acc => acc.name === toAccountName);
+
+                if (!fromAccount || !toAccount) {
+                    throw new Error('Invalid accounts');
+                }
+
                 const recordData = {
-                    date: new Date(form.date.value),
-                    amount: parseFloat(form.amount.value),
-                    description: `${form.fromAccount.value} → ${form.toAccount.value}`,
-                    creditorId: 1, // TODO: Get actual account IDs
-                    debitorId: 1
+                    Date: new Date(form.date.value),
+                    Amount: parseFloat(form.amount.value),
+                    Description: `${fromAccountName} → ${toAccountName}`,
+                    CreditorId: toAccount.Id,
+                    DebitorId: fromAccount.Id
                 };
 
                 const updatedRecord = await recordService.editRecord(recordId, recordData);

@@ -135,7 +135,7 @@ Ensure that the account IDs correspond to the accounts provided. If you cannot e
 
             return Ok(record);
         }
-
+        
         [HttpGet("getRecordsByDebitorId/{id}")]
         public IActionResult GetRecordsByDebitorId(int id)
         {
