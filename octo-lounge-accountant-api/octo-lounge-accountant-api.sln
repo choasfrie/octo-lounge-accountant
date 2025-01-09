@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "octo-lounge-accountant-api", "octo-lounge-accountant-api.csproj", "{B1B0B81D-4C0C-4747-8A74-55AF6FC547E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "octo-lounge-accountant-test", "..\octo-lounge-accountant-test\octo-lounge-accountant-test.csproj", "{91ADF938-D1CE-488E-8A8E-FFED148DAA46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B1B0B81D-4C0C-4747-8A74-55AF6FC547E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1B0B81D-4C0C-4747-8A74-55AF6FC547E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1B0B81D-4C0C-4747-8A74-55AF6FC547E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91ADF938-D1CE-488E-8A8E-FFED148DAA46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91ADF938-D1CE-488E-8A8E-FFED148DAA46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91ADF938-D1CE-488E-8A8E-FFED148DAA46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91ADF938-D1CE-488E-8A8E-FFED148DAA46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
