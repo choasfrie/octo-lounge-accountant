@@ -95,6 +95,16 @@ class TAccountManager {
                             <input type="number" id="new-account-number" name="accountNumber" required min="1000" max="9999">
                         </div>
                         <div class="form-group">
+                            <label for="new-account-type">Account Type</label>
+                            <select id="new-account-type" name="accountType" required>
+                                <option value="1">Assets</option>
+                                <option value="2">Liabilities</option>
+                                <option value="3">Revenue</option>
+                                <option value="4">Expenses</option>
+                                <option value="5">Equity</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="new-account-behavior">Account Behavior</label>
                             <select id="new-account-behavior" name="accountBehavior" required>
                                 <option value="D">Debit</option>
@@ -209,6 +219,7 @@ class TAccountManager {
             const accountData = {
                 Name: accountName,
                 AccountNumber: parseInt(accountNumber),
+                AccountType: parseInt(form.accountType.value),
                 Behaviour: accountBehavior,
                 OwnerId: this.getCurrentUserId()
             };

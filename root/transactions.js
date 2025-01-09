@@ -144,23 +144,46 @@ export class TransactionManager {
         `).join('');
     }
 
-    initializeFilter() {
+    async initializeFilter() {
         const filter = document.getElementById('account-filter');
         if (filter) {
-            filter.addEventListener('change', () => {
+            filter.addEventListener('change', async () => {
                 const selectedAccount = filter.value;
-                const transactions = document.querySelectorAll('#records .transaction');
-                
-                transactions.forEach(transaction => {
-                    const description = transaction.querySelector('.description').textContent;
-                    if (selectedAccount === 'all' || description.includes(selectedAccount)) {
-                        transaction.style.display = '';
-                    } else {
-                        transaction.style.display = 'none';
-                    }
-                });
+                if (selectedAccount === 'all') {
+                    await this.loadAccounts();
+                    return;
+                }
+
+                try {
+                    const records = selectedAccount.startsWith('debitor-') 
+                        ? await recordService.getRecordsByDebitorId(selectedAccount.replace('debitor-', ''))
+                        : await recordService.getRecordsByCreditorId(selectedAccount.replace('creditor-', ''));
+                    
+                    this.displayRecords(records);
+                } catch (error) {
+                    console.error('Error filtering records:', error);
+                }
             });
         }
+    }
+
+    updateAccountFilter(accounts) {
+        const filter = document.getElementById('account-filter');
+        if (!filter) return;
+
+        filter.innerHTML = '<option value="all">All Accounts</option>';
+        
+        accounts.forEach(account => {
+            const debitorOption = document.createElement('option');
+            debitorOption.value = `debitor-${account.AccountId}`;
+            debitorOption.textContent = `${account.AccountName} (Debits)`;
+            filter.appendChild(debitorOption);
+
+            const creditorOption = document.createElement('option');
+            creditorOption.value = `creditor-${account.AccountId}`;
+            creditorOption.textContent = `${account.AccountName} (Credits)`;
+            filter.appendChild(creditorOption);
+        });
     }
 
     updateAccountFilter(accounts) {
