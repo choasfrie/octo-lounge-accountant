@@ -19,7 +19,6 @@ export class TransactionManager {
     async loadExistingRecords() {
         try {
             if (!authManager.currentUser) {
-                console.error('No authenticated user');
                 return;
             }
 
@@ -138,18 +137,30 @@ export class TransactionManager {
     displayRecords(accounts) {
         // Get all records from all accounts
         const allRecords = [];
+        
+        // Handle if accounts is a single record
+        if (!Array.isArray(accounts)) {
+            accounts = [accounts];
+        }
+
         accounts.forEach(account => {
-            if (account.records && account.records.length > 0) {
+            // If the account itself is a record (from direct API response)
+            if (account.creditorId !== undefined) {
+                allRecords.push({
+                    ...account,
+                    date: new Date(account.date),
+                    creditorName: 'Account ' + account.creditorId,
+                    debitorName: 'Account ' + account.debitorId
+                });
+            }
+            // If it's an account with records
+            else if (account.records && account.records.length > 0) {
                 account.records.forEach(record => {
-                    // Find creditor and debitor account names
-                    const creditorAccount = accounts.find(a => a.accountId === record.creditorId);
-                    const debitorAccount = accounts.find(a => a.accountId === record.debitorId);
-                    
                     allRecords.push({
                         ...record,
-                        creditorName: creditorAccount ? creditorAccount.accountName : 'Unknown',
-                        debitorName: debitorAccount ? debitorAccount.accountName : 'Unknown',
-                        date: new Date(record.date) // Ensure date is properly parsed
+                        creditorName: 'Account ' + record.creditorId,
+                        debitorName: 'Account ' + record.debitorId,
+                        date: new Date(record.date)
                     });
                 });
             }
