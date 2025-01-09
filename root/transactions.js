@@ -1,8 +1,152 @@
-class TransactionManager {
+import { recordService } from './services/recordService.js';
+
+export class TransactionManager {
+    static init() {
+        try {
+            return new TransactionManager();
+        } catch (error) {
+            console.error('Error initializing TransactionManager:', error);
+        }
+    }
+
     constructor() {
-        this.initializeButtons();
-        this.initializeModal();
-        this.initializeFilter();
+        try {
+            this.initializeButtons();
+            this.initializeModal();
+            this.initializeFilter();
+            this.loadExistingRecords();
+        } catch (error) {
+            console.error('Error in TransactionManager constructor:', error);
+            throw error;
+        }
+    }
+
+    async loadExistingRecords() {
+        try {
+            if (!authManager.currentUser) {
+                console.error('No authenticated user');
+                return;
+            }
+
+            // Load accounts and their records
+            const accountsResponse = await accountService.getAccountsByOwner(authManager.currentUser.id);
+            const accounts = accountsResponse.data;
+            
+            // Calculate balances and get records for each account
+            const accountBalances = new Map();
+            const allRecords = [];
+            
+            for (const account of accounts) {
+                // Get records where account is creditor or debitor
+                const [creditorRecords, debitorRecords] = await Promise.all([
+                    recordService.getRecordsByCreditorId(account.Id),
+                    recordService.getRecordsByDebitorId(account.Id)
+                ]);
+                
+                // Calculate balance
+                let balance = 0;
+                const accountRecords = [...creditorRecords.data, ...debitorRecords.data];
+                
+                accountRecords.forEach(record => {
+                    if (record.CreditorId === account.Id) {
+                        balance -= record.Amount;
+                    } else if (record.DebitorId === account.Id) {
+                        balance += record.Amount;
+                    }
+                });
+                
+                accountBalances.set(account.Id, {
+                    name: account.Name,
+                    number: account.AccountNumber,
+                    balance: balance,
+                    records: accountRecords
+                });
+                
+                allRecords.push(...accountRecords);
+            }
+
+            // Sort records by date
+            allRecords.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+
+            // Update UI
+            this.displayAccounts(accountBalances);
+            this.displayRecords(allRecords);
+        } catch (error) {
+            console.error('Error loading records:', error);
+        }
+    }
+
+    displayAccounts(accountBalances) {
+        const accountGrid = document.getElementById('account-grid');
+        if (!accountGrid) return;
+
+        // Group accounts by category
+        const categories = new Map();
+        accountBalances.forEach((account, id) => {
+            const category = Math.floor(account.number / 1000) * 1000;
+            if (!categories.has(category)) {
+                categories.set(category, []);
+            }
+            categories.get(category).push(account);
+        });
+
+        // Create account items
+        accountGrid.innerHTML = '';
+        categories.forEach((accounts, category) => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'account-item';
+            
+            // Add icon based on category
+            let icon = 'fas fa-wallet';
+            if (category >= 2000 && category < 3000) icon = 'fas fa-file-invoice-dollar';
+            if (category >= 3000 && category < 4000) icon = 'fas fa-chart-line';
+            if (category >= 4000) icon = 'fas fa-chart-pie';
+            
+            categoryDiv.innerHTML = `
+                <i class="${icon}"></i>
+                <h3>${this.getCategoryName(category)}</h3>
+                <div class="account-details">
+                    ${accounts.map(acc => `
+                        <p>${acc.name} (${acc.number}): CHF ${this.formatAmount(acc.balance)}</p>
+                    `).join('')}
+                </div>
+            `;
+            accountGrid.appendChild(categoryDiv);
+        });
+    }
+
+    getCategoryName(category) {
+        switch(category) {
+            case 1000: return 'Current Assets';
+            case 2000: return 'Liabilities';
+            case 3000: return 'Revenue';
+            case 4000: return 'Expenses';
+            case 5000: return 'Personnel Expenses';
+            case 6000: return 'Other Operating Expenses';
+            case 7000: return 'Secondary Business Income';
+            case 8000: return 'Non-operating Results';
+            case 9000: return 'Closing';
+            default: return 'Other';
+        }
+    }
+
+    displayRecords(records) {
+        const transactionList = document.querySelector('#records .transaction-list');
+        if (!transactionList) return;
+
+        transactionList.innerHTML = records.map(record => `
+            <div class="transaction" data-record-id="${record.id}">
+                <span class="date">${new Date(record.date).toLocaleDateString()}</span>
+                <span class="description">
+                    ${record.Debitor?.Name || 'Unknown'} → ${record.Creditor?.Name || 'Unknown'}
+                    ${record.Description ? `: ${record.Description}` : ''}
+                    ${record.Notes ? `<i class="fas fa-book notes-icon" data-notes="${record.Notes}"></i>` : ''}
+                </span>
+                <span class="amount ${record.amount >= 0 ? 'income' : 'expense'}">
+                    ${this.formatAmount(record.amount)}
+                </span>
+            </div>
+        `).join('');
     }
 
     initializeFilter() {
@@ -109,10 +253,13 @@ class TransactionManager {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
         const modal = document.getElementById('transaction-modal');
-        const closeBtn = modal.querySelector('.close-modal');
+        const closeBtn = modal?.querySelector('.close-modal');
         
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.closeModal());
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.closeModal();
+            });
         }
         
         const addForm = document.getElementById('add-transaction-form');
@@ -193,41 +340,88 @@ class TransactionManager {
         modal.style.display = 'none';
     }
 
-    addTransaction(form) {
-        const date = form.date.value;
-        const fromAccount = form.fromAccount.value;
-        const toAccount = form.toAccount.value;
-        const amount = this.formatAmount(form.amount.value);
+    async addTransaction(form) {
+        try {
+            const fromAccountName = form.fromAccount.value;
+            const toAccountName = form.toAccount.value;
+            
+            const accounts = await accountService.getAccountsByOwner(authManager.currentUser.id);
+            const fromAccount = accounts.find(acc => acc.name === fromAccountName);
+            const toAccount = accounts.find(acc => acc.name === toAccountName);
 
-        const transactionList = document.querySelector('#records .transaction-list');
-        const newTransaction = document.createElement('div');
-        newTransaction.className = 'transaction';
-        const notes = form.notes.value;
-        newTransaction.innerHTML = `
-            <span class="date">${date}</span>
-            <span class="description">
-                ${fromAccount} → ${toAccount}
-                ${notes ? `<i class="fas fa-book notes-icon" data-notes="${notes}"></i>` : ''}
-            </span>
-            <span class="amount expense">${amount}</span>
-        `;
-        transactionList.insertBefore(newTransaction, transactionList.firstChild);
+            if (!fromAccount || !toAccount) {
+                throw new Error('Invalid accounts');
+            }
+
+            const recordData = {
+                Date: new Date(form.date.value),
+                Amount: parseFloat(form.amount.value),
+                Description: `${fromAccountName} → ${toAccountName}`,
+                CreditorId: toAccount.Id,
+                DebitorId: fromAccount.Id,
+                Notes: form.notes.value
+            };
+
+            const newRecord = await recordService.createRecord(recordData);
+            
+            // Update UI
+            const transactionList = document.querySelector('#records .transaction-list');
+            const newTransaction = document.createElement('div');
+            newTransaction.className = 'transaction';
+            newTransaction.dataset.recordId = newRecord.id;
+            newTransaction.innerHTML = `
+                <span class="date">${new Date(newRecord.Date).toLocaleDateString()}</span>
+                <span class="description">
+                    ${newRecord.Description}
+                    ${recordData.Notes ? `<i class="fas fa-book notes-icon" data-notes="${recordData.Notes}"></i>` : ''}
+                </span>
+                <span class="amount expense">${this.formatAmount(newRecord.Amount)}</span>
+            `;
+            transactionList.insertBefore(newTransaction, transactionList.firstChild);
+        } catch (error) {
+            console.error('Error adding transaction:', error);
+            alert('Failed to add transaction. Please try again.');
+        }
     }
 
-    editTransaction(form) {
-        const selectedIndex = form.transactionSelect.value;
-        const transactions = document.querySelectorAll('#records .transaction');
-        const transaction = transactions[selectedIndex];
+    async editTransaction(form) {
+        try {
+            const selectedIndex = form.transactionSelect.value;
+            const transactions = document.querySelectorAll('#records .transaction');
+            const transaction = transactions[selectedIndex];
 
-        if (transaction) {
-            const date = form.date.value;
-            const fromAccount = form.fromAccount.value;
-            const toAccount = form.toAccount.value;
-            const amount = this.formatAmount(form.amount.value);
+            if (transaction) {
+                const recordId = transaction.dataset.recordId;
+                
+                const fromAccountName = form.fromAccount.value;
+                const toAccountName = form.toAccount.value;
+                
+                const accounts = await accountService.getAccountsByOwner(authManager.currentUser.id);
+                const fromAccount = accounts.find(acc => acc.name === fromAccountName);
+                const toAccount = accounts.find(acc => acc.name === toAccountName);
 
-            transaction.querySelector('.date').textContent = date;
-            transaction.querySelector('.description').textContent = `${fromAccount} → ${toAccount}`;
-            transaction.querySelector('.amount').textContent = amount;
+                if (!fromAccount || !toAccount) {
+                    throw new Error('Invalid accounts');
+                }
+
+                const recordData = {
+                    Date: new Date(form.date.value),
+                    Amount: parseFloat(form.amount.value),
+                    Description: `${fromAccountName} → ${toAccountName}`,
+                    CreditorId: toAccount.Id,
+                    DebitorId: fromAccount.Id
+                };
+
+                const updatedRecord = await recordService.editRecord(recordId, recordData);
+
+                // Update UI
+                transaction.querySelector('.date').textContent = new Date(updatedRecord.date).toLocaleDateString();
+                transaction.querySelector('.description').textContent = updatedRecord.description;
+                transaction.querySelector('.amount').textContent = this.formatAmount(updatedRecord.amount);
+            }
+        } catch (error) {
+            console.error('Error editing transaction:', error);
+            alert('Failed to edit transaction. Please try again.');
         }
     }
 
@@ -250,7 +444,7 @@ class TransactionManager {
         form.amount.value = parseFloat(amount);
     }
 
-    deleteTransaction() {
+    async deleteTransaction() {
         const transactions = document.querySelectorAll('#records .transaction');
         if (transactions.length === 0) {
             alert('No transactions available to delete');
@@ -287,10 +481,17 @@ class TransactionManager {
                     confirmModal.style.display = 'block';
 
                     // Handle confirmation
-                    document.getElementById('confirm-delete').onclick = () => {
-                        transaction.remove();
-                        confirmModal.remove();
-                        this.removeDeleteIcons();
+                    document.getElementById('confirm-delete').onclick = async () => {
+                        try {
+                            const recordId = transaction.dataset.recordId;
+                            await recordService.deleteRecord(recordId);
+                            transaction.remove();
+                            confirmModal.remove();
+                            this.removeDeleteIcons();
+                        } catch (error) {
+                            console.error('Error deleting transaction:', error);
+                            alert('Failed to delete transaction. Please try again.');
+                        }
                     };
 
                     document.getElementById('cancel-delete').onclick = () => {
@@ -304,8 +505,12 @@ class TransactionManager {
     }
 
     removeDeleteIcons() {
-        const deleteIcons = document.querySelectorAll('#records .delete-icon');
-        deleteIcons.forEach(icon => icon.remove());
+        try {
+            const deleteIcons = document.querySelectorAll('#records .delete-icon');
+            deleteIcons.forEach(icon => icon.remove());
+        } catch (error) {
+            console.error('Error removing delete icons:', error);
+        }
     }
 
     getAccountsList() {
@@ -329,36 +534,40 @@ class TransactionManager {
 
     // Display autocomplete suggestions
     showSuggestions(input) {
-        const suggestionsList = input.nextElementSibling;
-        const accounts = this.getAccountsList(); 
-        const inputValue = input.value.toLowerCase();
+        try {
+            const suggestionsList = input.nextElementSibling;
+            const accounts = this.getAccountsList(); 
+            const inputValue = input.value.toLowerCase();
 
-        // Filter accounts based on input
-        const filteredAccounts = accounts.filter(account => 
-            account.toLowerCase().includes(inputValue)
-        );
+            // Filter accounts based on input
+            const filteredAccounts = accounts.filter(account => 
+                account.toLowerCase().includes(inputValue)
+            );
 
-        // Show/hide suggestions container
-        if (inputValue && filteredAccounts.length > 0) {
-            suggestionsList.innerHTML = filteredAccounts
-                .map(account => `<div class="suggestion-item">${account}</div>`)
-                .join('');
-            suggestionsList.style.display = 'block';
+            // Show/hide suggestions container
+            if (inputValue && filteredAccounts.length > 0) {
+                suggestionsList.innerHTML = filteredAccounts
+                    .map(account => `<div class="suggestion-item">${account}</div>`)
+                    .join('');
+                suggestionsList.style.display = 'block';
 
-            // Add click handlers to suggestions
-            const suggestions = suggestionsList.getElementsByClassName('suggestion-item');
-            Array.from(suggestions).forEach(suggestion => {
-                suggestion.addEventListener('click', () => {
-                    input.value = suggestion.textContent;
-                    suggestionsList.style.display = 'none';
+                // Add click handlers to suggestions
+                const suggestions = suggestionsList.getElementsByClassName('suggestion-item');
+                Array.from(suggestions).forEach(suggestion => {
+                    suggestion.addEventListener('click', () => {
+                        input.value = suggestion.textContent;
+                        suggestionsList.style.display = 'none';
+                    });
                 });
-            });
-        } else {
-            suggestionsList.style.display = 'none';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error showing suggestions:', error);
+            // Hide suggestions list in case of error
+            if (input.nextElementSibling) {
+                input.nextElementSibling.style.display = 'none';
+            }
         }
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    new TransactionManager();
-});

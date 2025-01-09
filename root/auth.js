@@ -1,3 +1,5 @@
+import { accountService } from './services/accountService.js';
+
 class AuthManager {
     constructor() {
         this.currentUser = null;
@@ -28,6 +30,7 @@ class AuthManager {
 
     async login(credentials) {
         try {
+
             const response = await fetch('https://localhost:7162/api/Profiles/login', {
                 method: 'POST',
                 headers: {
@@ -54,12 +57,14 @@ class AuthManager {
 
     async register(userData) {
         try {
+
             const userResponse = await fetch('https://localhost:7162/api/Profiles/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+
                     Username: userData.username,
                     Email: userData.email,
                     PasswordHash: userData.password
@@ -69,7 +74,7 @@ class AuthManager {
             if (!userResponse.ok) return false;
 
             const user = await userResponse.json();
-
+          
             const packageResponse = await fetch('https://localhost:7162/api/AccountTypes/createAccountType', {
                 method: 'POST',
                 headers: {
@@ -89,6 +94,7 @@ class AuthManager {
                 return true;
             }
             return false;
+
         } catch (error) {
             console.error('Registration error:', error);
             return false;
@@ -104,10 +110,28 @@ class AuthManager {
 
     updateUserDisplay() {
         const welcomeText = document.querySelector('.user-welcome');
+        const userMenu = document.querySelector('.user-menu');
         if (welcomeText) {
             welcomeText.textContent = this.currentUser ?
                 `Welcome, ${this.currentUser.username}` :
                 'Welcome, Guest';
+            
+            // Update menu buttons based on auth state
+            if (this.currentUser) {
+                userMenu.innerHTML = `
+                    <div class="user-welcome">Welcome, ${this.currentUser.username}</div>
+                    <button class="auth-button" id="logout-button">Logout</button>
+                `;
+                document.getElementById('logout-button').addEventListener('click', () => this.logout());
+            } else {
+                userMenu.innerHTML = `
+                    <div class="user-welcome">Welcome, Guest</div>
+                    <button class="auth-button" id="login-button">Login</button>
+                    <button class="auth-button" id="register-button">Register</button>
+                `;
+                document.getElementById('login-button').addEventListener('click', () => this.showAuthModal('login'));
+                document.getElementById('register-button').addEventListener('click', () => this.showAuthModal('register'));
+            }
         }
     }
 
@@ -132,6 +156,14 @@ class AuthManager {
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
 
+        // Reset forms
+        loginForm.reset();
+        registerForm.reset();
+        
+        // Hide error messages
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('register-error').style.display = 'none';
+
         modal.style.display = 'block';
         if (type === 'login') {
             loginForm.style.display = 'block';
@@ -144,7 +176,22 @@ class AuthManager {
 
     closeAuthModal() {
         const modal = document.getElementById('auth-modal');
-        modal.style.display = 'none';
+        if (modal) {
+            modal.style.display = 'none';
+            // Reset forms
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            if (loginForm) loginForm.reset();
+            if (registerForm) registerForm.reset();
+        }
+    }
+
+    async logout() {
+        this.currentUser = null;
+        this.updateUserDisplay();
+        // Clear stored credentials
+        localStorage.removeItem('username');
+        localStorage.removeItem('password');
     }
 }
 

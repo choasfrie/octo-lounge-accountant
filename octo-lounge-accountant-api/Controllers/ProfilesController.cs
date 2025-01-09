@@ -22,6 +22,7 @@ namespace octo_lounge_accountant_api.Controllers
         }
 
         [HttpPost("register")]
+
         public async Task<IActionResult> Registration([FromBody] ProfileDTO profileDto)
         {
             if (profileDto == null)
@@ -51,6 +52,7 @@ namespace octo_lounge_accountant_api.Controllers
 
             return Ok(profile);
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {

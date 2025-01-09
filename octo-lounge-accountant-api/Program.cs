@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using octo_lounge_accountant_api.Data;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using octo_lounge_accountant_api.Services;
 
 namespace octo_lounge_accountant_api
 {
@@ -12,13 +13,14 @@ namespace octo_lounge_accountant_api
 
             // Add services to the container.
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddHttpClient();
 
             // Add DbContext with SQL Server provider
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
             builder.Services.AddCors(options =>
             {
@@ -29,6 +31,14 @@ namespace octo_lounge_accountant_api
                         .AllowAnyHeader());
             });
 
+            // Register OpenAIService
+            builder.Services.AddSingleton<OpenAIService>(sp =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                var apiKey = configuration["OpenAI:ApiKey"];
+                return new OpenAIService(apiKey);
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -37,6 +47,7 @@ namespace octo_lounge_accountant_api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
 
             app.UseCors("AllowAnyOrigin");
 
