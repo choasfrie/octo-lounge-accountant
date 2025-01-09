@@ -15,7 +15,7 @@ class TAccountManager {
     async loadAccounts() {
         try {
             const userId = this.getCurrentUserId();
-            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}/getAllAccountsAndRecords/${userId}`);
+            const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${userId}`);
             if (!response.ok) throw new Error('Failed to fetch accounts');
             const accountsData = await response.json();
             

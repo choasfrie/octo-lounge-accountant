@@ -24,7 +24,6 @@ class AuthManager {
     }
 
     async login(credentials) {
-        console.log('Login attempt with credentials:', { ...credentials, password: '***' });
         const errors = validateAuthData(credentials, 'login');
         if (errors.length > 0) {
             console.log('Validation errors:', errors);
@@ -52,7 +51,6 @@ class AuthManager {
                 throw new Error(errorText || 'Login failed');
             }
             const data = await response.json();
-            console.log('Login response:', data);
             
             this.currentUser = { 
                 username: data.username,
