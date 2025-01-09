@@ -69,6 +69,16 @@ class AuthManager {
 
     async register(userData) {
         try {
+            // Check if server is available
+            try {
+                const healthCheck = await fetch(API_CONFIG.BASE_URL);
+                if (!healthCheck.ok) {
+                    throw new Error('Server is not available');
+                }
+            } catch (error) {
+                throw new Error('Cannot connect to server. Please ensure the API is running.');
+            }
+
             // First register the user
             const userResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/register`, {
                 method: 'POST',
@@ -82,7 +92,10 @@ class AuthManager {
                 })
             });
 
-            if (!userResponse.ok) return false;
+            if (!userResponse.ok) {
+                const errorData = await userResponse.json();
+                throw new Error(errorData.message || 'Registration failed');
+            }
             const user = await userResponse.json();
 
             // Then create the account package if one was selected
@@ -136,6 +149,9 @@ class AuthManager {
             return true;
 
         } catch (error) {
+            const errorDiv = document.querySelector('#register-error');
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = error.message || 'Registration failed. Please try again.';
             console.error('Registration error:', error);
             return false;
         }
