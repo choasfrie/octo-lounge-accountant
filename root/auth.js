@@ -55,13 +55,13 @@ class AuthManager {
             console.log('Login response:', data);
             
             this.currentUser = { 
-                username: data.Username,
-                id: data.Id,
-                email: data.Email
+                username: data.username,
+                id: data.id,
+                email: data.email
             };
-            localStorage.setItem('username', data.Username);
-            localStorage.setItem('userId', data.Id.toString());
-            localStorage.setItem('userEmail', data.Email);
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('userId', data.id.toString());
+            localStorage.setItem('userEmail', data.email);
             this.updateUserDisplay();
             this.toggleAuthButtons();
             this.closeAuthModal();
