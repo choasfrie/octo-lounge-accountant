@@ -35,11 +35,12 @@ class AuthManager {
     }
 
     async init() {
-        const storedUsername = localStorage.getItem('username');
-        const storedUserId = localStorage.getItem('userId');
-        const storedEmail = localStorage.getItem('userEmail');
+        const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+        const storedUsername = sessionStorage.getItem('username');
+        const storedUserId = sessionStorage.getItem('userId');
+        const storedEmail = sessionStorage.getItem('userEmail');
         
-        if (storedUsername && storedUserId && storedEmail) {
+        if (isAuthenticated && storedUsername && storedUserId && storedEmail) {
             this.currentUser = {
                 username: storedUsername,
                 id: parseInt(storedUserId),
@@ -50,21 +51,23 @@ class AuthManager {
             this.updateServiceIcons(true);
         } else {
             this.updateServiceIcons(false);
-            this.checkProtectedPages();
+            const currentPage = window.location.pathname.split('/').pop();
+            if (currentPage === 'bookkeeping.html') {
+                window.location.href = 'index.html';
+            }
         }
     }
 
     async login(credentials) {
-        const errors = validateAuthData(credentials, 'login');
-        if (errors.length > 0) {
-            console.log('Validation errors:', errors);
-            const errorDiv = document.querySelector('#login-error');
-            errorDiv.style.display = 'block';
-            errorDiv.textContent = errors.join('\n');
-            return false;
-        }
-
         try {
+            const errors = validateAuthData(credentials, 'login');
+            if (errors.length > 0) {
+                console.log('Validation errors:', errors);
+                const errorDiv = document.querySelector('#login-error');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = errors.join('\n');
+                return false;
+            }
             const response = await fetch('http://localhost:5116/api/Profiles/login', {
                 method: 'POST',
                 headers: {
@@ -83,14 +86,18 @@ class AuthManager {
             }
             const data = await response.json();
             
+            // Create session
             this.currentUser = { 
                 username: data.username,
                 id: data.id,
                 email: data.email
             };
-            localStorage.setItem('username', data.username);
-            localStorage.setItem('userId', data.id.toString());
-            localStorage.setItem('userEmail', data.email);
+            
+            // Store session data
+            sessionStorage.setItem('isAuthenticated', 'true');
+            sessionStorage.setItem('username', data.username);
+            sessionStorage.setItem('userId', data.id.toString());
+            sessionStorage.setItem('userEmail', data.email);
             this.updateUserDisplay();
             this.toggleAuthButtons();
             this.closeAuthModal();
@@ -275,13 +282,14 @@ class AuthManager {
     async logout() {
         this.currentUser = null;
         this.updateUserDisplay();
-        // Clear stored credentials
-        localStorage.removeItem('username');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('password');
+        // Clear session
+        sessionStorage.clear();
+        // Redirect to home page if on protected page
+        const currentPage = window.location.pathname.split('/').pop();
+        if (currentPage === 'bookkeeping.html') {
+            window.location.href = 'index.html';
+        }
         this.updateServiceIcons(false);
-        this.checkProtectedPages();
     }
 }
 
