@@ -64,16 +64,6 @@ class AuthManager {
 
     async register(userData) {
         try {
-            // Check if server is available
-            try {
-                const healthCheck = await fetch('http://localhost:5116/api');
-                if (!healthCheck.ok) {
-                    throw new Error('Server is not available');
-                }
-            } catch (error) {
-                throw new Error('Cannot connect to server. Please ensure the API is running.');
-            }
-
             // First register the user
             const userResponse = await fetch('http://localhost:5116/api/Profiles/register', {
                 method: 'POST',
