@@ -285,6 +285,39 @@ export class TransactionManager {
         return `CHF ${formattedWhole}.${decimal}`;
     }
 
+    formatDateForInput(dateString) {
+        try {
+            // First try parsing as a Date object
+            const date = new Date(dateString);
+            if (!isNaN(date)) {
+                return date.toISOString().split('T')[0];
+            }
+            
+            // If that fails, try parsing as locale format
+            const parts = dateString.split(/[\/\-.]/);
+            if (parts.length === 3) {
+                let year, month, day;
+                
+                // Handle different date formats
+                if (parts[2].length === 4) { // Assuming year is last
+                    [month, day, year] = parts;
+                } else if (parts[0].length === 4) { // Assuming year is first
+                    [year, month, day] = parts;
+                }
+                
+                if (year && month && day) {
+                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                }
+            }
+            
+            // If all else fails, return today's date
+            return new Date().toISOString().split('T')[0];
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return new Date().toISOString().split('T')[0];
+        }
+    }
+
     initializeButtons() {
         const addButton = document.querySelector('#records [data-tooltip="Add Record"]');
         const editButton = document.querySelector('#records [data-tooltip="Edit Record"]');
@@ -409,12 +442,66 @@ export class TransactionManager {
     }
 
     showModal(type) {
-        const config = {
-            forms: ['add-transaction-form', 'edit-transaction-form', 'delete-transaction-form'],
-            showForm: `${type}-transaction-form`
-        };
+        const modal = document.getElementById('transaction-modal');
+        const addForm = document.getElementById('add-transaction-form');
+        const editForm = document.getElementById('edit-transaction-form');
         
-        ModalUtils.showModal('transaction-modal', config);
+        // Hide all forms first
+        [addForm, editForm].forEach(form => form.style.display = 'none');
+
+        if (type === 'edit') {
+            // Populate the transaction select dropdown
+            const selectElement = document.getElementById('edit-transaction-select');
+            if (selectElement) {
+                // Clear existing options
+                selectElement.innerHTML = '';
+                
+                // Get all transactions from the list
+                const transactions = document.querySelectorAll('#records .transaction');
+                
+                transactions.forEach((transaction, index) => {
+                    const date = transaction.querySelector('.date').textContent;
+                    const description = transaction.querySelector('.description').textContent;
+                    const amount = transaction.querySelector('.amount').textContent;
+                    
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${date} - ${description} - ${amount}`;
+                    selectElement.appendChild(option);
+                });
+            }
+            
+            editForm.style.display = 'block';
+            
+            // Add event listener to transaction select
+            const transactionSelect = document.getElementById('edit-transaction-select');
+            transactionSelect.addEventListener('change', (e) => {
+                const selectedIndex = e.target.value;
+                const transaction = document.querySelectorAll('#records .transaction')[selectedIndex];
+                
+                if (transaction) {
+                    const date = transaction.querySelector('.date').textContent;
+                    const description = transaction.querySelector('.description').textContent;
+                    const amount = transaction.querySelector('.amount').textContent
+                        .replace('CHF ', '')
+                        .replace(',', '')
+                        .replace('.00', '');
+                    
+                    // Extract from/to accounts from description
+                    const [fromAccount, toAccount] = description.split(' → ');
+                    
+                    // Set form values
+                    document.getElementById('edit-transaction-date').value = this.formatDateForInput(date);
+                    document.getElementById('edit-transaction-from').value = fromAccount.trim();
+                    document.getElementById('edit-transaction-to').value = toAccount.trim();
+                    document.getElementById('edit-transaction-amount').value = parseFloat(amount);
+                }
+            });
+        } else if (type === 'add') {
+            addForm.style.display = 'block';
+        }
+
+        modal.style.display = 'block';
     }
 
     closeModal() {
@@ -518,10 +605,17 @@ export class TransactionManager {
             .replace('.00', '');
         const date = transaction.querySelector('.date').textContent;
 
+        // Set form values
         form.date.value = date;
         form.fromAccount.value = fromAccount;
         form.toAccount.value = toAccount;
         form.amount.value = parseFloat(amount);
+        
+        // Set the selected option in the dropdown
+        const selectElement = document.getElementById('edit-transaction-select');
+        if (selectElement) {
+            selectElement.value = index;
+        }
     }
 
     async deleteTransaction() {
