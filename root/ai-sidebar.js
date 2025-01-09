@@ -93,6 +93,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (response.ok) {
                     aiMessageDiv.textContent = "Code 200: Successfully created Record.";
+                    // Reload the page after a short delay to show the message
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
                     const errorCode = response.status;
                     aiMessageDiv.textContent = `[Error: ${errorCode}]`;
