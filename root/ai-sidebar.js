@@ -59,26 +59,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Handle messages
-    const sendMessage = () => {
+    const sendMessage = async () => {
         const message = userInput.value.trim();
         if (message) {
-            // Add user message to chat
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.className = 'message user-message';
-            userMessageDiv.textContent = message;
-            chatMessages.appendChild(userMessageDiv);
-            
-            // Clear input
-            userInput.value = '';
-            
-            // TODO: Integrate with ChatGPT API
-            // Placeholder response
-            const aiMessageDiv = document.createElement('div');
-            aiMessageDiv.className = 'message ai-message';
-            aiMessageDiv.textContent = "AI integration coming soon...";
-            chatMessages.appendChild(aiMessageDiv);
-            
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            try {
+                // Add user message to chat
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.className = 'message user-message';
+                userMessageDiv.textContent = message;
+                chatMessages.appendChild(userMessageDiv);
+                
+                // Clear input
+                userInput.value = '';
+
+                // Get current user ID from session storage
+                const userId = sessionStorage.getItem('userId');
+                if (!userId) {
+                    throw new Error('User not authenticated');
+                }
+
+                // Call the API
+                const response = await fetch(`http://localhost:5116/api/Records/createRecordGPT/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(message)
+                });
+
+                // Create AI response message
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'message ai-message';
+
+                if (response.ok) {
+                    aiMessageDiv.textContent = "Code 200: Successfully created Record.";
+                    // Reload the page after a short delay to show the message
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    aiMessageDiv.textContent = `[Error ${response.status}: ${errorData.message}]`;
+                }
+
+                chatMessages.appendChild(aiMessageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            } catch (error) {
+                // Handle errors
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'message ai-message';
+                aiMessageDiv.textContent = `[Error: ${error.message}]`;
+                chatMessages.appendChild(aiMessageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }
     };
 
