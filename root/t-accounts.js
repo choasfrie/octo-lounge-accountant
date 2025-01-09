@@ -33,31 +33,35 @@ class TAccountManager {
             accountsData.forEach(account => {
                 const accountElement = document.createElement('div');
                 accountElement.className = 't-account';
-                accountElement.dataset.accountId = account.AccountId;
+                accountElement.dataset.accountId = account.accountId;
                 accountElement.innerHTML = `
-                    <h3>${account.AccountName}</h3>
+                    <h3>${account.accountName} (${account.accountNumber})</h3>
                     <div class="t-account-content">
                         <div class="debit-side">
                             <h4>Debit (+)</h4>
-                            ${account.Records
-                                .filter(r => r.DebitorId === account.AccountId)
+                            ${account.records
+                                .filter(r => r.DebitorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
                                         <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
+                            ${account.records.filter(r => r.DebitorId === account.accountId).length === 0 ? 
+                                '<div class="entry"><span>No debit entries</span></div>' : ''}
                         </div>
                         <div class="credit-side">
                             <h4>Credit (-)</h4>
-                            ${account.Records
-                                .filter(r => r.CreditorId === account.AccountId)
+                            ${account.records
+                                .filter(r => r.CreditorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
                                         <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
+                            ${account.records.filter(r => r.CreditorId === account.accountId).length === 0 ? 
+                                '<div class="entry"><span>No credit entries</span></div>' : ''}
                         </div>
                     </div>
                 `;

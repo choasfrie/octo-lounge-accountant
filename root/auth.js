@@ -11,6 +11,7 @@ class AuthManager {
     updateServiceIcons(isLoggedIn) {
         const bookkeepingLink = document.getElementById('bookkeeping-link');
         const analysisLink = document.getElementById('analysis-link');
+        const finalBalanceLink = document.getElementById('finalbalance-link');
         
         if (bookkeepingLink) {
             const bookIcon = bookkeepingLink.querySelector('i');
@@ -20,6 +21,11 @@ class AuthManager {
         if (analysisLink) {
             const chartIcon = analysisLink.querySelector('i');
             chartIcon.className = isLoggedIn ? 'fas fa-chart-line' : 'fas fa-lock';
+        }
+
+        if (finalBalanceLink) {
+            const balanceIcon = finalBalanceLink.querySelector('i');
+            balanceIcon.className = isLoggedIn ? 'fa-solid fa-coins' : 'fas fa-lock';
         }
     }
 

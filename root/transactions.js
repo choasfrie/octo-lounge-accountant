@@ -51,22 +51,22 @@ export class TransactionManager {
             
             accountsWithRecords.forEach(account => {
                 let balance = 0;
-                account.Records.forEach(record => {
-                    if (record.CreditorId === account.AccountId) {
+                account.records.forEach(record => {
+                    if (record.CreditorId === account.accountId) {
                         balance -= record.Amount;
-                    } else if (record.DebitorId === account.AccountId) {
+                    } else if (record.DebitorId === account.accountId) {
                         balance += record.Amount;
                     }
                 });
 
-                accountBalances.set(account.AccountId, {
-                    name: account.AccountName,
-                    number: account.AccountNumber,
+                accountBalances.set(account.accountId, {
+                    name: account.accountName,
+                    number: account.accountNumber,
                     balance: balance,
-                    records: account.Records
+                    records: account.records
                 });
 
-                allRecords.push(...account.Records);
+                allRecords.push(...account.records);
             });
 
             // Sort records by date
