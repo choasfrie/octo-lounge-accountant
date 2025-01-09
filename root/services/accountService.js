@@ -1,7 +1,6 @@
-import { API_CONFIG } from '../config.js';
 import { validateAccountData, handleApiResponse, LoadingState } from '../utils/validationUtils.js';
 
-const API_BASE_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}`;
+const API_BASE_URL = 'http://localhost:5116/api/Accounts';
 
 class AccountService {
     constructor() {

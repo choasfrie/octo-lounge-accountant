@@ -1,5 +1,4 @@
 import { accountService } from './services/accountService.js';
-import { API_CONFIG } from './config.js';
 
 class AuthManager {
     constructor() {
@@ -33,7 +32,7 @@ class AuthManager {
         }
 
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/login`, {
+            const response = await fetch('http://localhost:5116/api/Profiles/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,7 +66,7 @@ class AuthManager {
         try {
             // Check if server is available
             try {
-                const healthCheck = await fetch(API_CONFIG.BASE_URL);
+                const healthCheck = await fetch('http://localhost:5116/api');
                 if (!healthCheck.ok) {
                     throw new Error('Server is not available');
                 }
@@ -76,7 +75,7 @@ class AuthManager {
             }
 
             // First register the user
-            const userResponse = await fetch(`${API_CONFIG.BASE_URL}/Profiles/register`, {
+            const userResponse = await fetch('http://localhost:5116/api/Profiles/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,7 +96,7 @@ class AuthManager {
             // Then create the account package if one was selected
             if (userData.accountPackage && userData.accountPackage !== 'none') {
                 // Create account type
-                const packageResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNT_TYPES}/createAccountType`, {
+                const packageResponse = await fetch('http://localhost:5116/api/AccountTypes/createAccountType', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -113,7 +112,7 @@ class AuthManager {
                 }
 
                 // Create standard account package based on type
-                const accountPackResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}/createStandardPackage`, {
+                const accountPackResponse = await fetch('http://localhost:5116/api/Accounts/createStandardPackage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
