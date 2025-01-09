@@ -1,10 +1,11 @@
+import { authManager } from './auth.js';
+
 class TAccountManager {
     getCurrentUserId() {
-        const username = localStorage.getItem('username');
-        if (!username) {
+        if (!authManager.currentUser) {
             throw new Error('User not authenticated');
         }
-        return username;
+        return authManager.currentUser.id;
     }
     constructor() {
         this.initializeButtons(); // Setup action buttons
