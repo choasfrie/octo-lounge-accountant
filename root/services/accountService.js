@@ -1,8 +1,20 @@
 import { API_CONFIG } from '../config.js';
+import { validateAccountData, handleApiResponse, LoadingState } from '../utils/validationUtils.js';
+
 const API_BASE_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}`;
 
 class AccountService {
+    constructor() {
+        this.loadingState = new LoadingState('account-grid');
+    }
+
     async createAccount(accountData) {
+        const errors = validateAccountData(accountData);
+        if (errors.length > 0) {
+            throw new Error(errors.join('\n'));
+        }
+
+        this.loadingState.start('Creating account...');
         try {
             const response = await fetch(`${API_BASE_URL}/createAccount`, {
                 method: 'POST',
@@ -11,17 +23,18 @@ class AccountService {
                     'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
                 body: JSON.stringify({
-                    Name: accountData.name,
-                    AccountType: accountData.accountType,
-                    AccountNumber: accountData.accountNumber,
-                    Behaviour: accountData.behaviour,
-                    OwnerId: accountData.ownerId
+                    Name: accountData.Name,
+                    AccountType: accountData.AccountType,
+                    AccountNumber: accountData.AccountNumber,
+                    Behaviour: accountData.Behaviour,
+                    OwnerId: accountData.OwnerId
                 })
             });
-            if (!response.ok) throw new Error('Failed to create account');
-            return await response.json();
+            const data = await handleApiResponse(response, 'Failed to create account');
+            this.loadingState.end();
+            return data;
         } catch (error) {
-            console.error('Error creating account:', error);
+            this.loadingState.error(error.message);
             throw error;
         }
     }

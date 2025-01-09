@@ -31,8 +31,15 @@ class AuthManager {
     }
 
     async login(credentials) {
-        try {
+        const errors = validateAuthData(credentials, 'login');
+        if (errors.length > 0) {
+            const errorDiv = document.querySelector('#login-error');
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = errors.join('\n');
+            return false;
+        }
 
+        try {
             const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/login`, {
                 method: 'POST',
                 headers: {
@@ -41,24 +48,24 @@ class AuthManager {
                 body: JSON.stringify(credentials)
             });
 
-            if (response.ok) {
-                const userData = await response.json();
-                this.currentUser = { 
-                    username: userData.Username,
-                    id: userData.Id,
-                    email: userData.Email
-                };
-                this.token = userData.JWT;
-                localStorage.setItem('jwt', userData.JWT);
-                localStorage.setItem('username', userData.Username);
-                this.updateUserDisplay();
-                this.toggleAuthButtons();
-                this.closeAuthModal();
-                return true;
-            }
-            return false;
+            const data = await handleApiResponse(response, 'Login failed');
+            
+            this.currentUser = { 
+                username: data.Username,
+                id: data.Id,
+                email: data.Email
+            };
+            this.token = data.JWT;
+            localStorage.setItem('jwt', data.JWT);
+            localStorage.setItem('username', data.Username);
+            this.updateUserDisplay();
+            this.toggleAuthButtons();
+            this.closeAuthModal();
+            return true;
         } catch (error) {
-            console.error('Login error:', error);
+            const errorDiv = document.querySelector('#login-error');
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = error.message;
             return false;
         }
     }

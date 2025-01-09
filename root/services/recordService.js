@@ -1,8 +1,20 @@
 import { API_CONFIG } from '../config.js';
+import { validateRecordData, handleApiResponse, LoadingState } from '../utils/validationUtils.js';
+
 const API_BASE_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.RECORDS}`;
 
 class RecordService {
+    constructor() {
+        this.loadingState = new LoadingState('records');
+    }
+
     async createRecord(recordData) {
+        const errors = validateRecordData(recordData);
+        if (errors.length > 0) {
+            throw new Error(errors.join('\n'));
+        }
+
+        this.loadingState.start('Creating record...');
         try {
             const response = await fetch(`${API_BASE_URL}/createRecord`, {
                 method: 'POST',
@@ -11,17 +23,18 @@ class RecordService {
                     'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
                 body: JSON.stringify({
-                    Date: new Date(recordData.date).toISOString(),
-                    Amount: parseFloat(recordData.amount),
-                    Description: recordData.description,
-                    CreditorId: recordData.creditorId,
-                    DebitorId: recordData.debitorId
+                    Date: new Date(recordData.Date).toISOString(),
+                    Amount: parseFloat(recordData.Amount),
+                    Description: recordData.Description,
+                    CreditorId: recordData.CreditorId,
+                    DebitorId: recordData.DebitorId
                 })
             });
-            if (!response.ok) throw new Error('Failed to create record');
-            return await response.json();
+            const data = await handleApiResponse(response, 'Failed to create record');
+            this.loadingState.end();
+            return data;
         } catch (error) {
-            console.error('Error creating record:', error);
+            this.loadingState.error(error.message);
             throw error;
         }
     }
