@@ -65,6 +65,7 @@ class AuthManager {
 
     async register(userData) {
         try {
+            // First register the user
             const userResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/register`, {
                 method: 'POST',
                 headers: {
@@ -79,28 +80,57 @@ class AuthManager {
             });
 
             if (!userResponse.ok) return false;
-
             const user = await userResponse.json();
-          
-            const packageResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNT_TYPES}/createAccountType`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    Name: userData.accountPackage || 'none'
-                })
-            });
 
-            if (packageResponse.ok) {
-                this.currentUser = { username: user.Username };
-                localStorage.setItem('username', this.currentUser.username);
-                this.updateUserDisplay();
-                this.toggleAuthButtons();
-                this.closeAuthModal();
-                return true;
+            // Then create the account package if one was selected
+            if (userData.accountPackage && userData.accountPackage !== 'none') {
+                // Create account type
+                const packageResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNT_TYPES}/createAccountType`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        Name: userData.accountPackage
+                    })
+                });
+
+                if (!packageResponse.ok) {
+                    console.error('Failed to create account package');
+                    // Continue anyway since user is created
+                }
+
+                // Create standard account package based on type
+                const accountPackResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}/createStandardPackage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        profileId: user.Id,
+                        companyType: userData.accountPackage === 'llc' ? 'L' : 
+                                   userData.accountPackage === 'plc' ? 'G' : 
+                                   userData.accountPackage === 'sp' ? 'S' : 'N'
+                    })
+                });
+
+                if (!accountPackResponse.ok) {
+                    console.error('Failed to create standard account package');
+                    // Continue anyway since user and account type are created
+                }
             }
-            return false;
+
+            // Update UI state
+            this.currentUser = { 
+                username: user.Username,
+                id: user.Id,
+                email: user.Email
+            };
+            localStorage.setItem('username', this.currentUser.username);
+            this.updateUserDisplay();
+            this.toggleAuthButtons();
+            this.closeAuthModal();
+            return true;
 
         } catch (error) {
             console.error('Registration error:', error);
