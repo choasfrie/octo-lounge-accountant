@@ -608,6 +608,20 @@ h2 {
     background-color: #333;
     border-radius: 8px;
     padding: 20px;
+    transition: box-shadow 0.3s ease;
+    position: relative;
+}
+
+.t-account:hover {
+    box-shadow: 0 0 0 2px var(--outline-color);
+}
+
+.t-account[data-behavior="D"] {
+    --outline-color: #4CAF50;
+}
+
+.t-account[data-behavior="C"] {
+    --outline-color: #F44336;
 }
 
 .t-account h3 {

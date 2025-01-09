@@ -34,8 +34,19 @@ class TAccountManager {
                 const accountElement = document.createElement('div');
                 accountElement.className = 't-account';
                 accountElement.dataset.accountId = account.accountId;
+                accountElement.dataset.behavior = account.accountBehaviour;
+                // Determine outline color and behavior symbol based on account behavior
+                const outlineColor = account.accountBehaviour === 'D' ? '#4CAF50' : '#F44336';
+                const behaviorSymbol = account.accountBehaviour === 'D' ? '+' : '-';
+                
                 accountElement.innerHTML = `
-                    <h3>${account.accountName} (${account.accountNumber})</h3>
+                    <h3>
+                        ${account.accountName} (${account.accountNumber})
+                        <i class="fas fa-book" 
+                           style="margin-left: 8px; font-size: 0.8em; color: #666;"
+                           title="${account.accountBehaviour === 'D' ? 'Active Account (Debit behavior)' : 'Passive Account (Credit behavior)'}">
+                        </i>
+                    </h3>
                     <div class="t-account-content">
                         <div class="debit-side">
                             <h4>Debit (+)</h4>
@@ -43,7 +54,8 @@ class TAccountManager {
                                 .filter(r => r.DebitorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span>${r.Description}</span>
+                                        <span class="amount">${this.formatAmount(r.Amount)}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
@@ -56,7 +68,8 @@ class TAccountManager {
                                 .filter(r => r.CreditorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span>${r.Description}</span>
+                                        <span class="amount">${this.formatAmount(r.Amount)}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
