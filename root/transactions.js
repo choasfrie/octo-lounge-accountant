@@ -1,5 +1,6 @@
 import { recordService } from './services/recordService.js';
 import { authManager } from './auth.js';
+import { ModalUtils } from './utils/modalUtils.js';
 
 export class TransactionManager {
     static init() {
@@ -403,12 +404,6 @@ export class TransactionManager {
     }
 
     showModal(type) {
-        const modal = document.getElementById('transaction-modal');
-        const addForm = document.getElementById('add-transaction-form');
-        const editForm = document.getElementById('edit-transaction-form');
-
-        [addForm, editForm].forEach(form => form.style.display = 'none');
-
         if (type === 'edit') {
             const transactions = Array.from(document.querySelectorAll('#records .transaction'))
                 .map((trans, index) => {
@@ -426,21 +421,26 @@ export class TransactionManager {
             const select = document.getElementById('edit-transaction-select');
             select.innerHTML = transactions;
             select.addEventListener('change', (e) => this.populateEditForm(e.target.value));
-            editForm.style.display = 'block';
+            
+            ModalUtils.showModal('transaction-modal', {
+                forms: ['add-transaction-form', 'edit-transaction-form'],
+                showForm: 'edit-transaction-form'
+            });
+
             // Populate initial selection
             if (transactions.length > 0) {
                 this.populateEditForm(0);
             }
         } else {
-            addForm.style.display = 'block';
+            ModalUtils.showModal('transaction-modal', {
+                forms: ['add-transaction-form', 'edit-transaction-form'],
+                showForm: 'add-transaction-form'
+            });
         }
-
-        modal.style.display = 'block';
     }
 
     closeModal() {
-        const modal = document.getElementById('transaction-modal');
-        modal.style.display = 'none';
+        ModalUtils.closeModal('transaction-modal');
     }
 
     async addTransaction(form) {
