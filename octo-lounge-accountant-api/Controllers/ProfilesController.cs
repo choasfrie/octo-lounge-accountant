@@ -22,7 +22,6 @@ namespace octo_lounge_accountant_api.Controllers
         }
 
         [HttpPost("register")]
-
         public async Task<IActionResult> Registration([FromBody] ProfileDTO profileDto)
         {
             if (profileDto == null)
@@ -76,7 +75,7 @@ namespace octo_lounge_accountant_api.Controllers
             // Generate JWT token if needed
             // var token = GenerateJwtToken(profile);
 
-            return Ok(new { Message = "Login successful" /*, Token = token */ });
+            return Ok(profile);
         }
 
         private string EncryptPassword(string password)
