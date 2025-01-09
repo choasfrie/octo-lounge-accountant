@@ -72,9 +72,6 @@ namespace octo_lounge_accountant_api.Controllers
                 return Unauthorized("Invalid username or password.");
             }
 
-            // Generate JWT token if needed
-            // var token = GenerateJwtToken(profile);
-
             return Ok(profile);
         }
 

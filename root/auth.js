@@ -4,7 +4,6 @@ import { API_CONFIG } from './config.js';
 class AuthManager {
     constructor() {
         this.currentUser = null;
-        this.token = localStorage.getItem('jwt');
         this.init();
     }
 
@@ -55,8 +54,6 @@ class AuthManager {
                 id: data.Id,
                 email: data.Email
             };
-            this.token = data.JWT;
-            localStorage.setItem('jwt', data.JWT);
             localStorage.setItem('username', data.Username);
             this.updateUserDisplay();
             this.toggleAuthButtons();

@@ -19,8 +19,7 @@ class AccountService {
             const response = await fetch(`${API_BASE_URL}/createAccount`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     Name: accountData.Name,
