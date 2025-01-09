@@ -88,14 +88,14 @@ class AuthManager {
                 throw new Error(errorData.message || 'Registration failed');
             }
 
+            const user = await userResponse.json();
+
             // Only proceed if registration was successful
             if (userResponse.status === 200) {
-                const user = await userResponse.json();
-
                 // Create account package if selected and not "none"
                 if (userData.accountPackage && userData.accountPackage !== '' && userData.accountPackage !== 'none') {
                     console.log('Creating account package:', {
-                        profileId: user.id,
+                        profileId: user.Id,
                         companyType: userData.accountPackage
                     });
                     try {
