@@ -9,23 +9,17 @@ class AuthManager {
 
     async init() {
         const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            this.currentUser = { username: storedUsername };
+        const storedUserId = localStorage.getItem('userId');
+        const storedEmail = localStorage.getItem('userEmail');
+        
+        if (storedUsername && storedUserId && storedEmail) {
+            this.currentUser = {
+                username: storedUsername,
+                id: parseInt(storedUserId),
+                email: storedEmail
+            };
             this.updateUserDisplay();
             this.toggleAuthButtons();
-        } else {
-            try {
-                const response = await fetch('/api/user-info');
-                if (response.ok) {
-                    const userData = await response.json(); // Store user data
-                    this.currentUser = { username: userData.username || 'Guest' };
-                    localStorage.setItem('username', this.currentUser.username); // Save username in local storage
-                    this.updateUserDisplay();
-                    this.toggleAuthButtons();
-                }
-            } catch (error) {
-                console.error('Error fetching user info:', error);
-            }
         }
     }
 
@@ -55,6 +49,8 @@ class AuthManager {
                 email: data.Email
             };
             localStorage.setItem('username', data.Username);
+            localStorage.setItem('userId', data.Id.toString());
+            localStorage.setItem('userEmail', data.Email);
             this.updateUserDisplay();
             this.toggleAuthButtons();
             this.closeAuthModal();
@@ -258,6 +254,8 @@ class AuthManager {
         this.updateUserDisplay();
         // Clear stored credentials
         localStorage.removeItem('username');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userEmail');
         localStorage.removeItem('password');
     }
 }
