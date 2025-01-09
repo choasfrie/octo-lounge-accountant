@@ -28,42 +28,33 @@ export class TransactionManager {
                 return;
             }
 
-            // Load accounts and their records
-            const accountsResponse = await accountService.getAccountsByOwner(authManager.currentUser.id);
-            const accounts = accountsResponse.data;
-            
-            // Calculate balances and get records for each account
+            // Get all accounts with their records
+            const response = await accountService.getAllAccountsAndRecords(authManager.currentUser.id);
+            const accountsWithRecords = response.data;
+
+            // Calculate balances and collect all records
             const accountBalances = new Map();
             const allRecords = [];
             
-            for (const account of accounts) {
-                // Get records where account is creditor or debitor
-                const [creditorRecords, debitorRecords] = await Promise.all([
-                    recordService.getRecordsByCreditorId(account.Id),
-                    recordService.getRecordsByDebitorId(account.Id)
-                ]);
-                
-                // Calculate balance
+            accountsWithRecords.forEach(account => {
                 let balance = 0;
-                const accountRecords = [...creditorRecords.data, ...debitorRecords.data];
-                
-                accountRecords.forEach(record => {
-                    if (record.CreditorId === account.Id) {
+                account.Records.forEach(record => {
+                    if (record.CreditorId === account.AccountId) {
                         balance -= record.Amount;
-                    } else if (record.DebitorId === account.Id) {
+                    } else if (record.DebitorId === account.AccountId) {
                         balance += record.Amount;
                     }
                 });
-                
-                accountBalances.set(account.Id, {
-                    name: account.Name,
+
+                accountBalances.set(account.AccountId, {
+                    name: account.AccountName,
                     number: account.AccountNumber,
                     balance: balance,
-                    records: accountRecords
+                    records: account.Records
                 });
-                
-                allRecords.push(...accountRecords);
-            }
+
+                allRecords.push(...account.Records);
+            });
 
             // Sort records by date
             allRecords.sort((a, b) => new Date(b.Date) - new Date(a.Date));
@@ -71,6 +62,7 @@ export class TransactionManager {
             // Update UI
             this.displayAccounts(accountBalances);
             this.displayRecords(allRecords);
+            this.updateAccountFilter(accountsWithRecords);
         } catch (error) {
             console.error('Error loading records:', error);
         }
@@ -131,6 +123,7 @@ export class TransactionManager {
     }
 
     displayRecords(records) {
+        this.renderTAccounts(records);
         const transactionList = document.querySelector('#records .transaction-list');
         if (!transactionList) return;
 
@@ -168,7 +161,92 @@ export class TransactionManager {
         }
     }
 
+    updateAccountFilter(accounts) {
+        const filter = document.getElementById('account-filter');
+        if (!filter) return;
+
+        // Clear existing options
+        filter.innerHTML = '<option value="all">All Accounts</option>';
+
+        // Add account options
+        accounts.forEach(account => {
+            const option = document.createElement('option');
+            option.value = account.AccountName;
+            option.textContent = `${account.AccountName} (${account.AccountNumber})`;
+            filter.appendChild(option);
+        });
+    }
+
     // Format currency amount
+    renderTAccounts(records) {
+        const tAccountsGrid = document.getElementById('t-accounts-grid');
+        if (!tAccountsGrid) return;
+
+        // Group records by account
+        const accountsMap = new Map();
+        records.forEach(record => {
+            if (!accountsMap.has(record.DebitorId)) {
+                accountsMap.set(record.DebitorId, {
+                    name: record.Debitor?.Name || 'Unknown',
+                    debits: [],
+                    credits: []
+                });
+            }
+            if (!accountsMap.has(record.CreditorId)) {
+                accountsMap.set(record.CreditorId, {
+                    name: record.Creditor?.Name || 'Unknown',
+                    debits: [],
+                    credits: []
+                });
+            }
+
+            // Add to debitor's credits
+            accountsMap.get(record.DebitorId).credits.push({
+                amount: record.Amount,
+                date: record.Date,
+                description: record.Description
+            });
+
+            // Add to creditor's debits
+            accountsMap.get(record.CreditorId).debits.push({
+                amount: record.Amount,
+                date: record.Date,
+                description: record.Description
+            });
+        });
+
+        // Render T-Accounts
+        tAccountsGrid.innerHTML = '';
+        accountsMap.forEach((account, accountId) => {
+            const tAccount = document.createElement('div');
+            tAccount.className = 't-account';
+            tAccount.innerHTML = `
+                <h3>${account.name}</h3>
+                <div class="t-account-content">
+                    <div class="debit-side">
+                        <h4>Debit (+)</h4>
+                        ${account.debits.map(entry => `
+                            <div class="entry">
+                                <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
+                                <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="credit-side">
+                        <h4>Credit (-)</h4>
+                        ${account.credits.map(entry => `
+                            <div class="entry">
+                                <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
+                                <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            tAccountsGrid.appendChild(tAccount);
+        });
+    }
+
     formatAmount(amount) {
         const num = parseFloat(amount).toFixed(2);
         const [whole, decimal] = num.split('.');
@@ -513,23 +591,20 @@ export class TransactionManager {
         }
     }
 
-    getAccountsList() {
-        // Get accounts from chart of accounts
-        return [
-            // Assets (1000-1999)
-            'Kasse (1000)', 'Bank (1020)', 'PayPal (1021)', 'Post (1030)', 'Kreditkarten (1040)',
-            'Debitoren (1100)', 'Delkredere (1109)', 'Vorschüsse (1140)', 'Vorsteuer (1170)',
-            'Handelswaren (1200)', 'Rohstoffe (1210)',
-            // Liabilities (2000-2999)
-            'Kreditoren (2000)', 'Bank (2100)', 'Mehrwertsteuer (2200)', 'Sozialversicherungen (2210)',
-            // Equity (2800-2999)
-            'Eigenkapital (2800)', 'Privat (2891)',
-            // Revenue (3000-3999)
-            'Warenertrag (3000)', 'Dienstleistungsertrag (3200)',
-            // Expenses (4000-6999)
-            'Materialaufwand (4000)', 'Handelswarenaufwand (4200)', 'Löhne (5000)',
-            'Mietaufwand (6000)', 'Versicherungsaufwand (6300)'
-        ];
+    async getAccountsList() {
+        try {
+            if (!authManager.currentUser) {
+                return [];
+            }
+            
+            const response = await accountService.getAccountsByOwner(authManager.currentUser.id);
+            return response.data.map(account => 
+                `${account.Name} (${account.AccountNumber})`
+            );
+        } catch (error) {
+            console.error('Error fetching accounts:', error);
+            return [];
+        }
     }
 
     // Display autocomplete suggestions
