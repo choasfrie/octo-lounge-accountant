@@ -24,8 +24,10 @@ class AuthManager {
     }
 
     async login(credentials) {
+        console.log('Login attempt with credentials:', { ...credentials, password: '***' });
         const errors = validateAuthData(credentials, 'login');
         if (errors.length > 0) {
+            console.log('Validation errors:', errors);
             const errorDiv = document.querySelector('#login-error');
             errorDiv.style.display = 'block';
             errorDiv.textContent = errors.join('\n');
@@ -38,10 +40,19 @@ class AuthManager {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(credentials)
+                body: JSON.stringify({
+                    username: credentials.username,
+                    password: credentials.password
+                })
             });
 
-            const data = await handleApiResponse(response, 'Login failed');
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Login failed:', response.status, errorText);
+                throw new Error(errorText || 'Login failed');
+            }
+            const data = await response.json();
+            console.log('Login response:', data);
             
             this.currentUser = { 
                 username: data.Username,
@@ -65,12 +76,6 @@ class AuthManager {
 
     async register(userData) {
         try {
-            console.log('Starting registration with data:', {
-                username: userData.username,
-                email: userData.email,
-                accountPackage: userData.accountPackage
-            });
-
             // First register the user
             const userResponse = await fetch('http://localhost:5116/api/Profiles/register', {
                 method: 'POST',
@@ -95,10 +100,6 @@ class AuthManager {
             if (userResponse.status === 200) {
                 // Create account package if selected and not "none"
                 if (userData.accountPackage && userData.accountPackage !== '' && userData.accountPackage !== 'none') {
-                    console.log('Creating account package:', {
-                        profileId: user.Id,
-                        companyType: userData.accountPackage
-                    });
                     try {
                         const response = await fetch('http://localhost:5116/api/Accounts/createStandardPackage', {
                             method: 'POST',

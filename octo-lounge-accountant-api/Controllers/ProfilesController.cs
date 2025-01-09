@@ -73,14 +73,16 @@ namespace octo_lounge_accountant_api.Controllers
                 return BadRequest("Login data is null.");
             }
 
-            var profile = await _context.Profiles.SingleOrDefaultAsync(p => p.Username == loginDto.Username);
+            var profile = await _context.Profiles.SingleOrDefaultAsync(p => p.Username == loginDto.username);
             if (profile == null)
             {
                 return Unauthorized("Invalid username or password.");
             }
 
-            var encryptedPassword = EncryptPassword(loginDto.Password);
-            if (profile.PasswordHash != encryptedPassword)
+            // Hash the login password attempt the same way as registration
+            var hashedLoginAttempt = EncryptPassword(loginDto.password);
+            // Compare the hashed attempt with stored hash
+            if (!string.Equals(profile.PasswordHash, hashedLoginAttempt, StringComparison.OrdinalIgnoreCase))
             {
                 return Unauthorized("Invalid username or password.");
             }
