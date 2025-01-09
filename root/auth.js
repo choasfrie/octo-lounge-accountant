@@ -76,9 +76,12 @@ class AuthManager {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Login failed:', response.status, errorText);
-                throw new Error(errorText || 'Login failed');
+                const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
+                console.error('Login failed:', {
+                    status: response.status,
+                    message: errorData.message
+                });
+                throw new Error(errorData.message || 'Login failed');
             }
             const data = await response.json();
             
@@ -394,4 +397,7 @@ const initializeEventListeners = () => {
 };
 
 // Start initialization when DOM is loaded
-document.addEventListener('DOMContentLoaded', initializeEventListeners);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEventListeners();
+    setupAuthButtons();
+});

@@ -197,22 +197,6 @@ export class TransactionManager {
         });
     }
 
-    updateAccountFilter(accounts) {
-        const filter = document.getElementById('account-filter');
-        if (!filter) return;
-
-        // Clear existing options
-        filter.innerHTML = '<option value="all">All Accounts</option>';
-
-        // Add account options
-        accounts.forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.AccountName;
-            option.textContent = `${account.AccountName} (${account.AccountNumber})`;
-            filter.appendChild(option);
-        });
-    }
-
     // Format currency amount
     renderTAccounts(records) {
         const tAccountsGrid = document.getElementById('t-accounts-grid');
@@ -414,39 +398,12 @@ export class TransactionManager {
     }
 
     showModal(type) {
-        if (type === 'edit') {
-            const transactions = Array.from(document.querySelectorAll('#records .transaction'))
-                .map((trans, index) => {
-                    const date = trans.querySelector('.date').textContent;
-                    const description = trans.querySelector('.description').textContent;
-                    const amount = trans.querySelector('.amount').textContent;
-                    return `<option value="${index}">${date} - ${description} - ${amount}</option>`;
-                }).join('');
-
-            if (transactions.length === 0) {
-                alert('No transactions available to edit');
-                return;
-            }
-
-            const select = document.getElementById('edit-transaction-select');
-            select.innerHTML = transactions;
-            select.addEventListener('change', (e) => this.populateEditForm(e.target.value));
-            
-            ModalUtils.showModal('transaction-modal', {
-                forms: ['add-transaction-form', 'edit-transaction-form'],
-                showForm: 'edit-transaction-form'
-            });
-
-            // Populate initial selection
-            if (transactions.length > 0) {
-                this.populateEditForm(0);
-            }
-        } else {
-            ModalUtils.showModal('transaction-modal', {
-                forms: ['add-transaction-form', 'edit-transaction-form'],
-                showForm: 'add-transaction-form'
-            });
-        }
+        const config = {
+            forms: ['add-transaction-form', 'edit-transaction-form', 'delete-transaction-form'],
+            showForm: `${type}-transaction-form`
+        };
+        
+        ModalUtils.showModal('transaction-modal', config);
     }
 
     closeModal() {
