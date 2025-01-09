@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         window.location.reload();
                     }, 1500);
                 } else {
-                    const errorCode = response.status;
-                    aiMessageDiv.textContent = `[Error: ${errorCode}]`;
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    aiMessageDiv.textContent = `[Error ${response.status}: ${errorData.message}]`;
                 }
 
                 chatMessages.appendChild(aiMessageDiv);

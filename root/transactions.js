@@ -599,7 +599,7 @@ export class TransactionManager {
                 return [];
             }
             
-            const response = await fetch(`https://localhost:7162/api/Accounts/getAccountsByOwner/${authManager.currentUser.id}`);
+            const response = await fetch(`http://localhost:5116/api/Accounts/getAccountsByOwner/${authManager.currentUser.id}`);
             if (!response.ok) throw new Error('Failed to fetch accounts');
             const accounts = await response.json();
             
