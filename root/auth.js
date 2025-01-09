@@ -94,7 +94,7 @@ class AuthManager {
             const user = await userResponse.json();
 
             // Then create the account package if one was selected
-            if (userData.accountPackage && userData.accountPackage !== 'none') {
+            if (userData.accountPackage && userData.accountPackage !== '') {
                 // Create account type
                 const packageResponse = await fetch('http://localhost:5116/api/AccountTypes/createAccountType', {
                     method: 'POST',
@@ -119,9 +119,7 @@ class AuthManager {
                     },
                     body: JSON.stringify({
                         profileId: user.Id,
-                        companyType: userData.accountPackage === 'llc' ? 'L' : 
-                                   userData.accountPackage === 'plc' ? 'G' : 
-                                   userData.accountPackage === 'sp' ? 'S' : 'N'
+                        companyType: userData.accountPackage
                     })
                 });
 
