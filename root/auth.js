@@ -4,6 +4,33 @@ import { validateAuthData } from './utils/validationUtils.js';
 class AuthManager {
     constructor() {
         this.currentUser = null;
+        this.protectedPages = ['bookkeeping.html', 'financialanalysis.html'];
+        this.init();
+    }
+
+    updateServiceIcons(isLoggedIn) {
+        const bookkeepingLink = document.getElementById('bookkeeping-link');
+        const analysisLink = document.getElementById('analysis-link');
+        
+        if (bookkeepingLink) {
+            const bookIcon = bookkeepingLink.querySelector('i');
+            bookIcon.className = isLoggedIn ? 'fas fa-book-open' : 'fas fa-lock';
+        }
+        
+        if (analysisLink) {
+            const chartIcon = analysisLink.querySelector('i');
+            chartIcon.className = isLoggedIn ? 'fas fa-chart-line' : 'fas fa-lock';
+        }
+    }
+
+    checkProtectedPages() {
+        const currentPage = window.location.pathname.split('/').pop();
+        if (this.protectedPages.includes(currentPage) && !this.currentUser) {
+            window.location.href = 'index.html';
+        }
+    }
+    constructor() {
+        this.currentUser = null;
         this.init();
     }
 
@@ -20,6 +47,10 @@ class AuthManager {
             };
             this.updateUserDisplay();
             this.toggleAuthButtons();
+            this.updateServiceIcons(true);
+        } else {
+            this.updateServiceIcons(false);
+            this.checkProtectedPages();
         }
     }
 
@@ -249,6 +280,8 @@ class AuthManager {
         localStorage.removeItem('userId');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('password');
+        this.updateServiceIcons(false);
+        this.checkProtectedPages();
     }
 }
 
