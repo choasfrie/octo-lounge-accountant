@@ -45,10 +45,24 @@ namespace octo_lounge_accountant_api.Controllers
                 PasswordHash = encryptedPassword,
             };
 
-            _context.Profiles.Add(profile);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Profiles.Add(profile);
+                await _context.SaveChangesAsync();
+                
+                // Fetch the newly created profile to ensure it exists
+                var createdProfile = await _context.Profiles.FindAsync(profile.Id);
+                if (createdProfile == null)
+                {
+                    return StatusCode(500, "Profile creation failed");
+                }
 
-            return Ok(profile);
+                return Ok(createdProfile);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Profile creation failed: {ex.Message}");
+            }
         }
 
         [HttpPost("login")]

@@ -135,11 +135,18 @@ namespace octo_lounge_accountant_api.Controllers
         }
 
         [HttpPost("createStandardPackage")]
-        public IActionResult CreateStandardAccountPackage([FromBody] AccountPackDTO accountPackDto)
+        public async Task<IActionResult> CreateStandardAccountPackage([FromBody] AccountPackDTO accountPackDto)
         {
             if (accountPackDto == null)
             {
                 return BadRequest("Account package data is null.");
+            }
+
+            // Verify that the Profile exists
+            var profile = await _context.Profiles.FindAsync(accountPackDto.profileId);
+            if (profile == null)
+            {
+                return BadRequest($"Profile with ID {accountPackDto.profileId} does not exist.");
             }
             AccountPackageHandler handler = new AccountPackageHandler();
             List<Account> accounts;
