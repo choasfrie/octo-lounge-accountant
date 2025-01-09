@@ -439,8 +439,7 @@ export class TransactionManager {
                 amount: parseFloat(form.amount.value),
                 description: `${fromAccountName} → ${toAccountName}`,
                 creditorId: toAccount.id,
-                debitorId: fromAccount.id,
-                notes: form.notes.value
+                debitorId: fromAccount.id
             };
 
             const newRecord = await recordService.createRecord(recordData);
