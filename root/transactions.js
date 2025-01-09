@@ -38,8 +38,11 @@ export class TransactionManager {
                     const accountGrid = document.getElementById('account-grid');
                     if (accountGrid) accountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
                     
+                    const recentTransactionsList = document.querySelector('#recent-transactions .transaction-list');
+                    if (recentTransactionsList) recentTransactionsList.innerHTML = '<div class="error">No transactions found.</div>';
+
                     const transactionList = document.querySelector('#records .transaction-list');
-                    if (transactionList) transactionList.innerHTML = '<div class="error">No accounts or transactions found.</div>';
+                    if (transactionList) transactionList.innerHTML = '<div class="error">No transactions found.</div>';
                     
                     const tAccountGrid = document.getElementById('t-accounts-grid');
                     if (tAccountGrid) tAccountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
