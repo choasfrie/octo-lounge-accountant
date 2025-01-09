@@ -96,6 +96,7 @@ class AuthManager {
             sessionStorage.setItem('userEmail', data.email);
             this.updateUserDisplay();
             this.toggleAuthButtons();
+            this.updateServiceIcons(true);
             this.closeAuthModal();
             return true;
         } catch (error) {
@@ -162,6 +163,7 @@ class AuthManager {
             localStorage.setItem('username', this.currentUser.username);
             this.updateUserDisplay();
             this.toggleAuthButtons();
+            this.updateServiceIcons(true);
             this.closeAuthModal();
             return true;
 
