@@ -81,49 +81,32 @@ class AuthManager {
                 const errorData = await userResponse.json();
                 throw new Error(errorData.message || 'Registration failed');
             }
-            const user = await userResponse.json();
 
-            // Then create the account package if one was selected
-            if (userData.accountPackage && userData.accountPackage !== '') {
-                // Only create account type if a package was selected
-                if (userData.accountPackage) {
-                    const packageResponse = await fetch('http://localhost:5116/api/AccountTypes/createAccountType', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            Name: userData.accountPackage
-                        })
-                    });
+            // Only proceed if registration was successful
+            if (userResponse.status === 200) {
+                const user = await userResponse.json();
 
-                    if (!packageResponse.ok) {
-                        console.error('Failed to create account type');
+                // Create account package if selected
+                if (userData.accountPackage && userData.accountPackage !== '') {
+                    try {
+                        const response = await fetch('http://localhost:5116/api/Accounts/createStandardPackage', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                profileId: user.Id,
+                                companyType: userData.accountPackage
+                            })
+                        });
+
+                        if (!response.ok) {
+                            console.warn('Failed to create account package, but continuing with registration');
+                        }
+                    } catch (error) {
+                        console.warn('Failed to setup account package, but user was created:', error);
                     }
                 }
-
-                if (!packageResponse.ok) {
-                    console.error('Failed to create account package');
-                    // Continue anyway since user is created
-                }
-
-                // Create standard account package based on type
-                const accountPackResponse = await fetch('http://localhost:5116/api/Accounts/createStandardPackage', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        profileId: user.Id,
-                        companyType: userData.accountPackage
-                    })
-                });
-
-                if (!accountPackResponse.ok) {
-                    console.error('Failed to create standard account package');
-                    // Continue anyway since user and account type are created
-                }
-            }
 
             // Update UI state
             this.currentUser = { 
