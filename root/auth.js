@@ -77,9 +77,9 @@ class AuthManager {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: userData.username,
-                    email: userData.email,
-                    passwordHash: userData.password
+                    Username: userData.username,
+                    Email: userData.email,
+                    PasswordHash: userData.password
                 })
             });
 
@@ -95,8 +95,8 @@ class AuthManager {
                 // Create account package if selected and not "none"
                 if (userData.accountPackage && userData.accountPackage !== '' && userData.accountPackage !== 'none') {
                     console.log('Creating account package:', {
-                        profileId: user.Id,
-                        packageType: userData.accountPackage
+                        profileId: user.id,
+                        companyType: userData.accountPackage
                     });
                     try {
                         const response = await fetch('http://localhost:5116/api/Accounts/createStandardPackage', {
@@ -105,7 +105,7 @@ class AuthManager {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                profileId: user.Id,
+                                profileId: user.id,
                                 companyType: userData.accountPackage
                             })
                         });
@@ -305,7 +305,7 @@ const initializeEventListeners = () => {
         const formData = new FormData(e.target);
         const success = await authManager.register({
             username: formData.get('username'),
-            accountPackage: formData.get('accountPackage'),
+            accountPackage: formData.get('data-package'),
             email: formData.get('email'),
             password: formData.get('password')
         });
