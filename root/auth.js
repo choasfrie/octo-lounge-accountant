@@ -76,7 +76,7 @@ class AuthManager {
             }
 
             // First register the user
-            const userResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/register`, {
+            const userResponse = await fetch(`${API_CONFIG.BASE_URL}/Profiles/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
