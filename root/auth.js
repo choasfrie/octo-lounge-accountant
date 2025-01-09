@@ -86,8 +86,8 @@ class AuthManager {
             if (userResponse.status === 200) {
                 const user = await userResponse.json();
 
-                // Create account package if selected
-                if (userData.accountPackage && userData.accountPackage !== '') {
+                // Create account package if selected and not "none"
+                if (userData.accountPackage && userData.accountPackage !== '' && userData.accountPackage !== 'none') {
                     try {
                         const response = await fetch('http://localhost:5116/api/Accounts/createStandardPackage', {
                             method: 'POST',
