@@ -2,6 +2,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize Sidebar
     const loadComponents = async () => {
         try {
+            // Check if components are already loaded
+            const existingSidebar = document.getElementById('ai-sidebar');
+            if (existingSidebar) {
+                initAIChat();
+                return;
+            }
+
+            // Load components if not already present
             const componentsResponse = await fetch('components.html');
             const componentsHtml = await componentsResponse.text();
             const parser = new DOMParser();
@@ -10,28 +18,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Insert into document
             const aiSidebar = doc.querySelector('.ai-sidebar');
             if (aiSidebar) {
-                document.body.appendChild(aiSidebar);
+                document.body.appendChild(aiSidebar.cloneNode(true));
+                // Dispatch event when components are loaded
+                document.dispatchEvent(new Event('componentsLoaded'));
+                initAIChat();
             }
-
-            // Initialize functionality
-            initAIChat();
         } catch (error) {
             console.error('Error loading components:', error);
         }
     };
 
     const initAIChat = () => {
-        const aiSidebar = document.getElementById('ai-sidebar');
-        const toggleButton = document.getElementById('toggle-ai-sidebar');
-        const closeButton = document.querySelector('.close-ai-sidebar');
-        const sendButton = document.getElementById('send-message');
-        const userInput = document.getElementById('user-input');
-        const chatMessages = document.getElementById('chat-messages');
+        // Wait for components to be loaded
+        const tryInit = () => {
+            const aiSidebar = document.getElementById('ai-sidebar');
+            const toggleButton = document.getElementById('toggle-ai-sidebar');
+            const closeButton = document.querySelector('.close-ai-sidebar');
+            const sendButton = document.getElementById('send-message');
+            const userInput = document.getElementById('user-input');
+            const chatMessages = document.getElementById('chat-messages');
 
-        if (!aiSidebar || !toggleButton || !closeButton || !sendButton || !userInput || !chatMessages) {
-            console.error('Some AI chat elements not found');
-            return;
-        }
+            if (!aiSidebar || !toggleButton || !closeButton || !sendButton || !userInput || !chatMessages) {
+                // If elements aren't ready, wait for components
+                document.addEventListener('componentsLoaded', tryInit);
+                return;
+            }
 
     const exampleMessages = [
         "On the 24th of October, I bought a car for 20,000 CHF.",
