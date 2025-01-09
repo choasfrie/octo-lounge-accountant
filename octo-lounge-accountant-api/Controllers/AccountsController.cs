@@ -90,6 +90,7 @@ namespace octo_lounge_accountant_api.Controllers
 
             return Ok(accounts);
         }
+
         [HttpGet("getAllAccountsAndRecords/{ownerId}")]
         public IActionResult GetAllAccountsAndStatements(int ownerId)
         {
@@ -132,6 +133,7 @@ namespace octo_lounge_accountant_api.Controllers
 
             return Ok(accountWithRecordsList);
         }
+
         [HttpPost("createStandardPackage")]
         public IActionResult CreateStandardAccountPackage([FromBody] AccountPackDTO accountPackDto)
         {
@@ -170,5 +172,6 @@ namespace octo_lounge_accountant_api.Controllers
 
             return Ok(accounts);
         }
+
     }
 }

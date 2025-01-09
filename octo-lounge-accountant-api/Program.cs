@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using octo_lounge_accountant_api.Data;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using octo_lounge_accountant_api.Services;
 
 namespace octo_lounge_accountant_api
@@ -20,6 +21,16 @@ namespace octo_lounge_accountant_api
             builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAnyOrigin",
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
+
             // Register OpenAIService
             builder.Services.AddSingleton<OpenAIService>(sp =>
             {
@@ -27,7 +38,6 @@ namespace octo_lounge_accountant_api
                 var apiKey = configuration["OpenAI:ApiKey"];
                 return new OpenAIService(apiKey);
             });
-
 
             var app = builder.Build();
 
@@ -37,6 +47,9 @@ namespace octo_lounge_accountant_api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+
+            app.UseCors("AllowAnyOrigin");
 
             app.UseHttpsRedirection();
 

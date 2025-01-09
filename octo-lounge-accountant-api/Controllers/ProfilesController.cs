@@ -21,8 +21,8 @@ namespace octo_lounge_accountant_api.Controllers
             _context = context;
         }
 
-        [HttpPost]
-        [Route("register")]
+        [HttpPost("register")]
+
         public async Task<IActionResult> Registration([FromBody] ProfileDTO profileDto)
         {
             if (profileDto == null)

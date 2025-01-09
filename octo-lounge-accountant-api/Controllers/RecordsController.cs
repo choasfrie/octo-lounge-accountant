@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using octo_lounge_accountant_api.Data;
 using octo_lounge_accountant_api.Models;
 using octo_lounge_accountant_api.ModelsDTO;
@@ -11,12 +12,12 @@ using octo_lounge_accountant_api.Services;
 
 namespace octo_lounge_accountant_api.Controllers
 
-
 {
     [Route("api/[controller]")]
     [ApiController]
     public class RecordsController : ControllerBase
     {
+
         private readonly DataContext _context;
         private readonly HttpClient _httpClient;
         private readonly OpenAIService _openAIService;
@@ -112,7 +113,6 @@ Ensure that the account IDs correspond to the accounts provided. If you cannot e
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }
-
 
         [HttpPost("createRecord")]
         public IActionResult CreateRecord([FromBody] RecordDTO recordDto)
