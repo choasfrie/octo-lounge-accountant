@@ -136,19 +136,30 @@ class AuthManager {
     }
 
     toggleAuthButtons() {
-        const loginButton = document.getElementById('login-button');
-        const registerButton = document.getElementById('register-button');
-        const logoutButton = document.getElementById('logout-button');
+        // Wait for components to be loaded
+        const tryToggle = () => {
+            const loginButton = document.getElementById('login-button');
+            const registerButton = document.getElementById('register-button');
+            const logoutButton = document.getElementById('logout-button');
 
-        if (this.currentUser) {
-            loginButton.style.display = 'none';
-            registerButton.style.display = 'none';
-            logoutButton.style.display = 'block';
-        } else {
-            loginButton.style.display = 'block';
-            registerButton.style.display = 'block';
-            logoutButton.style.display = 'none';
-        }
+            if (!loginButton || !registerButton || !logoutButton) {
+                // If elements aren't ready, wait for components
+                document.addEventListener('componentsLoaded', this.toggleAuthButtons.bind(this));
+                return;
+            }
+
+            if (this.currentUser) {
+                loginButton.style.display = 'none';
+                registerButton.style.display = 'none';
+                logoutButton.style.display = 'block';
+            } else {
+                loginButton.style.display = 'block';
+                registerButton.style.display = 'block';
+                logoutButton.style.display = 'none';
+            }
+        };
+
+        tryToggle();
     }
 
     showAuthModal(type) {
@@ -196,15 +207,30 @@ class AuthManager {
 }
 
 // Initialize AuthManager
-const authManager = new AuthManager();
+export const authManager = new AuthManager();
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Event listener for logout
-    document.getElementById('logout-button').addEventListener('click', () => {
+// Initialize event listeners after components are loaded
+const initializeEventListeners = () => {
+    const logoutButton = document.getElementById('logout-button');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginButton = document.getElementById('login-button');
+    const registerButton = document.getElementById('register-button');
+    const userMenuTrigger = document.querySelector('.user-menu-trigger');
+    const userMenu = document.querySelector('.user-menu');
+
+    if (!logoutButton || !loginForm || !registerForm || !loginButton || 
+        !registerButton || !userMenuTrigger || !userMenu) {
+        // If elements aren't ready, wait for components
+        document.addEventListener('componentsLoaded', initializeEventListeners);
+        return;
+    }
+
+    logoutButton.addEventListener('click', () => {
         authManager.logout();
     });
 
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const success = await authManager.login({
@@ -218,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
+    registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const success = await authManager.register({
@@ -234,20 +260,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Event listener for user menu trigger
-    const userMenuTrigger = document.querySelector('.user-menu-trigger');
-    const userMenu = document.querySelector('.user-menu');
-
     userMenuTrigger.addEventListener('click', () => {
         userMenu.classList.toggle('show');
     });
 
-    // Event listeners for showing auth modal
-    document.getElementById('login-button').addEventListener('click', () => {
+    loginButton.addEventListener('click', () => {
         authManager.showAuthModal('login');
     });
 
-    document.getElementById('register-button').addEventListener('click', () => {
+    registerButton.addEventListener('click', () => {
         authManager.showAuthModal('register');
     });
-});     
+};
+
+// Start initialization when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializeEventListeners);

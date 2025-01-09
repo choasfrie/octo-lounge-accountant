@@ -1,4 +1,5 @@
 import { recordService } from './services/recordService.js';
+import { authManager } from './auth.js';
 
 export class TransactionManager {
     static init() {
@@ -29,8 +30,9 @@ export class TransactionManager {
             }
 
             // Get all accounts with their records
-            const response = await accountService.getAllAccountsAndRecords(authManager.currentUser.id);
-            const accountsWithRecords = response.data;
+            const response = await fetch(`https://localhost:7162/api/Accounts/getAllAccountsAndRecords/${authManager.currentUser.id}`);
+            if (!response.ok) throw new Error('Failed to fetch accounts and records');
+            const accountsWithRecords = await response.json();
 
             // Calculate balances and collect all records
             const accountBalances = new Map();
@@ -597,9 +599,12 @@ export class TransactionManager {
                 return [];
             }
             
-            const response = await accountService.getAccountsByOwner(authManager.currentUser.id);
-            return response.data.map(account => 
-                `${account.Name} (${account.AccountNumber})`
+            const response = await fetch(`https://localhost:7162/api/Accounts/getAccountsByOwner/${authManager.currentUser.id}`);
+            if (!response.ok) throw new Error('Failed to fetch accounts');
+            const accounts = await response.json();
+            
+            return accounts.map(account => 
+                `${account.name} (${account.accountNumber})`
             );
         } catch (error) {
             console.error('Error fetching accounts:', error);
