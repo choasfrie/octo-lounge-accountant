@@ -30,12 +30,12 @@
         <!-- Auth Modal -->
         <div id="auth-modal" class="auth-modal">
             <div class="auth-modal-content">
-                <button class="close-modal" id="close-auth-modal">&times;</button>
+                <button class="close-modal" id="close-auth-modal" onclick="document.getElementById('auth-modal').style.display='none'">&times;</button>
                 
                 <form id="login-form" class="auth-form">
                     <h2>Login</h2>
                     <div class="form-group">
-                        <label for="login-username">Username or Email</label>
+                        <label for="login-username">Username</label>
                         <input type="text" id="login-username" name="username" required>
                     </div>
                     <div class="form-group">
@@ -55,10 +55,10 @@
                     <div class="form-group">
                         <label>Account Package</label>
                         <div class="package-buttons">
-                            <button type="button" class="package-button" data-package="none">None</button>
-                            <button type="button" class="package-button" data-package="llc">LLC</button>
-                            <button type="button" class="package-button" data-package="plc">PLC</button>
-                            <button type="button" class="package-button" data-package="sp">Sole Proprietorship</button>
+                            <button type="button" class="package-button" data-package="">None</button>
+                            <button type="button" class="package-button" data-package="L">LLC</button>
+                            <button type="button" class="package-button" data-package="G">PLC</button>
+                            <button type="button" class="package-button" data-package="S">Sole Proprietorship</button>
                         </div>
                         <input type="hidden" id="selected-package" name="accountPackage" required>
                     </div>
@@ -85,20 +85,20 @@
             <section id="services">
                 <h2>Our Services</h2>
                 <div class="service-grid">
-                    <a href="bookkeeping.html" class="service-item">
-                        <i class="fas fa-book-open"></i>
+                    <a href="bookkeeping.html" class="service-item" id="bookkeeping-link">
+                        <i class="fas fa-lock"></i>
                         <h3>Bookkeeping</h3>
                         <p>Accurate and timely financial records.</p>
                     </a>
-                    <a href="financialanalysis.html" class="service-item">
-                        <i class="fas fa-chart-line"></i>
+                    <a href="financialanalysis.html" class="service-item" id="analysis-link">
+                        <i class="fas fa-lock"></i>
                         <h3>Financial Analysis</h3>
                         <p>Insightful reports for informed decisions.</p>
                     </a>
-                    <a href="#" class="service-item">
-                        <i class="fas fa-calculator"></i>
-                        <h3>Tax Planning</h3>
-                        <p>Optimize your tax strategy.</p>
+                    <a href="#" class="service-item" id="finalbalance-link">
+                        <i class="fas fa-lock"></i>
+                        <h3>Final Balance</h3>
+                        <p>Have your final balance gradually updated throughout the year.</p>
                     </a>
                 </div>
             </section>

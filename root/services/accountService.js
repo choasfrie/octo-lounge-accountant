@@ -1,19 +1,38 @@
-const API_BASE_URL = 'api/Accounts';
+import { validateAccountData, handleApiResponse, LoadingState } from '../utils/validationUtils.js';
+
+const API_BASE_URL = 'http://localhost:5116/api/Accounts';
 
 class AccountService {
+    constructor() {
+        this.loadingState = new LoadingState('account-grid');
+    }
+
     async createAccount(accountData) {
+        const errors = validateAccountData(accountData);
+        if (errors.length > 0) {
+            throw new Error(errors.join('\n'));
+        }
+
+        this.loadingState.start('Creating account...');
         try {
             const response = await fetch(`${API_BASE_URL}/createAccount`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(accountData)
+                body: JSON.stringify({
+                    name: accountData.name,
+                    accountType: accountData.accountType,
+                    accountNumber: accountData.accountNumber,
+                    behaviour: accountData.behaviour,
+                    ownerId: accountData.ownerId
+                })
             });
-            if (!response.ok) throw new Error('Failed to create account');
-            return await response.json();
+            const data = await handleApiResponse(response, 'Failed to create account');
+            this.loadingState.end();
+            return data;
         } catch (error) {
-            console.error('Error creating account:', error);
+            this.loadingState.error(error.message);
             throw error;
         }
     }
@@ -55,26 +74,6 @@ class AccountService {
             return await response.json();
         } catch (error) {
             console.error('Error fetching accounts:', error);
-            throw error;
-        }
-    }
-
-    async createStandardPackage(profileId, companyType) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/createStandardPackage`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    profileId: profileId,
-                    companyType: companyType
-                })
-            });
-            if (!response.ok) throw new Error('Failed to create standard package');
-            return await response.json();
-        } catch (error) {
-            console.error('Error creating standard package:', error);
             throw error;
         }
     }

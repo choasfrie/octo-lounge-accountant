@@ -135,14 +135,24 @@ namespace octo_lounge_accountant_api.Controllers
         }
 
         [HttpPost("createStandardPackage")]
-        public IActionResult CreateStandardAccountPackage([FromBody] AccountPackDTO accountPackDto)
+        public async Task<IActionResult> CreateStandardAccountPackage([FromBody] AccountPackDTO accountPackDto)
         {
+            Console.WriteLine($"Received request to create standard package. ProfileId: {accountPackDto?.profileId}, CompanyType: {accountPackDto?.companyType}");
+            
             if (accountPackDto == null)
             {
                 return BadRequest("Account package data is null.");
             }
+
+            // Verify that the Profile exists
+            var profile = await _context.Profiles.FindAsync(accountPackDto.profileId);
+            if (profile == null)
+            {
+                return BadRequest($"Profile with ID {accountPackDto.profileId} does not exist.");
+            }
             AccountPackageHandler handler = new AccountPackageHandler();
             List<Account> accounts;
+            Console.WriteLine($"Creating account package for company type: {accountPackDto.companyType}");
             switch (accountPackDto.companyType)
             {
                 case 'L':
@@ -155,7 +165,7 @@ namespace octo_lounge_accountant_api.Controllers
                     accounts = handler.CreateStandardAccountPackageForSole(accountPackDto.profileId);
                     break;
                 default:
-                    return BadRequest("Invalid company type.");
+                    return BadRequest("Invalid company type. Must be L (LLC), G (PLC), or S (Sole Proprietorship).");
             }
 
             // Validate AccountTypeId
@@ -167,9 +177,12 @@ namespace octo_lounge_accountant_api.Controllers
                 }
             }*/
 
+            Console.WriteLine($"Created {accounts.Count} accounts for the package");
+            
             _context.Accounts.AddRange(accounts);
             _context.SaveChanges();
 
+            Console.WriteLine("Successfully saved accounts to database");
             return Ok(accounts);
         }
 

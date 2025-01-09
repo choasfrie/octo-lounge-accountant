@@ -1,12 +1,84 @@
+import { authManager } from './auth.js';
+
 class TAccountManager {
     getCurrentUserId() {
-        // Get the current user ID from your auth system
-        // This is just a placeholder - implement based on your auth system
-        return localStorage.getItem('userId') || 1;
+        if (!authManager.currentUser) {
+            throw new Error('User not authenticated');
+        }
+        return authManager.currentUser.id;
     }
     constructor() {
         this.initializeButtons(); // Setup action buttons
         this.initializeModal(); // Setup modal dialogs
+        this.loadAccounts(); // Load initial accounts
+    }
+
+    async loadAccounts() {
+        try {
+            const userId = this.getCurrentUserId();
+            const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${userId}`);
+            if (!response.ok) {
+                if (response.status === 404) {
+                    const tAccountGrid = document.querySelector('.t-account-grid');
+                    tAccountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    return;
+                }
+                throw new Error('Failed to fetch accounts');
+            }
+            const accountsData = await response.json();
+            
+            const tAccountGrid = document.querySelector('.t-account-grid');
+            tAccountGrid.innerHTML = ''; // Clear loading state
+            
+            accountsData.forEach(account => {
+                const accountElement = document.createElement('div');
+                accountElement.className = 't-account';
+                accountElement.dataset.accountId = account.accountId;
+                accountElement.innerHTML = `
+                    <h3>${account.accountName} (${account.accountNumber})</h3>
+                    <div class="t-account-content">
+                        <div class="debit-side">
+                            <h4>Debit (+)</h4>
+                            ${account.records
+                                .filter(r => r.DebitorId === account.accountId)
+                                .map(r => `
+                                    <div class="entry">
+                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
+                                    </div>
+                                `).join('')}
+                            ${account.records.filter(r => r.DebitorId === account.accountId).length === 0 ? 
+                                '<div class="entry"><span>No debit entries</span></div>' : ''}
+                        </div>
+                        <div class="credit-side">
+                            <h4>Credit (-)</h4>
+                            ${account.records
+                                .filter(r => r.CreditorId === account.accountId)
+                                .map(r => `
+                                    <div class="entry">
+                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
+                                    </div>
+                                `).join('')}
+                            ${account.records.filter(r => r.CreditorId === account.accountId).length === 0 ? 
+                                '<div class="entry"><span>No credit entries</span></div>' : ''}
+                        </div>
+                    </div>
+                `;
+                tAccountGrid.appendChild(accountElement);
+            });
+        } catch (error) {
+            console.error('Error loading accounts:', error);
+            const tAccountGrid = document.querySelector('.t-account-grid');
+            tAccountGrid.innerHTML = '<div class="error">Failed to load accounts. Please try again.</div>';
+        }
+    }
+
+    formatAmount(amount) {
+        return new Intl.NumberFormat('de-CH', { 
+            style: 'currency', 
+            currency: 'CHF' 
+        }).format(amount);
     }
 
     initializeButtons() {
@@ -31,6 +103,27 @@ class TAccountManager {
                         <div class="form-group">
                             <label for="new-account-name">Account Name</label>
                             <input type="text" id="new-account-name" name="accountName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-account-number">Account Number</label>
+                            <input type="number" id="new-account-number" name="accountNumber" required min="1000" max="9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-account-type">Account Type</label>
+                            <select id="new-account-type" name="accountType" required>
+                                <option value="1">Assets</option>
+                                <option value="2">Liabilities</option>
+                                <option value="3">Revenue</option>
+                                <option value="4">Expenses</option>
+                                <option value="5">Equity</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-account-behavior">Account Behavior</label>
+                            <select id="new-account-behavior" name="accountBehavior" required>
+                                <option value="D">Debit</option>
+                                <option value="C">Credit</option>
+                            </select>
                         </div>
                         <button type="submit" class="auth-button">Add Account</button>
                     </form>
@@ -70,10 +163,11 @@ class TAccountManager {
         closeBtn.addEventListener('click', () => this.closeModal());
         
         // Initialize form submissions
-        document.getElementById('add-account-form').addEventListener('submit', (e) => {
+        document.getElementById('add-account-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            this.addAccount(e.target.accountName.value);
+            await this.addAccount(e.target);
             this.closeModal();
+            this.loadAccounts(); // Refresh the accounts view
         });
 
         document.getElementById('edit-account-form').addEventListener('submit', (e) => {
@@ -128,15 +222,20 @@ class TAccountManager {
     }
 
     // Create new T-Account entry
-    async addAccount(accountName) {
-        if (!accountName) return;
+    async addAccount(form) {
+        const accountName = form.accountName.value;
+        const accountNumber = form.accountNumber.value;
+        const accountBehavior = form.accountBehavior.value;
+
+        if (!accountName || !accountNumber || !accountBehavior) return;
 
         try {
             const accountData = {
-                Name: accountName,
-                AccountType: 1, // Default type
-                Behaviour: 'D', // Default behavior
-                OwnerId: this.getCurrentUserId()
+                name: accountName,
+                accountNumber: parseInt(accountNumber),
+                accountType: parseInt(form.accountType.value),
+                behaviour: accountBehavior,
+                ownerId: this.getCurrentUserId()
             };
 
             const newAccount = await accountService.createAccount(accountData);
@@ -144,7 +243,7 @@ class TAccountManager {
             const tAccountGrid = document.querySelector('.t-account-grid');
             const accountElement = document.createElement('div');
             accountElement.className = 't-account';
-            accountElement.dataset.accountId = newAccount.Id;
+            accountElement.dataset.accountId = newAccount.id;
             accountElement.innerHTML = `
                 <h3>${newAccount.Name}</h3>
                 <div class="t-account-content">

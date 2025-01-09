@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         const parser = new DOMParser();
         parsedDoc = parser.parseFromString(componentsHtml, 'text/html');
 
+        // Initialize user menu functionality
+        initializeUserMenu();
+
         // Insert navigation, social links, and modals into document
         const sidePanel = document.querySelector('.side-panel');
         if (sidePanel) {
@@ -30,6 +33,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             
             // Dispatch event when components are loaded
             document.dispatchEvent(new Event('componentsLoaded'));
+        }
+
+        // Re-initialize user menu after components are loaded
+        initializeUserMenu();
+
+        // Show/hide AI assistant button based on current page
+        const aiAssistantMenuItem = document.getElementById('ai-assistant-menu-item');
+        if (aiAssistantMenuItem) {
+            aiAssistantMenuItem.style.display = 
+                window.location.pathname.endsWith('bookkeeping.html') ? 'block' : 'none';
         }
 
         // Insert footer
@@ -56,3 +69,30 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     });
 });
+
+// Function to initialize user menu functionality
+function initializeUserMenu() {
+    const userMenuTrigger = document.querySelector('.user-menu-trigger');
+    const userMenu = document.querySelector('.user-menu');
+    
+    // Remove existing event listeners
+    const newTrigger = userMenuTrigger.cloneNode(true);
+    userMenuTrigger.parentNode.replaceChild(newTrigger, userMenuTrigger);
+    
+    if (newTrigger && userMenu) {
+        newTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+        });
+
+        // Close menu when clicking outside
+        const handleClickOutside = (e) => {
+            if (!newTrigger.contains(e.target) && !userMenu.contains(e.target)) {
+                userMenu.classList.remove('show');
+            }
+        };
+        
+        document.removeEventListener('click', handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
+    }
+}

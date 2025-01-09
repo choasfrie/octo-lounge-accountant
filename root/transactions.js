@@ -1,13 +1,8 @@
 import { recordService } from './services/recordService.js';
+import { authManager } from './auth.js';
+import { ModalUtils } from './utils/modalUtils.js';
 
 export class TransactionManager {
-    static init() {
-        try {
-            return new TransactionManager();
-        } catch (error) {
-            console.error('Error initializing TransactionManager:', error);
-        }
-    }
 
     constructor() {
         try {
@@ -24,13 +19,30 @@ export class TransactionManager {
     async loadExistingRecords() {
         try {
             if (!authManager.currentUser) {
-                console.error('No authenticated user');
                 return;
             }
 
             // Get all accounts with their records
-            const response = await accountService.getAllAccountsAndRecords(authManager.currentUser.id);
-            const accountsWithRecords = response.data;
+            const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${authManager.currentUser.id}`);
+            if (!response.ok) {
+                if (response.status === 404) {
+                    // Clear the loading state and show the message
+                    const accountGrid = document.getElementById('account-grid');
+                    if (accountGrid) accountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    
+                    const recentTransactionsList = document.querySelector('#recent-transactions .transaction-list');
+                    if (recentTransactionsList) recentTransactionsList.innerHTML = '<div class="error">No transactions found.</div>';
+
+                    const transactionList = document.querySelector('#records .transaction-list');
+                    if (transactionList) transactionList.innerHTML = '<div class="error">No transactions found.</div>';
+                    
+                    const tAccountGrid = document.getElementById('t-accounts-grid');
+                    if (tAccountGrid) tAccountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    return;
+                }
+                throw new Error('Failed to fetch accounts and records');
+            }
+            const accountsWithRecords = await response.json();
 
             // Calculate balances and collect all records
             const accountBalances = new Map();
@@ -38,22 +50,22 @@ export class TransactionManager {
             
             accountsWithRecords.forEach(account => {
                 let balance = 0;
-                account.Records.forEach(record => {
-                    if (record.CreditorId === account.AccountId) {
+                account.records.forEach(record => {
+                    if (record.CreditorId === account.accountId) {
                         balance -= record.Amount;
-                    } else if (record.DebitorId === account.AccountId) {
+                    } else if (record.DebitorId === account.accountId) {
                         balance += record.Amount;
                     }
                 });
 
-                accountBalances.set(account.AccountId, {
-                    name: account.AccountName,
-                    number: account.AccountNumber,
+                accountBalances.set(account.accountId, {
+                    name: account.accountName,
+                    number: account.accountNumber,
                     balance: balance,
-                    records: account.Records
+                    records: account.records
                 });
 
-                allRecords.push(...account.Records);
+                allRecords.push(...account.records);
             });
 
             // Sort records by date
@@ -122,41 +134,86 @@ export class TransactionManager {
         }
     }
 
-    displayRecords(records) {
-        this.renderTAccounts(records);
+    displayRecords(accounts) {
+        // Get all records from all accounts
+        const allRecords = [];
+        
+        // Handle if accounts is a single record
+        if (!Array.isArray(accounts)) {
+            accounts = [accounts];
+        }
+
+        accounts.forEach(account => {
+            // If the account itself is a record (from direct API response)
+            if (account.creditorId !== undefined) {
+                allRecords.push({
+                    ...account,
+                    date: new Date(account.date),
+                    creditorName: 'Account ' + account.creditorId,
+                    debitorName: 'Account ' + account.debitorId
+                });
+            }
+            // If it's an account with records
+            else if (account.records && account.records.length > 0) {
+                account.records.forEach(record => {
+                    allRecords.push({
+                        ...record,
+                        creditorName: 'Account ' + record.creditorId,
+                        debitorName: 'Account ' + record.debitorId,
+                        date: new Date(record.date)
+                    });
+                });
+            }
+        });
+
+        // Sort records by date (most recent first)
+        allRecords.sort((a, b) => b.date - a.date);
+        // Update the transaction list in the UI
         const transactionList = document.querySelector('#records .transaction-list');
         if (!transactionList) return;
 
-        transactionList.innerHTML = records.map(record => `
-            <div class="transaction" data-record-id="${record.id}">
-                <span class="date">${new Date(record.date).toLocaleDateString()}</span>
+        if (allRecords.length === 0) {
+            transactionList.innerHTML = '<div class="error">No transactions found.</div>';
+            return;
+        }
+
+        transactionList.innerHTML = allRecords.map(record => `
+            <div class="transaction" data-record-id="${record.recordId || ''}">
+                <span class="date">${record.date.toLocaleDateString()}</span>
                 <span class="description">
-                    ${record.Debitor?.Name || 'Unknown'} → ${record.Creditor?.Name || 'Unknown'}
-                    ${record.Description ? `: ${record.Description}` : ''}
-                    ${record.Notes ? `<i class="fas fa-book notes-icon" data-notes="${record.Notes}"></i>` : ''}
+                    ${record.debitorName} → ${record.creditorName}
+                    ${record.description ? `: ${record.description}` : ''}
+                    ${record.notes ? `<i class="fas fa-book notes-icon" data-notes="${record.notes}"></i>` : ''}
                 </span>
-                <span class="amount ${record.amount >= 0 ? 'income' : 'expense'}">
+                <span class="amount ${parseFloat(record.amount) >= 0 ? 'income' : 'expense'}">
                     ${this.formatAmount(record.amount)}
                 </span>
             </div>
         `).join('');
+
+        // Also update T-Accounts display
+        this.renderTAccounts(accounts.filter(account => account.records && account.records.length > 0));
     }
 
-    initializeFilter() {
+    async initializeFilter() {
         const filter = document.getElementById('account-filter');
         if (filter) {
-            filter.addEventListener('change', () => {
+            filter.addEventListener('change', async () => {
                 const selectedAccount = filter.value;
-                const transactions = document.querySelectorAll('#records .transaction');
-                
-                transactions.forEach(transaction => {
-                    const description = transaction.querySelector('.description').textContent;
-                    if (selectedAccount === 'all' || description.includes(selectedAccount)) {
-                        transaction.style.display = '';
-                    } else {
-                        transaction.style.display = 'none';
-                    }
-                });
+                if (selectedAccount === 'all') {
+                    await this.loadAccounts();
+                    return;
+                }
+
+                try {
+                    const records = selectedAccount.startsWith('debitor-') 
+                        ? await recordService.getRecordsByDebitorId(selectedAccount.replace('debitor-', ''))
+                        : await recordService.getRecordsByCreditorId(selectedAccount.replace('creditor-', ''));
+                    
+                    this.displayRecords(records);
+                } catch (error) {
+                    console.error('Error filtering records:', error);
+                }
             });
         }
     }
@@ -165,81 +222,55 @@ export class TransactionManager {
         const filter = document.getElementById('account-filter');
         if (!filter) return;
 
-        // Clear existing options
         filter.innerHTML = '<option value="all">All Accounts</option>';
-
-        // Add account options
+        
         accounts.forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.AccountName;
-            option.textContent = `${account.AccountName} (${account.AccountNumber})`;
-            filter.appendChild(option);
+            const debitorOption = document.createElement('option');
+            debitorOption.value = `debitor-${account.accountId}`;
+            debitorOption.textContent = `${account.accountName} (Debits)`;
+            filter.appendChild(debitorOption);
+
+            const creditorOption = document.createElement('option');
+            creditorOption.value = `creditor-${account.accountId}`;
+            creditorOption.textContent = `${account.accountName} (Credits)`;
+            filter.appendChild(creditorOption);
         });
     }
 
     // Format currency amount
-    renderTAccounts(records) {
+    renderTAccounts(accounts) {
         const tAccountsGrid = document.getElementById('t-accounts-grid');
         if (!tAccountsGrid) return;
 
-        // Group records by account
-        const accountsMap = new Map();
-        records.forEach(record => {
-            if (!accountsMap.has(record.DebitorId)) {
-                accountsMap.set(record.DebitorId, {
-                    name: record.Debitor?.Name || 'Unknown',
-                    debits: [],
-                    credits: []
-                });
-            }
-            if (!accountsMap.has(record.CreditorId)) {
-                accountsMap.set(record.CreditorId, {
-                    name: record.Creditor?.Name || 'Unknown',
-                    debits: [],
-                    credits: []
-                });
-            }
-
-            // Add to debitor's credits
-            accountsMap.get(record.DebitorId).credits.push({
-                amount: record.Amount,
-                date: record.Date,
-                description: record.Description
-            });
-
-            // Add to creditor's debits
-            accountsMap.get(record.CreditorId).debits.push({
-                amount: record.Amount,
-                date: record.Date,
-                description: record.Description
-            });
-        });
-
         // Render T-Accounts
         tAccountsGrid.innerHTML = '';
-        accountsMap.forEach((account, accountId) => {
+        accounts.forEach(account => {
             const tAccount = document.createElement('div');
             tAccount.className = 't-account';
             tAccount.innerHTML = `
-                <h3>${account.name}</h3>
+                <h3>${account.accountName} (${account.accountNumber})</h3>
                 <div class="t-account-content">
                     <div class="debit-side">
                         <h4>Debit (+)</h4>
-                        ${account.debits.map(entry => `
-                            <div class="entry">
-                                <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
-                                <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
-                            </div>
-                        `).join('')}
+                        ${account.records
+                            .filter(r => r.debitorId === account.accountId)
+                            .map(entry => `
+                                <div class="entry">
+                                    <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
+                                    <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                                </div>
+                            `).join('')}
                     </div>
                     <div class="credit-side">
                         <h4>Credit (-)</h4>
-                        ${account.credits.map(entry => `
-                            <div class="entry">
-                                <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
-                                <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
-                            </div>
-                        `).join('')}
+                        ${account.records
+                            .filter(r => r.creditorId === account.accountId)
+                            .map(entry => `
+                                <div class="entry">
+                                    <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
+                                    <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                                </div>
+                            `).join('')}
                     </div>
                 </div>
             `;
@@ -378,44 +409,16 @@ export class TransactionManager {
     }
 
     showModal(type) {
-        const modal = document.getElementById('transaction-modal');
-        const addForm = document.getElementById('add-transaction-form');
-        const editForm = document.getElementById('edit-transaction-form');
-
-        [addForm, editForm].forEach(form => form.style.display = 'none');
-
-        if (type === 'edit') {
-            const transactions = Array.from(document.querySelectorAll('#records .transaction'))
-                .map((trans, index) => {
-                    const date = trans.querySelector('.date').textContent;
-                    const description = trans.querySelector('.description').textContent;
-                    const amount = trans.querySelector('.amount').textContent;
-                    return `<option value="${index}">${date} - ${description} - ${amount}</option>`;
-                }).join('');
-
-            if (transactions.length === 0) {
-                alert('No transactions available to edit');
-                return;
-            }
-
-            const select = document.getElementById('edit-transaction-select');
-            select.innerHTML = transactions;
-            select.addEventListener('change', (e) => this.populateEditForm(e.target.value));
-            editForm.style.display = 'block';
-            // Populate initial selection
-            if (transactions.length > 0) {
-                this.populateEditForm(0);
-            }
-        } else {
-            addForm.style.display = 'block';
-        }
-
-        modal.style.display = 'block';
+        const config = {
+            forms: ['add-transaction-form', 'edit-transaction-form', 'delete-transaction-form'],
+            showForm: `${type}-transaction-form`
+        };
+        
+        ModalUtils.showModal('transaction-modal', config);
     }
 
     closeModal() {
-        const modal = document.getElementById('transaction-modal');
-        modal.style.display = 'none';
+        ModalUtils.closeModal('transaction-modal');
     }
 
     async addTransaction(form) {
@@ -432,12 +435,12 @@ export class TransactionManager {
             }
 
             const recordData = {
-                Date: new Date(form.date.value),
-                Amount: parseFloat(form.amount.value),
-                Description: `${fromAccountName} → ${toAccountName}`,
-                CreditorId: toAccount.Id,
-                DebitorId: fromAccount.Id,
-                Notes: form.notes.value
+                date: new Date(form.date.value).toISOString(),
+                amount: parseFloat(form.amount.value),
+                description: `${fromAccountName} → ${toAccountName}`,
+                creditorId: toAccount.id,
+                debitorId: fromAccount.id,
+                notes: form.notes.value
             };
 
             const newRecord = await recordService.createRecord(recordData);
@@ -483,11 +486,11 @@ export class TransactionManager {
                 }
 
                 const recordData = {
-                    Date: new Date(form.date.value),
-                    Amount: parseFloat(form.amount.value),
-                    Description: `${fromAccountName} → ${toAccountName}`,
-                    CreditorId: toAccount.Id,
-                    DebitorId: fromAccount.Id
+                    date: new Date(form.date.value).toISOString(),
+                    amount: parseFloat(form.amount.value),
+                    description: `${fromAccountName} → ${toAccountName}`,
+                    creditorId: toAccount.id,
+                    debitorId: fromAccount.id
                 };
 
                 const updatedRecord = await recordService.editRecord(recordId, recordData);
@@ -597,9 +600,12 @@ export class TransactionManager {
                 return [];
             }
             
-            const response = await accountService.getAccountsByOwner(authManager.currentUser.id);
-            return response.data.map(account => 
-                `${account.Name} (${account.AccountNumber})`
+            const response = await fetch(`https://localhost:7162/api/Accounts/getAccountsByOwner/${authManager.currentUser.id}`);
+            if (!response.ok) throw new Error('Failed to fetch accounts');
+            const accounts = await response.json();
+            
+            return accounts.map(account => 
+                `${account.name} (${account.accountNumber})`
             );
         } catch (error) {
             console.error('Error fetching accounts:', error);

@@ -1,9 +1,22 @@
+<!-- User Menu -->
+<div class="user-section">
+    <button class="user-menu-trigger" data-tooltip="User Menu">
+        <i class="fas fa-user"></i>
+    </button>
+    <div class="user-menu">
+        <div class="user-welcome">Welcome, Guest</div>
+        <button class="auth-button" id="login-button">Login</button>
+        <button class="auth-button" id="register-button">Register</button>
+        <button class="auth-button" id="logout-button" style="display: none;">Logout</button>
+    </div>
+</div>
+
 <!-- Navigation -->
 <nav>
     <ul>
         <li><a href="index.html#home"><i class="fa-solid fa-house"></i> Home</a></li>
         <li><a href="index.html#services"><i class="fa-solid fa-wrench"></i> Services</a></li>
-        <li class="service-submenu">
+        <li class="service-submenu" id="ai-assistant-menu-item" style="display: none;">
             <button id="toggle-ai-sidebar" class="ai-toggle nav-button" data-tooltip="AI Assistant">
                 <i class="fa-solid fa-robot"></i> AI Assistant
             </button>

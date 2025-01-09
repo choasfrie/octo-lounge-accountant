@@ -43,13 +43,26 @@ namespace octo_lounge_accountant_api.Controllers
                 Username = profileDto.Username,
                 Email = profileDto.Email,
                 PasswordHash = encryptedPassword,
-                JWT = string.Empty, 
             };
 
-            _context.Profiles.Add(profile);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Profiles.Add(profile);
+                await _context.SaveChangesAsync();
+                
+                // Fetch the newly created profile to ensure it exists
+                var createdProfile = await _context.Profiles.FindAsync(profile.Id);
+                if (createdProfile == null)
+                {
+                    return StatusCode(500, "Profile creation failed");
+                }
 
-            return Ok(profile);
+                return Ok(createdProfile);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Profile creation failed: {ex.Message}");
+            }
         }
 
         [HttpPost("login")]
@@ -60,20 +73,19 @@ namespace octo_lounge_accountant_api.Controllers
                 return BadRequest("Login data is null.");
             }
 
-            var profile = await _context.Profiles.SingleOrDefaultAsync(p => p.Username == loginDto.Username);
+            var profile = await _context.Profiles.SingleOrDefaultAsync(p => p.Username == loginDto.username);
             if (profile == null)
             {
                 return Unauthorized("Invalid username or password.");
             }
 
-            var encryptedPassword = EncryptPassword(loginDto.Password);
-            if (profile.PasswordHash != encryptedPassword)
+            // Hash the login password attempt the same way as registration
+            var hashedLoginAttempt = EncryptPassword(loginDto.password);
+            // Compare the hashed attempt with stored hash
+            if (!string.Equals(profile.PasswordHash, hashedLoginAttempt, StringComparison.OrdinalIgnoreCase))
             {
                 return Unauthorized("Invalid username or password.");
             }
-
-            // Generate JWT token if needed
-            // var token = GenerateJwtToken(profile);
 
             return Ok(profile);
         }
