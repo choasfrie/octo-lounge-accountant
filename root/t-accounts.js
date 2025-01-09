@@ -34,8 +34,19 @@ class TAccountManager {
                 const accountElement = document.createElement('div');
                 accountElement.className = 't-account';
                 accountElement.dataset.accountId = account.accountId;
+                accountElement.dataset.behavior = account.accountBehaviour;
+                // Determine outline color and behavior symbol based on account behavior
+                const outlineColor = account.accountBehaviour === 'D' ? '#4CAF50' : '#F44336';
+                const behaviorSymbol = account.accountBehaviour === 'D' ? '+' : '-';
+                
                 accountElement.innerHTML = `
-                    <h3>${account.accountName} (${account.accountNumber})</h3>
+                    <h3>
+                        ${account.accountName} (${account.accountNumber})
+                        <i class="fas fa-book" 
+                           style="margin-left: 8px; font-size: 0.8em; color: #666;"
+                           title="${account.accountBehaviour === 'D' ? 'Active Account (Debit behavior)' : 'Passive Account (Credit behavior)'}">
+                        </i>
+                    </h3>
                     <div class="t-account-content">
                         <div class="debit-side">
                             <h4>Debit (+)</h4>
@@ -43,12 +54,11 @@ class TAccountManager {
                                 .filter(r => r.DebitorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span>${r.Description}</span>
+                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount))}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
-                                `).join('')}
-                            ${account.records.filter(r => r.DebitorId === account.accountId).length === 0 ? 
-                                '<div class="entry"><span>No debit entries</span></div>' : ''}
+                                `).join('') || '<div class="entry"><span>No debit entries</span></div>'}
                         </div>
                         <div class="credit-side">
                             <h4>Credit (-)</h4>
@@ -56,12 +66,11 @@ class TAccountManager {
                                 .filter(r => r.CreditorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span>${r.Description}</span>
+                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount))}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
-                                `).join('')}
-                            ${account.records.filter(r => r.CreditorId === account.accountId).length === 0 ? 
-                                '<div class="entry"><span>No credit entries</span></div>' : ''}
+                                `).join('') || '<div class="entry"><span>No credit entries</span></div>'}
                         </div>
                     </div>
                 `;
@@ -176,9 +185,9 @@ class TAccountManager {
             this.closeModal();
         });
 
-        document.getElementById('delete-account-form').addEventListener('submit', (e) => {
+        document.getElementById('delete-account-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            this.deleteAccount(e.target.accountSelect.value);
+            await this.deleteAccount();
             this.closeModal();
         });
     }
@@ -293,47 +302,48 @@ class TAccountManager {
         }
     }
 
-    async deleteAccount(accountName) {
-        if (!accountName) return;
-
-        const accountElement = Array.from(document.querySelectorAll('.t-account'))
-            .find(acc => acc.querySelector('h3').textContent === accountName);
-
-        if (accountElement) {
-            // Show confirmation modal
-            const confirmModal = document.createElement('div');
-            confirmModal.className = 'auth-modal';
-            confirmModal.innerHTML = `
-                <div class="auth-modal-content">
-                    <h2>Confirm Delete</h2>
-                    <p>Are you sure you want to delete the account "${accountName}"?</p>
-                    <div class="auth-error">Warning: This action cannot be undone!</div>
-                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                        <button class="auth-button" id="confirm-delete">Delete</button>
-                        <button class="auth-button" id="cancel-delete">Cancel</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(confirmModal);
-            confirmModal.style.display = 'block';
-
-            // Handle confirmation
-            document.getElementById('confirm-delete').onclick = async () => {
-                try {
-                    const accountId = accountElement.dataset.accountId;
-                    await accountService.deleteAccount(accountId);
-                    accountElement.remove();
-                    confirmModal.remove();
-                } catch (error) {
-                    console.error('Failed to delete account:', error);
-                    alert('Failed to delete account. Please try again.');
-                }
-            };
-
-            document.getElementById('cancel-delete').onclick = () => {
-                confirmModal.remove();
-            };
+    async deleteAccount() {
+        const accountElement = document.querySelector('.t-account[data-account-id]');
+        if (!accountElement) {
+            alert('No account selected');
+            return;
         }
+
+        const accountId = accountElement.dataset.accountId;
+        const accountName = accountElement.querySelector('h3').textContent;
+
+        // Show confirmation modal
+        const confirmModal = document.createElement('div');
+        confirmModal.className = 'auth-modal';
+        confirmModal.innerHTML = `
+            <div class="auth-modal-content">
+                <h2>Confirm Delete</h2>
+                <p>Are you sure you want to delete the account "${accountName}"?</p>
+                <div class="auth-error">Warning: This action cannot be undone!</div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button class="auth-button" id="confirm-delete">Delete</button>
+                    <button class="auth-button" id="cancel-delete">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(confirmModal);
+        confirmModal.style.display = 'block';
+
+        // Handle confirmation
+        document.getElementById('confirm-delete').onclick = async () => {
+            try {
+                await accountService.deleteAccount(accountId);
+                accountElement.remove();
+                confirmModal.remove();
+            } catch (error) {
+                console.error('Failed to delete account:', error);
+                alert('Failed to delete account. Please try again.');
+            }
+        };
+
+        document.getElementById('cancel-delete').onclick = () => {
+            confirmModal.remove();
+        };
     }
 }
 
