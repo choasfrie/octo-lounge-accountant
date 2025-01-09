@@ -21,13 +21,7 @@ class RecordService {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
-                body: JSON.stringify({
-                    date: new Date(recordData.date).toISOString(),
-                    amount: parseFloat(recordData.amount),
-                    description: recordData.description,
-                    creditorId: recordData.creditorId,
-                    debitorId: recordData.debitorId
-                })
+                body: JSON.stringify(recordData)
             });
             const data = await handleApiResponse(response, 'Failed to create record');
             this.loadingState.end();

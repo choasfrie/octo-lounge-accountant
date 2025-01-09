@@ -20,13 +20,7 @@ class AccountService {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    name: accountData.name,
-                    accountType: accountData.accountType,
-                    accountNumber: accountData.accountNumber,
-                    behaviour: accountData.behaviour,
-                    ownerId: accountData.ownerId
-                })
+                body: JSON.stringify(accountData)
             });
             const data = await handleApiResponse(response, 'Failed to create account');
             this.loadingState.end();

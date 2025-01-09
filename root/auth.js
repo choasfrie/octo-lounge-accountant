@@ -165,9 +165,9 @@ class AuthManager {
 
             // Update UI state
             this.currentUser = { 
-                username: user.Username,
-                id: user.Id,
-                email: user.Email
+                username: user.username,
+                id: user.id,
+                email: user.email
             };
             localStorage.setItem('username', this.currentUser.username);
             this.updateUserDisplay();
