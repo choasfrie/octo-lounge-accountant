@@ -85,16 +85,22 @@ class AuthManager {
 
             // Then create the account package if one was selected
             if (userData.accountPackage && userData.accountPackage !== '') {
-                // Create account type
-                const packageResponse = await fetch('http://localhost:5116/api/AccountTypes/createAccountType', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        Name: userData.accountPackage
-                    })
-                });
+                // Only create account type if a package was selected
+                if (userData.accountPackage) {
+                    const packageResponse = await fetch('http://localhost:5116/api/AccountTypes/createAccountType', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            Name: userData.accountPackage
+                        })
+                    });
+
+                    if (!packageResponse.ok) {
+                        console.error('Failed to create account type');
+                    }
+                }
 
                 if (!packageResponse.ok) {
                     console.error('Failed to create account package');
