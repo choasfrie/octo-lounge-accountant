@@ -1,4 +1,5 @@
 import { accountService } from './services/accountService.js';
+import { validateAuthData } from './utils/validationUtils.js';
 
 class AuthManager {
     constructor() {
