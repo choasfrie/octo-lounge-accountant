@@ -43,7 +43,14 @@
             <p>&copy; 2024 Financial Dashboard. All rights reserved.</p>
         </footer>
     </div>
+    <script type="module" src="auth.js"></script>
     <script src="financialanalysis.js"></script>
     <script src="donation.js"></script>
+    <script type="module">
+        // Check session before loading page
+        if (!sessionStorage.getItem('isAuthenticated')) {
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
 </html>
