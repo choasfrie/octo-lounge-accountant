@@ -43,7 +43,6 @@ namespace octo_lounge_accountant_api.Controllers
                 Username = profileDto.Username,
                 Email = profileDto.Email,
                 PasswordHash = encryptedPassword,
-                JWT = string.Empty, 
             };
 
             _context.Profiles.Add(profile);
