@@ -71,9 +71,9 @@ class AuthManager {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    Username: userData.username,
-                    Email: userData.email,
-                    PasswordHash: userData.password
+                    username: userData.username,
+                    email: userData.email,
+                    passwordHash: userData.password
                 })
             });
 
