@@ -21,11 +21,11 @@ class AccountService {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    Name: accountData.Name,
-                    AccountType: accountData.AccountType,
-                    AccountNumber: accountData.AccountNumber,
-                    Behaviour: accountData.Behaviour,
-                    OwnerId: accountData.OwnerId
+                    name: accountData.name,
+                    accountType: accountData.accountType,
+                    accountNumber: accountData.accountNumber,
+                    behaviour: accountData.behaviour,
+                    ownerId: accountData.ownerId
                 })
             });
             const data = await handleApiResponse(response, 'Failed to create account');

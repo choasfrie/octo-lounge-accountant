@@ -22,11 +22,11 @@ class RecordService {
                     'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
                 body: JSON.stringify({
-                    Date: new Date(recordData.Date).toISOString(),
-                    Amount: parseFloat(recordData.Amount),
-                    Description: recordData.Description,
-                    CreditorId: recordData.CreditorId,
-                    DebitorId: recordData.DebitorId
+                    date: new Date(recordData.date).toISOString(),
+                    amount: parseFloat(recordData.amount),
+                    description: recordData.description,
+                    creditorId: recordData.creditorId,
+                    debitorId: recordData.debitorId
                 })
             });
             const data = await handleApiResponse(response, 'Failed to create record');

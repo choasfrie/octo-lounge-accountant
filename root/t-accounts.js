@@ -40,27 +40,27 @@ class TAccountManager {
                         <div class="debit-side">
                             <h4>Debit (+)</h4>
                             ${account.records
-                                .filter(r => r.debitorId === account.accountId)
+                                .filter(r => r.DebitorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.description} - ${this.formatAmount(r.amount)}</span>
-                                        <span class="date">${new Date(r.date).toLocaleDateString()}</span>
+                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
-                            ${account.records.filter(r => r.debitorId === account.accountId).length === 0 ? 
+                            ${account.records.filter(r => r.DebitorId === account.accountId).length === 0 ? 
                                 '<div class="entry"><span>No debit entries</span></div>' : ''}
                         </div>
                         <div class="credit-side">
                             <h4>Credit (-)</h4>
                             ${account.records
-                                .filter(r => r.creditorId === account.accountId)
+                                .filter(r => r.CreditorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.description} - ${this.formatAmount(r.amount)}</span>
-                                        <span class="date">${new Date(r.date).toLocaleDateString()}</span>
+                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
+                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
-                            ${account.records.filter(r => r.creditorId === account.accountId).length === 0 ? 
+                            ${account.records.filter(r => r.CreditorId === account.accountId).length === 0 ? 
                                 '<div class="entry"><span>No credit entries</span></div>' : ''}
                         </div>
                     </div>
@@ -231,11 +231,11 @@ class TAccountManager {
 
         try {
             const accountData = {
-                Name: accountName,
-                AccountNumber: parseInt(accountNumber),
-                AccountType: parseInt(form.accountType.value),
-                Behaviour: accountBehavior,
-                OwnerId: this.getCurrentUserId()
+                name: accountName,
+                accountNumber: parseInt(accountNumber),
+                accountType: parseInt(form.accountType.value),
+                behaviour: accountBehavior,
+                ownerId: this.getCurrentUserId()
             };
 
             const newAccount = await accountService.createAccount(accountData);
@@ -243,7 +243,7 @@ class TAccountManager {
             const tAccountGrid = document.querySelector('.t-account-grid');
             const accountElement = document.createElement('div');
             accountElement.className = 't-account';
-            accountElement.dataset.accountId = newAccount.Id;
+            accountElement.dataset.accountId = newAccount.id;
             accountElement.innerHTML = `
                 <h3>${newAccount.Name}</h3>
                 <div class="t-account-content">

@@ -424,12 +424,12 @@ export class TransactionManager {
             }
 
             const recordData = {
-                Date: new Date(form.date.value),
-                Amount: parseFloat(form.amount.value),
-                Description: `${fromAccountName} → ${toAccountName}`,
-                CreditorId: toAccount.Id,
-                DebitorId: fromAccount.Id,
-                Notes: form.notes.value
+                date: new Date(form.date.value).toISOString(),
+                amount: parseFloat(form.amount.value),
+                description: `${fromAccountName} → ${toAccountName}`,
+                creditorId: toAccount.id,
+                debitorId: fromAccount.id,
+                notes: form.notes.value
             };
 
             const newRecord = await recordService.createRecord(recordData);
@@ -475,11 +475,11 @@ export class TransactionManager {
                 }
 
                 const recordData = {
-                    Date: new Date(form.date.value),
-                    Amount: parseFloat(form.amount.value),
-                    Description: `${fromAccountName} → ${toAccountName}`,
-                    CreditorId: toAccount.Id,
-                    DebitorId: fromAccount.Id
+                    date: new Date(form.date.value).toISOString(),
+                    amount: parseFloat(form.amount.value),
+                    description: `${fromAccountName} → ${toAccountName}`,
+                    creditorId: toAccount.id,
+                    debitorId: fromAccount.id
                 };
 
                 const updatedRecord = await recordService.editRecord(recordId, recordData);
