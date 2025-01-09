@@ -65,14 +65,12 @@ class AuthManager {
 
     async register(userData) {
         try {
-
             const userResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-
                     Username: userData.username,
                     Email: userData.email,
                     PasswordHash: userData.password,
@@ -90,13 +88,13 @@ class AuthManager {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    Name: userData.accountPackage
+                    Name: userData.accountPackage || 'none'
                 })
             });
 
             if (packageResponse.ok) {
-                this.currentUser = { username: user.username = null };
-                localStorage.setItem('username', this.currentUser.username); // Save username
+                this.currentUser = { username: user.Username };
+                localStorage.setItem('username', this.currentUser.username);
                 this.updateUserDisplay();
                 this.toggleAuthButtons();
                 this.closeAuthModal();
@@ -218,8 +216,23 @@ class AuthManager {
 // Initialize AuthManager
 export const authManager = new AuthManager();
 
+// Initialize package buttons
+const initializePackageButtons = () => {
+    const packageButtons = document.querySelectorAll('.package-button');
+    packageButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            packageButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            document.getElementById('selected-package').value = button.dataset.package;
+        });
+    });
+};
+
 // Initialize event listeners after components are loaded
 const initializeEventListeners = () => {
+    // Initialize package buttons
+    initializePackageButtons();
     const logoutButton = document.getElementById('logout-button');
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
@@ -279,6 +292,8 @@ const initializeEventListeners = () => {
 
     registerButton.addEventListener('click', () => {
         authManager.showAuthModal('register');
+        // Re-initialize package buttons when register form is shown
+        setTimeout(initializePackageButtons, 100);
     });
 };
 
