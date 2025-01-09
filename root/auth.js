@@ -1,4 +1,5 @@
 import { accountService } from './services/accountService.js';
+import { API_CONFIG } from './config.js';
 
 class AuthManager {
     constructor() {
@@ -31,7 +32,7 @@ class AuthManager {
     async login(credentials) {
         try {
 
-            const response = await fetch('https://localhost:7162/api/Profiles/login', {
+            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ class AuthManager {
     async register(userData) {
         try {
 
-            const userResponse = await fetch('https://localhost:7162/api/Profiles/register', {
+            const userResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.PROFILES}/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ class AuthManager {
 
             const user = await userResponse.json();
           
-            const packageResponse = await fetch('https://localhost:7162/api/AccountTypes/createAccountType', {
+            const packageResponse = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNT_TYPES}/createAccountType`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -30,7 +30,7 @@ export class TransactionManager {
             }
 
             // Get all accounts with their records
-            const response = await fetch(`https://localhost:7162/api/Accounts/getAllAccountsAndRecords/${authManager.currentUser.id}`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}/getAllAccountsAndRecords/${authManager.currentUser.id}`);
             if (!response.ok) throw new Error('Failed to fetch accounts and records');
             const accountsWithRecords = await response.json();
 

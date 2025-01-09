@@ -1,8 +1,10 @@
 class TAccountManager {
     getCurrentUserId() {
-        // Get the current user ID from your auth system
-        // This is just a placeholder - implement based on your auth system
-        return localStorage.getItem('userId') || 1;
+        const username = localStorage.getItem('username');
+        if (!username) {
+            throw new Error('User not authenticated');
+        }
+        return username;
     }
     constructor() {
         this.initializeButtons(); // Setup action buttons
@@ -13,7 +15,7 @@ class TAccountManager {
     async loadAccounts() {
         try {
             const userId = this.getCurrentUserId();
-            const response = await fetch(`https://localhost:7162/api/Accounts/getAllAccountsAndRecords/${userId}`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}/getAllAccountsAndRecords/${userId}`);
             if (!response.ok) throw new Error('Failed to fetch accounts');
             const accountsData = await response.json();
             

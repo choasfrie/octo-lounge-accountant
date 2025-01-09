@@ -1,4 +1,5 @@
-const API_BASE_URL = 'api/Accounts';
+import { API_CONFIG } from '../config.js';
+const API_BASE_URL = `${API_CONFIG.BASE_URL}${API_CONFIG.ACCOUNTS}`;
 
 class AccountService {
     async createAccount(accountData) {
