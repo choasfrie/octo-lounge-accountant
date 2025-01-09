@@ -745,3 +745,7 @@ export class TransactionManager {
         }
     }
 }
+
+export class TransactionManager {
+    // ... rest of the class implementation
+}
