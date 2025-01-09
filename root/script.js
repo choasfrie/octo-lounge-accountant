@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         const parser = new DOMParser();
         parsedDoc = parser.parseFromString(componentsHtml, 'text/html');
 
+        // Initialize user menu functionality
+        initializeUserMenu();
+
         // Insert navigation, social links, and modals into document
         const sidePanel = document.querySelector('.side-panel');
         if (sidePanel) {
@@ -32,6 +35,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.dispatchEvent(new Event('componentsLoaded'));
         }
 
+        // Re-initialize user menu after components are loaded
+        initializeUserMenu();
+
         // Insert footer
         const footerContainer = document.querySelector('footer');
         if (footerContainer && parsedDoc.querySelector('footer p')) {
@@ -56,3 +62,23 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     });
 });
+
+// Function to initialize user menu functionality
+function initializeUserMenu() {
+    const userMenuTrigger = document.querySelector('.user-menu-trigger');
+    const userMenu = document.querySelector('.user-menu');
+    
+    if (userMenuTrigger && userMenu) {
+        userMenuTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenuTrigger.contains(e.target) && !userMenu.contains(e.target)) {
+                userMenu.classList.remove('show');
+            }
+        });
+    }
+}
