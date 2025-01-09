@@ -399,5 +399,4 @@ const initializeEventListeners = () => {
 // Start initialization when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
-    setupAuthButtons();
 });
