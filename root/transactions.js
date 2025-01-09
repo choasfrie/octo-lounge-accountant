@@ -3,13 +3,6 @@ import { authManager } from './auth.js';
 import { ModalUtils } from './utils/modalUtils.js';
 
 export class TransactionManager {
-    static init() {
-        try {
-            return new TransactionManager();
-        } catch (error) {
-            console.error('Error initializing TransactionManager:', error);
-        }
-    }
 
     constructor() {
         try {

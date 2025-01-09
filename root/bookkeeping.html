@@ -29,17 +29,12 @@
                     Account Management Dashboard 
                     <a href="chartofaccounts.html" data-tooltip="View Chart of Accounts" class="section-icon"><i class="fas fa-book"></i></a>
                 </h2>
-                <div class="account-grid" id="account-grid">
-                    <div class="loading">Loading accounts...</div>
-                </div>
+                <div class="account-grid" id="account-grid"></div>
             </section>
 
             <section id="recent-transactions">
                 <h2>Recent Transactions</h2>
-                <div class="transaction-list">
-                    <!-- Transactions will be loaded dynamically -->
-                    <div class="loading">Loading recent transactions...</div>
-                </div>
+                <div class="transaction-list"></div>
             </section>
 
             <section id="records">
@@ -64,10 +59,7 @@
                     </div>
                 </h2>
 
-                <div class="transaction-list">
-                    <!-- Transaction records will be loaded dynamically -->
-                    <div class="loading">Loading transaction records...</div>
-                </div>
+                <div class="transaction-list"></div>
             </section>
 
             <section id="t-accounts">
@@ -85,9 +77,7 @@
                         </button>
                     </span>
                 </h2>
-                <div class="t-account-grid" id="t-accounts-grid">
-                    <div class="loading">Loading T-Accounts...</div>
-                </div>
+                <div class="t-account-grid" id="t-accounts-grid"></div>
             </section>
         </main>
 
@@ -117,11 +107,12 @@
     <script type="module" src="auth.js"></script>
     <script type="module" src="transactions.js"></script>
     <script type="module">
+        import { TransactionManager } from './transactions.js';
         // Check session before loading page
         if (!sessionStorage.getItem('isAuthenticated')) {
             window.location.href = 'index.html';
         } else {
-            document.addEventListener('DOMContentLoaded', () => TransactionManager.init());
+            document.addEventListener('DOMContentLoaded', () => new TransactionManager());
         }
     </script>
     <script src="ai-sidebar.js"></script>

@@ -38,6 +38,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Re-initialize user menu after components are loaded
         initializeUserMenu();
 
+        // Show/hide AI assistant button based on current page
+        const aiAssistantMenuItem = document.getElementById('ai-assistant-menu-item');
+        if (aiAssistantMenuItem) {
+            aiAssistantMenuItem.style.display = 
+                window.location.pathname.endsWith('bookkeeping.html') ? 'block' : 'none';
+        }
+
         // Insert footer
         const footerContainer = document.querySelector('footer');
         if (footerContainer && parsedDoc.querySelector('footer p')) {

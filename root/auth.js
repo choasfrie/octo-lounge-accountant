@@ -29,10 +29,6 @@ class AuthManager {
             window.location.href = 'index.html';
         }
     }
-    constructor() {
-        this.currentUser = null;
-        this.init();
-    }
 
     async init() {
         const isAuthenticated = sessionStorage.getItem('isAuthenticated');
@@ -313,68 +309,86 @@ const initializePackageButtons = () => {
 const initializeEventListeners = () => {
     // Initialize package buttons
     initializePackageButtons();
-    const logoutButton = document.getElementById('logout-button');
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const loginButton = document.getElementById('login-button');
-    const registerButton = document.getElementById('register-button');
-    const userMenuTrigger = document.querySelector('.user-menu-trigger');
-    const userMenu = document.querySelector('.user-menu');
 
-    if (!logoutButton || !loginForm || !registerForm || !loginButton || 
-        !registerButton || !userMenuTrigger || !userMenu) {
-        // If elements aren't ready, wait for components
-        document.addEventListener('componentsLoaded', initializeEventListeners);
-        return;
+    // Function to setup auth buttons
+    const setupAuthButtons = () => {
+        const logoutButton = document.getElementById('logout-button');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginButton = document.getElementById('login-button');
+        const registerButton = document.getElementById('register-button');
+        const userMenuTrigger = document.querySelector('.user-menu-trigger');
+        const userMenu = document.querySelector('.user-menu');
+
+        if (!logoutButton || !loginForm || !registerForm || !loginButton || 
+            !registerButton || !userMenuTrigger || !userMenu) {
+            return false;
+        }
+
+        // Remove existing event listeners
+        const newLoginButton = loginButton.cloneNode(true);
+        const newRegisterButton = registerButton.cloneNode(true);
+        const newLogoutButton = logoutButton.cloneNode(true);
+        
+        loginButton.parentNode.replaceChild(newLoginButton, loginButton);
+        registerButton.parentNode.replaceChild(newRegisterButton, registerButton);
+        logoutButton.parentNode.replaceChild(newLogoutButton, logoutButton);
+
+        newLogoutButton.addEventListener('click', () => {
+            authManager.logout();
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const success = await authManager.login({
+                username: formData.get('username'),
+                password: formData.get('password')
+            });
+            if (!success) {
+                const errorDiv = document.querySelector('#login-error');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Login failed. Please check your credentials.';
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const success = await authManager.register({
+                username: formData.get('username'),
+                accountPackage: formData.get('accountPackage'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            });
+            if (!success) {
+                const errorDiv = document.querySelector('#register-error');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Registration failed. Please try again.';
+            }
+        });
+
+        userMenuTrigger.addEventListener('click', () => {
+            userMenu.classList.toggle('show');
+        });
+
+        newLoginButton.addEventListener('click', () => {
+            authManager.showAuthModal('login');
+        });
+
+        newRegisterButton.addEventListener('click', () => {
+            authManager.showAuthModal('register');
+            // Re-initialize package buttons when register form is shown
+            setTimeout(initializePackageButtons, 100);
+        });
+
+        return true;
+    };
+
+    // Try to setup auth buttons, if not successful, wait for components
+    if (!setupAuthButtons()) {
+        document.addEventListener('componentsLoaded', setupAuthButtons);
     }
-
-    logoutButton.addEventListener('click', () => {
-        authManager.logout();
-    });
-
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const success = await authManager.login({
-            username: formData.get('username'),
-            password: formData.get('password')
-        });
-        if (!success) {
-            const errorDiv = document.querySelector('#login-error');
-            errorDiv.style.display = 'block';
-            errorDiv.textContent = 'Login failed. Please check your credentials.';
-        }
-    });
-
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const success = await authManager.register({
-            username: formData.get('username'),
-            accountPackage: formData.get('data-package'),
-            email: formData.get('email'),
-            password: formData.get('password')
-        });
-        if (!success) {
-            const errorDiv = document.querySelector('#register-error');
-            errorDiv.style.display = 'block';
-            errorDiv.textContent = 'Registration failed. Please try again.';
-        }
-    });
-
-    userMenuTrigger.addEventListener('click', () => {
-        userMenu.classList.toggle('show');
-    });
-
-    loginButton.addEventListener('click', () => {
-        authManager.showAuthModal('login');
-    });
-
-    registerButton.addEventListener('click', () => {
-        authManager.showAuthModal('register');
-        // Re-initialize package buttons when register form is shown
-        setTimeout(initializePackageButtons, 100);
-    });
 };
 
 // Start initialization when DOM is loaded
