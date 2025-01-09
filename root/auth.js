@@ -172,6 +172,11 @@ class AuthManager {
                 document.getElementById('register-button').addEventListener('click', () => this.showAuthModal('register'));
             }
         }
+        
+        // Reinitialize user menu functionality
+        if (typeof initializeUserMenu === 'function') {
+            initializeUserMenu();
+        }
     }
 
     toggleAuthButtons() {

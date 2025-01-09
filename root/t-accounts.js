@@ -17,7 +17,14 @@ class TAccountManager {
         try {
             const userId = this.getCurrentUserId();
             const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${userId}`);
-            if (!response.ok) throw new Error('Failed to fetch accounts');
+            if (!response.ok) {
+                if (response.status === 404) {
+                    const tAccountGrid = document.querySelector('.t-account-grid');
+                    tAccountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    return;
+                }
+                throw new Error('Failed to fetch accounts');
+            }
             const accountsData = await response.json();
             
             const tAccountGrid = document.querySelector('.t-account-grid');

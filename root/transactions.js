@@ -34,19 +34,16 @@ export class TransactionManager {
             const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${authManager.currentUser.id}`);
             if (!response.ok) {
                 if (response.status === 404) {
-                    const errorData = await response.json();
-                    if (errorData === "No accounts found for the specified owner.") {
-                        // Clear the loading state and show the message
-                        const accountGrid = document.getElementById('account-grid');
-                        if (accountGrid) accountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
-                        
-                        const transactionList = document.querySelector('#records .transaction-list');
-                        if (transactionList) transactionList.innerHTML = '<div class="error">No accounts or transactions found.</div>';
-                        
-                        const tAccountGrid = document.getElementById('t-accounts-grid');
-                        if (tAccountGrid) tAccountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
-                        return;
-                    }
+                    // Clear the loading state and show the message
+                    const accountGrid = document.getElementById('account-grid');
+                    if (accountGrid) accountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    
+                    const transactionList = document.querySelector('#records .transaction-list');
+                    if (transactionList) transactionList.innerHTML = '<div class="error">No accounts or transactions found.</div>';
+                    
+                    const tAccountGrid = document.getElementById('t-accounts-grid');
+                    if (tAccountGrid) tAccountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    return;
                 }
                 throw new Error('Failed to fetch accounts and records');
             }

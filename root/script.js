@@ -68,17 +68,24 @@ function initializeUserMenu() {
     const userMenuTrigger = document.querySelector('.user-menu-trigger');
     const userMenu = document.querySelector('.user-menu');
     
-    if (userMenuTrigger && userMenu) {
-        userMenuTrigger.addEventListener('click', (e) => {
+    // Remove existing event listeners
+    const newTrigger = userMenuTrigger.cloneNode(true);
+    userMenuTrigger.parentNode.replaceChild(newTrigger, userMenuTrigger);
+    
+    if (newTrigger && userMenu) {
+        newTrigger.addEventListener('click', (e) => {
             e.stopPropagation();
             userMenu.classList.toggle('show');
         });
 
         // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!userMenuTrigger.contains(e.target) && !userMenu.contains(e.target)) {
+        const handleClickOutside = (e) => {
+            if (!newTrigger.contains(e.target) && !userMenu.contains(e.target)) {
                 userMenu.classList.remove('show');
             }
-        });
+        };
+        
+        document.removeEventListener('click', handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
     }
 }
