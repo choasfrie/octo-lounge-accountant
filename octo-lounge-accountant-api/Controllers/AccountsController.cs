@@ -155,7 +155,7 @@ namespace octo_lounge_accountant_api.Controllers
                     accounts = handler.CreateStandardAccountPackageForSole(accountPackDto.profileId);
                     break;
                 default:
-                    return BadRequest("Invalid company type.");
+                    return BadRequest("Invalid company type. Must be L (LLC), G (PLC), or S (Sole Proprietorship).");
             }
 
             // Validate AccountTypeId
