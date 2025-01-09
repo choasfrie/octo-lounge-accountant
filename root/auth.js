@@ -1,11 +1,9 @@
-// Handles user authentication
 class AuthManager {
     constructor() {
-        this.currentUser = null; // Current user session
+        this.currentUser = null;
         this.init();
     }
 
-    // Initialize user session
     async init() {
         const storedUsername = localStorage.getItem('username');
         if (storedUsername) {
@@ -41,7 +39,7 @@ class AuthManager {
             if (response.ok) {
                 const userData = await response.json();
                 this.currentUser = { username: userData.username || 'Guest' };
-                localStorage.setItem('username', this.currentUser.username); // Save username
+                localStorage.setItem('username', this.currentUser.username); 
                 this.updateUserDisplay();
                 this.toggleAuthButtons();
                 this.closeAuthModal();
@@ -83,7 +81,7 @@ class AuthManager {
             });
 
             if (packageResponse.ok) {
-                this.currentUser = { username: user.username || 'Guest' };
+                this.currentUser = { username: user.username = null };
                 localStorage.setItem('username', this.currentUser.username); // Save username
                 this.updateUserDisplay();
                 this.toggleAuthButtons();
@@ -205,4 +203,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('register-button').addEventListener('click', () => {
         authManager.showAuthModal('register');
     });
-});
+});     
