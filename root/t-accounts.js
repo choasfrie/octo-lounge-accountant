@@ -55,7 +55,7 @@ class TAccountManager {
                                 .map(r => `
                                     <div class="entry">
                                         <span>${r.Description}</span>
-                                        <span class="amount">${this.formatAmount(r.Amount)}</span>
+                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount))}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
@@ -69,7 +69,7 @@ class TAccountManager {
                                 .map(r => `
                                     <div class="entry">
                                         <span>${r.Description}</span>
-                                        <span class="amount">${this.formatAmount(r.Amount)}</span>
+                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount))}</span>
                                         <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
