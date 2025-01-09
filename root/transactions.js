@@ -28,7 +28,7 @@ export class TransactionManager {
                 if (response.status === 404) {
                     // Clear the loading state and show the message
                     const accountGrid = document.getElementById('account-grid');
-                    if (accountGrid) accountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    if (accountGrid) accountGrid.innerHTML = '<div class="error">No accounts found.</div>';
                     
                     const recentTransactionsList = document.querySelector('#recent-transactions .transaction-list');
                     if (recentTransactionsList) recentTransactionsList.innerHTML = '<div class="error">No transactions found.</div>';
@@ -37,7 +37,7 @@ export class TransactionManager {
                     if (transactionList) transactionList.innerHTML = '<div class="error">No transactions found.</div>';
                     
                     const tAccountGrid = document.getElementById('t-accounts-grid');
-                    if (tAccountGrid) tAccountGrid.innerHTML = '<div class="error">No accounts found. Please create an account to get started.</div>';
+                    if (tAccountGrid) tAccountGrid.innerHTML = '<div class="error">No accounts found.</div>';
                     return;
                 }
                 throw new Error('Failed to fetch accounts and records');
