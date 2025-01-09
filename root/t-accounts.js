@@ -40,27 +40,27 @@ class TAccountManager {
                         <div class="debit-side">
                             <h4>Debit (+)</h4>
                             ${account.records
-                                .filter(r => r.DebitorId === account.accountId)
+                                .filter(r => r.debitorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
-                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
+                                        <span>${r.description} - ${this.formatAmount(r.amount)}</span>
+                                        <span class="date">${new Date(r.date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
-                            ${account.records.filter(r => r.DebitorId === account.accountId).length === 0 ? 
+                            ${account.records.filter(r => r.debitorId === account.accountId).length === 0 ? 
                                 '<div class="entry"><span>No debit entries</span></div>' : ''}
                         </div>
                         <div class="credit-side">
                             <h4>Credit (-)</h4>
                             ${account.records
-                                .filter(r => r.CreditorId === account.accountId)
+                                .filter(r => r.creditorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description} - ${this.formatAmount(r.Amount)}</span>
-                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
+                                        <span>${r.description} - ${this.formatAmount(r.amount)}</span>
+                                        <span class="date">${new Date(r.date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('')}
-                            ${account.records.filter(r => r.CreditorId === account.accountId).length === 0 ? 
+                            ${account.records.filter(r => r.creditorId === account.accountId).length === 0 ? 
                                 '<div class="entry"><span>No credit entries</span></div>' : ''}
                         </div>
                     </div>
