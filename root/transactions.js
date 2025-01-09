@@ -135,41 +135,53 @@ export class TransactionManager {
         }
     }
 
-    displayRecords(accountsWithRecords) {
-        // Filter accounts with non-empty records
-        const accountsWithNonEmptyRecords = accountsWithRecords.filter(account => 
-            account.records && account.records.length > 0
-        );
+    displayRecords(accounts) {
+        // Get all records from all accounts
+        const allRecords = [];
+        accounts.forEach(account => {
+            if (account.records && account.records.length > 0) {
+                account.records.forEach(record => {
+                    // Find creditor and debitor account names
+                    const creditorAccount = accounts.find(a => a.accountId === record.creditorId);
+                    const debitorAccount = accounts.find(a => a.accountId === record.debitorId);
+                    
+                    allRecords.push({
+                        ...record,
+                        creditorName: creditorAccount ? creditorAccount.accountName : 'Unknown',
+                        debitorName: debitorAccount ? debitorAccount.accountName : 'Unknown',
+                        date: new Date(record.date) // Ensure date is properly parsed
+                    });
+                });
+            }
+        });
 
-        // Flatten all records and add account names
-        const allRecords = accountsWithNonEmptyRecords.flatMap(account => 
-            account.records.map(record => ({
-                ...record,
-                creditorName: accountsWithRecords.find(a => a.accountId === record.creditorId)?.accountName || 'Unknown',
-                debitorName: accountsWithRecords.find(a => a.accountId === record.debitorId)?.accountName || 'Unknown'
-            }))
-        );
-
-        // Sort records by date
-        allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        this.renderTAccounts(accountsWithNonEmptyRecords);
+        // Sort records by date (most recent first)
+        allRecords.sort((a, b) => b.date - a.date);
+        // Update the transaction list in the UI
         const transactionList = document.querySelector('#records .transaction-list');
         if (!transactionList) return;
 
+        if (allRecords.length === 0) {
+            transactionList.innerHTML = '<div class="error">No transactions found.</div>';
+            return;
+        }
+
         transactionList.innerHTML = allRecords.map(record => `
-            <div class="transaction" data-record-id="${record.recordId}">
-                <span class="date">${new Date(record.date).toLocaleDateString()}</span>
+            <div class="transaction" data-record-id="${record.recordId || ''}">
+                <span class="date">${record.date.toLocaleDateString()}</span>
                 <span class="description">
                     ${record.debitorName} → ${record.creditorName}
                     ${record.description ? `: ${record.description}` : ''}
                     ${record.notes ? `<i class="fas fa-book notes-icon" data-notes="${record.notes}"></i>` : ''}
                 </span>
-                <span class="amount ${record.amount >= 0 ? 'income' : 'expense'}">
+                <span class="amount ${parseFloat(record.amount) >= 0 ? 'income' : 'expense'}">
                     ${this.formatAmount(record.amount)}
                 </span>
             </div>
         `).join('');
+
+        // Also update T-Accounts display
+        this.renderTAccounts(accounts.filter(account => account.records && account.records.length > 0));
     }
 
     async initializeFilter() {
