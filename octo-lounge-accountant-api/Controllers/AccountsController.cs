@@ -137,6 +137,8 @@ namespace octo_lounge_accountant_api.Controllers
         [HttpPost("createStandardPackage")]
         public async Task<IActionResult> CreateStandardAccountPackage([FromBody] AccountPackDTO accountPackDto)
         {
+            Console.WriteLine($"Received request to create standard package. ProfileId: {accountPackDto?.profileId}, CompanyType: {accountPackDto?.companyType}");
+            
             if (accountPackDto == null)
             {
                 return BadRequest("Account package data is null.");
@@ -150,6 +152,7 @@ namespace octo_lounge_accountant_api.Controllers
             }
             AccountPackageHandler handler = new AccountPackageHandler();
             List<Account> accounts;
+            Console.WriteLine($"Creating account package for company type: {accountPackDto.companyType}");
             switch (accountPackDto.companyType)
             {
                 case 'L':
@@ -174,9 +177,12 @@ namespace octo_lounge_accountant_api.Controllers
                 }
             }*/
 
+            Console.WriteLine($"Created {accounts.Count} accounts for the package");
+            
             _context.Accounts.AddRange(accounts);
             _context.SaveChanges();
 
+            Console.WriteLine("Successfully saved accounts to database");
             return Ok(accounts);
         }
 

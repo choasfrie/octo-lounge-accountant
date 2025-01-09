@@ -64,6 +64,12 @@ class AuthManager {
 
     async register(userData) {
         try {
+            console.log('Starting registration with data:', {
+                username: userData.username,
+                email: userData.email,
+                accountPackage: userData.accountPackage
+            });
+
             // First register the user
             const userResponse = await fetch('http://localhost:5116/api/Profiles/register', {
                 method: 'POST',
@@ -88,6 +94,10 @@ class AuthManager {
 
                 // Create account package if selected and not "none"
                 if (userData.accountPackage && userData.accountPackage !== '' && userData.accountPackage !== 'none') {
+                    console.log('Creating account package:', {
+                        profileId: user.Id,
+                        packageType: userData.accountPackage
+                    });
                     try {
                         const response = await fetch('http://localhost:5116/api/Accounts/createStandardPackage', {
                             method: 'POST',
