@@ -226,13 +226,13 @@ export class TransactionManager {
         
         accounts.forEach(account => {
             const debitorOption = document.createElement('option');
-            debitorOption.value = `debitor-${account.AccountId}`;
-            debitorOption.textContent = `${account.AccountName} (Debits)`;
+            debitorOption.value = `debitor-${account.accountId}`;
+            debitorOption.textContent = `${account.accountName} (Debits)`;
             filter.appendChild(debitorOption);
 
             const creditorOption = document.createElement('option');
-            creditorOption.value = `creditor-${account.AccountId}`;
-            creditorOption.textContent = `${account.AccountName} (Credits)`;
+            creditorOption.value = `creditor-${account.accountId}`;
+            creditorOption.textContent = `${account.accountName} (Credits)`;
             filter.appendChild(creditorOption);
         });
     }
