@@ -107,6 +107,7 @@ class AuthManager {
                         console.warn('Failed to setup account package, but user was created:', error);
                     }
                 }
+            }
 
             // Update UI state
             this.currentUser = { 
