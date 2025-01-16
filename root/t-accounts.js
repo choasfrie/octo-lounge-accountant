@@ -28,6 +28,10 @@ class TAccountManager {
             const accountsData = await response.json();
             
             const tAccountGrid = document.querySelector('.t-account-grid');
+            if (!tAccountGrid) {
+                console.error('T-account grid element not found');
+                return;
+            }
             tAccountGrid.innerHTML = ''; // Clear loading state
             
             accountsData.forEach(account => {
@@ -35,6 +39,14 @@ class TAccountManager {
                 accountElement.className = 't-account';
                 accountElement.dataset.accountId = account.accountId;
                 accountElement.dataset.behavior = account.accountBehaviour;
+                
+                // Calculate totals for debugging - handle both camelCase and PascalCase
+                const debits = account.records
+                    .filter(r => (r.DebitorId === account.accountId || r.debitorId === account.accountId))
+                    .reduce((sum, r) => sum + parseFloat(r.Amount || r.amount), 0);
+                const credits = account.records
+                    .filter(r => (r.CreditorId === account.accountId || r.creditorId === account.accountId))
+                    .reduce((sum, r) => sum + parseFloat(r.Amount || r.amount), 0);
                 // Determine outline color and behavior symbol based on account behavior
                 const outlineColor = account.accountBehaviour === 'D' ? '#4CAF50' : '#F44336';
                 const behaviorSymbol = account.accountBehaviour === 'D' ? '+' : '-';
@@ -51,24 +63,20 @@ class TAccountManager {
                         <div class="debit-side">
                             <h4>Debit (+)</h4>
                             ${account.records
-                                .filter(r => r.DebitorId === account.accountId)
+                                .filter(r => r.DebitorId === account.accountId || r.debitorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description}</span>
-                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount))}</span>
-                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
+                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount || r.amount))}</span>
                                     </div>
                                 `).join('') || '<div class="entry"><span>No debit entries</span></div>'}
                         </div>
                         <div class="credit-side">
                             <h4>Credit (-)</h4>
                             ${account.records
-                                .filter(r => r.CreditorId === account.accountId)
+                                .filter(r => r.CreditorId === account.accountId || r.creditorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description}</span>
-                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount))}</span>
-                                        <span class="date">${new Date(r.Date).toLocaleDateString()}</span>
+                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount || r.amount))}</span>
                                     </div>
                                 `).join('') || '<div class="entry"><span>No credit entries</span></div>'}
                         </div>

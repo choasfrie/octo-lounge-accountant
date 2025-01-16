@@ -610,6 +610,40 @@ h2 {
     padding: 20px;
     transition: box-shadow 0.3s ease;
     position: relative;
+    margin-bottom: 20px;
+}
+
+.t-account .total {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+    font-weight: bold;
+    color: #00ccff;
+}
+
+.t-account .balance {
+    margin-top: 15px;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+}
+
+.t-account .balance.positive {
+    color: #4CAF50;
+}
+
+.t-account .balance.negative {
+    color: #f44336;
+}
+
+.category-total {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+    font-weight: bold;
+    color: #00ccff;
 }
 
 .t-account:hover {

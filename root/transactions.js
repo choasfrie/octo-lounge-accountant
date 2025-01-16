@@ -82,7 +82,10 @@ export class TransactionManager {
 
     displayAccounts(accountBalances) {
         const accountGrid = document.getElementById('account-grid');
-        if (!accountGrid) return;
+        if (!accountGrid) {
+            console.error('Account grid element not found');
+            return;
+        }
 
         // Group accounts by category
         const categories = new Map();
@@ -91,7 +94,25 @@ export class TransactionManager {
             if (!categories.has(category)) {
                 categories.set(category, []);
             }
-            categories.get(category).push(account);
+            
+            // Calculate balance based on account behavior and records
+            let balance = 0;
+            account.records.forEach(record => {
+                const amount = parseFloat(record.amount || record.Amount);
+                if (record.debitorId === id || record.DebitorId === id) {
+                    balance += amount;
+                }
+                if (record.creditorId === id || record.CreditorId === id) {
+                    balance -= amount;
+                }
+            });
+            
+            // Create account object with calculated balance
+            const accountWithBalance = {
+                ...account,
+                balance: balance
+            };
+            categories.get(category).push(accountWithBalance);
         });
 
         // Create account items
@@ -106,13 +127,16 @@ export class TransactionManager {
             if (category >= 3000 && category < 4000) icon = 'fas fa-chart-line';
             if (category >= 4000) icon = 'fas fa-chart-pie';
             
+            const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+            
             categoryDiv.innerHTML = `
                 <i class="${icon}"></i>
                 <h3>${this.getCategoryName(category)}</h3>
                 <div class="account-details">
                     ${accounts.map(acc => `
-                        <p>${acc.name} (${acc.number}): CHF ${this.formatAmount(acc.balance)}</p>
+                        <p>${acc.name} (${acc.number}): ${this.formatAmount(acc.balance)}</p>
                     `).join('')}
+                    <p class="category-total">Category Total: ${this.formatAmount(totalBalance)}</p>
                 </div>
             `;
             accountGrid.appendChild(categoryDiv);
@@ -135,7 +159,6 @@ export class TransactionManager {
     }
 
     displayRecords(accounts) {
-        // Get all records from all accounts
         const allRecords = [];
         
         // Handle if accounts is a single record
@@ -144,7 +167,6 @@ export class TransactionManager {
         }
 
         accounts.forEach(account => {
-            // If the account itself is a record (from direct API response)
             if (account.creditorId !== undefined) {
                 allRecords.push({
                     ...account,
@@ -245,33 +267,49 @@ export class TransactionManager {
         // Render T-Accounts
         tAccountsGrid.innerHTML = '';
         accounts.forEach(account => {
+            // Calculate totals, handling both camelCase and PascalCase property names
+            const debits = account.records
+                .filter(r => r.debitorId === account.accountId || r.DebitorId === account.accountId)
+                .reduce((sum, r) => sum + parseFloat(r.amount || r.Amount), 0);
+            
+            const credits = account.records
+                .filter(r => r.creditorId === account.accountId || r.CreditorId === account.accountId)
+                .reduce((sum, r) => sum + parseFloat(r.amount || r.Amount), 0);
+            
+            // Calculate balance based on account behavior
+            const balance = debits - credits;
+            
             const tAccount = document.createElement('div');
             tAccount.className = 't-account';
+            tAccount.dataset.behavior = account.accountBehaviour || 'D';
             tAccount.innerHTML = `
                 <h3>${account.accountName} (${account.accountNumber})</h3>
                 <div class="t-account-content">
                     <div class="debit-side">
                         <h4>Debit (+)</h4>
                         ${account.records
-                            .filter(r => r.debitorId === account.accountId)
+                            .filter(r => r.DebitorId === account.accountId)
                             .map(entry => `
                                 <div class="entry">
-                                    <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
-                                    <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                                    <span>${this.formatAmount(entry.Amount)}</span>
                                 </div>
                             `).join('')}
+                        <div class="total">Total Debits: ${this.formatAmount(debits)}</div>
                     </div>
                     <div class="credit-side">
                         <h4>Credit (-)</h4>
                         ${account.records
-                            .filter(r => r.creditorId === account.accountId)
+                            .filter(r => r.CreditorId === account.accountId)
                             .map(entry => `
                                 <div class="entry">
-                                    <span>${this.formatAmount(entry.amount)} - ${entry.description}</span>
-                                    <span class="date">${new Date(entry.date).toLocaleDateString()}</span>
+                                    <span>${this.formatAmount(entry.Amount)}</span>
                                 </div>
                             `).join('')}
+                        <div class="total">Total Credits: ${this.formatAmount(credits)}</div>
                     </div>
+                </div>
+                <div class="balance ${balance >= 0 ? 'positive' : 'negative'}">
+                    Balance: ${this.formatAmount(Math.abs(balance))} ${balance >= 0 ? 'DR' : 'CR'}
                 </div>
             `;
             tAccountsGrid.appendChild(tAccount);
