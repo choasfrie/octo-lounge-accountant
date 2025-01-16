@@ -281,7 +281,7 @@ export class TransactionManager {
             
             const tAccount = document.createElement('div');
             tAccount.className = 't-account';
-            tAccount.dataset.behavior = account.accountBehaviour || 'D';
+            tAccount.dataset.behavior = account.accountBehaviour || '+';
             tAccount.innerHTML = `
                 <h3>${account.accountName} (${account.accountNumber})</h3>
                 <div class="t-account-content">
@@ -511,30 +511,30 @@ export class TransactionManager {
             
             editForm.style.display = 'block';
             
-            // Add event listener to transaction select
-            const transactionSelect = document.getElementById('edit-transaction-select');
-            transactionSelect.addEventListener('change', (e) => {
-                const selectedIndex = e.target.value;
-                const transaction = document.querySelectorAll('#records .transaction')[selectedIndex];
+            // Add event listener to account select
+            const accountSelect = document.getElementById('edit-account-select');
+            accountSelect.addEventListener('change', (e) => {
+                const selectedAccount = e.target.value;
+                const accountElement = Array.from(document.querySelectorAll('.t-account'))
+                    .find(acc => acc.querySelector('h3').textContent === selectedAccount);
                 
-                if (transaction) {
-                    const date = transaction.querySelector('.date').textContent;
-                    const description = transaction.querySelector('.description').textContent;
-                    const amount = transaction.querySelector('.amount').textContent
-                        .replace('CHF ', '')
-                        .replace(',', '')
-                        .replace('.00', '');
-                    
-                    // Extract from/to accounts from description
-                    const [fromAccount, toAccount] = description.split(' → ');
+                if (accountElement) {
+                    // Extract account name and number from the h3 text which is in format "Name (Number)"
+                    const accountName = accountElement.querySelector('h3').textContent.split(' (')[0];
+                    const accountNumber = accountElement.querySelector('h3').textContent.match(/\((\d+)\)/)[1];
+                    const accountBehavior = accountElement.dataset.behavior;
                     
                     // Set form values
-                    document.getElementById('edit-transaction-date').value = this.formatDateForInput(date);
-                    document.getElementById('edit-transaction-from').value = fromAccount.trim();
-                    document.getElementById('edit-transaction-to').value = toAccount.trim();
-                    document.getElementById('edit-transaction-amount').value = parseFloat(amount);
+                    document.getElementById('edit-account-name').value = accountName;
+                    document.getElementById('edit-account-number').value = accountNumber;
+                    document.getElementById('edit-account-behavior').value = accountBehavior;
                 }
             });
+
+            // Trigger change event on initial load if there's a selected option
+            if (accountSelect.value) {
+                accountSelect.dispatchEvent(new Event('change'));
+            }
         } else if (type === 'add') {
             addForm.style.display = 'block';
         }

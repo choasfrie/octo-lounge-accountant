@@ -13,6 +13,7 @@ class AccountService {
             throw new Error(errors.join('\n'));
         }
 
+        console.log('Create Account Request Body:', accountData);
         this.loadingState.start('Creating account...');
         try {
             const response = await fetch(`${API_BASE_URL}/createAccount`, {
@@ -33,6 +34,7 @@ class AccountService {
 
     async deleteAccount(accountId) {
         try {
+            console.log('Delete Account Request:', { accountId });
             const response = await fetch(`${API_BASE_URL}/deleteAccount/${accountId}`, {
                 method: 'DELETE'
             });
@@ -46,6 +48,7 @@ class AccountService {
 
     async editAccount(accountId, accountData) {
         try {
+            console.log('Edit Account Request Body:', { accountId, accountData });
             const response = await fetch(`${API_BASE_URL}/editAccount/${accountId}`, {
                 method: 'PUT',
                 headers: {

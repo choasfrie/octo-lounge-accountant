@@ -5,7 +5,7 @@ export const validateAccountData = (data) => {
     if (!data.AccountNumber || data.AccountNumber < 1000 || data.AccountNumber > 9999) {
         errors.push('Account number must be between 1000 and 9999');
     }
-    if (!['D', 'C'].includes(data.Behaviour)) errors.push('Invalid account behavior');
+    if (!['+', '-'].includes(data.Behaviour)) errors.push('Invalid account behavior');
     if (!data.OwnerId) errors.push('Owner ID is required');
     return errors;
 };

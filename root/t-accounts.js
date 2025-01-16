@@ -49,8 +49,8 @@ class TAccountManager {
                     .filter(r => (r.CreditorId === account.accountId || r.creditorId === account.accountId))
                     .reduce((sum, r) => sum + parseFloat(r.Amount || r.amount), 0);
                 // Determine outline color and behavior symbol based on account behavior
-                const outlineColor = account.accountBehaviour === 'D' ? '#4CAF50' : '#F44336';
-                const behaviorSymbol = account.accountBehaviour === 'D' ? '+' : '-';
+                const outlineColor = account.accountBehaviour === '+' ? '#4CAF50' : '#F44336';
+                const behaviorSymbol = account.accountBehaviour;
                 
                 accountElement.innerHTML = `
                     <h3>
@@ -126,20 +126,10 @@ class TAccountManager {
                             <input type="number" id="new-account-number" name="accountNumber" required min="1000" max="9999">
                         </div>
                         <div class="form-group">
-                            <label for="new-account-type">Account Type</label>
-                            <select id="new-account-type" name="accountType" required>
-                                <option value="1">Assets</option>
-                                <option value="2">Liabilities</option>
-                                <option value="3">Revenue</option>
-                                <option value="4">Expenses</option>
-                                <option value="5">Equity</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label for="new-account-behavior">Account Behavior</label>
                             <select id="new-account-behavior" name="accountBehavior" required>
-                                <option value="D">Debit</option>
-                                <option value="C">Credit</option>
+                                <option value="+">Active (Debit)</option>
+                                <option value="-">Passive (Credit)</option>
                             </select>
                         </div>
                         <button type="submit" class="auth-button">Add Account</button>
@@ -152,8 +142,19 @@ class TAccountManager {
                             <select id="edit-account-select" name="accountSelect" required></select>
                         </div>
                         <div class="form-group">
-                            <label for="edit-account-name">New Account Name</label>
+                            <label for="edit-account-name">Account Name</label>
                             <input type="text" id="edit-account-name" name="accountName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-account-number">Account Number</label>
+                            <input type="number" id="edit-account-number" name="accountNumber" required min="1000" max="9999">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-account-behavior">Account Behavior</label>
+                            <select id="edit-account-behavior" name="accountBehavior" required>
+                                <option value="+">Active (Debit)</option>
+                                <option value="-">Passive (Credit)</option>
+                            </select>
                         </div>
                         <button type="submit" class="auth-button">Update Account</button>
                     </form>
@@ -187,9 +188,9 @@ class TAccountManager {
             this.loadAccounts(); // Refresh the accounts view
         });
 
-        document.getElementById('edit-account-form').addEventListener('submit', (e) => {
+        document.getElementById('edit-account-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            this.editAccount(e.target.accountSelect.value, e.target.accountName.value);
+            await this.editAccount(e.target);
             this.closeModal();
         });
 
@@ -248,11 +249,11 @@ class TAccountManager {
 
         try {
             const accountData = {
-                name: accountName,
-                accountNumber: parseInt(accountNumber),
-                accountType: parseInt(form.accountType.value),
-                behaviour: accountBehavior,
-                ownerId: this.getCurrentUserId()
+                Name: accountName,
+                AccountNumber: parseInt(accountNumber),
+                AccountType: null,
+                Behaviour: accountBehavior,
+                OwnerId: parseInt(sessionStorage.getItem('userId'))
             };
 
             const newAccount = await accountService.createAccount(accountData);
@@ -285,24 +286,26 @@ class TAccountManager {
         }
     }
 
-    async editAccount(oldName, newName) {
-        if (!oldName || !newName) return;
+    async editAccount(form) {
+        const selectedAccount = form.accountSelect.value;
+        if (!selectedAccount) return;
 
         const accountElement = Array.from(document.querySelectorAll('.t-account'))
-            .find(acc => acc.querySelector('h3').textContent === oldName);
+            .find(acc => acc.querySelector('h3').textContent === selectedAccount);
 
         if (accountElement) {
             try {
                 const accountId = accountElement.dataset.accountId;
                 const accountData = {
-                    name: newName,
-                    accountType: 1, // Maintain existing type
-                    behaviour: 'D', // Maintain existing behavior
-                    ownerId: this.getCurrentUserId()
+                    name: form.accountName.value,
+                    accountType: null,
+                    accountNumber: parseInt(form.accountNumber.value),
+                    behaviour: form.accountBehavior.value,
+                    ownerId: parseInt(sessionStorage.getItem('userId'))
                 };
 
                 await accountService.editAccount(accountId, accountData);
-                accountElement.querySelector('h3').textContent = newName;
+                await this.loadAccounts(); // Refresh the accounts view
             } catch (error) {
                 console.error('Failed to edit account:', error);
                 alert('Failed to update account. Please try again.');
@@ -311,14 +314,25 @@ class TAccountManager {
     }
 
     async deleteAccount() {
-        const accountElement = document.querySelector('.t-account[data-account-id]');
-        if (!accountElement) {
+        const selectElement = document.getElementById('delete-account-select');
+        if (!selectElement || !selectElement.value) {
             alert('No account selected');
             return;
         }
 
-        const accountId = accountElement.dataset.accountId;
-        const accountName = accountElement.querySelector('h3').textContent;
+        // Find the account element that matches the selected name
+        const accounts = document.querySelectorAll('.t-account');
+        const selectedAccount = Array.from(accounts).find(account => 
+            account.querySelector('h3').textContent === selectElement.value
+        );
+
+        if (!selectedAccount) {
+            alert('Selected account not found');
+            return;
+        }
+
+        const accountId = selectedAccount.dataset.accountId;
+        const accountName = selectElement.value;
 
         // Show confirmation modal
         const confirmModal = document.createElement('div');
@@ -341,8 +355,9 @@ class TAccountManager {
         document.getElementById('confirm-delete').onclick = async () => {
             try {
                 await accountService.deleteAccount(accountId);
-                accountElement.remove();
+                selectedAccount.remove();
                 confirmModal.remove();
+                await this.loadAccounts(); // Refresh the accounts view
             } catch (error) {
                 console.error('Failed to delete account:', error);
                 alert('Failed to delete account. Please try again.');
