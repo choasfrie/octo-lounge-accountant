@@ -1,4 +1,5 @@
 import { authManager } from './auth.js';
+import { accountService } from './services/accountService.js';
 
 class TAccountManager {
     getCurrentUserId() {
