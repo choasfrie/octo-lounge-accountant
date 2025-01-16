@@ -81,7 +81,6 @@ export class TransactionManager {
     }
 
     displayAccounts(accountBalances) {
-        console.log('Displaying accounts with balances:', accountBalances);
         const accountGrid = document.getElementById('account-grid');
         if (!accountGrid) {
             console.error('Account grid element not found');
@@ -113,7 +112,6 @@ export class TransactionManager {
                 ...account,
                 balance: balance
             };
-            console.log(`Calculated balance for account ${account.name || account.accountName}:`, balance);
             categories.get(category).push(accountWithBalance);
         });
 
@@ -293,8 +291,7 @@ export class TransactionManager {
                             .filter(r => r.DebitorId === account.accountId)
                             .map(entry => `
                                 <div class="entry">
-                                    <span>${this.formatAmount(entry.Amount)} - ${entry.Description || ''}</span>
-                                    <span class="date">${new Date(entry.Date).toLocaleDateString()}</span>
+                                    <span>${this.formatAmount(entry.Amount)}</span>
                                 </div>
                             `).join('')}
                         <div class="total">Total Debits: ${this.formatAmount(debits)}</div>
@@ -305,8 +302,7 @@ export class TransactionManager {
                             .filter(r => r.CreditorId === account.accountId)
                             .map(entry => `
                                 <div class="entry">
-                                    <span>${this.formatAmount(entry.Amount)} - ${entry.Description || ''}</span>
-                                    <span class="date">${new Date(entry.Date).toLocaleDateString()}</span>
+                                    <span>${this.formatAmount(entry.Amount)}</span>
                                 </div>
                             `).join('')}
                         <div class="total">Total Credits: ${this.formatAmount(credits)}</div>

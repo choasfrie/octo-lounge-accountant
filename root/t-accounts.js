@@ -16,7 +16,6 @@ class TAccountManager {
     async loadAccounts() {
         try {
             const userId = this.getCurrentUserId();
-            console.log('Loading accounts for user:', userId);
             const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${userId}`);
             if (!response.ok) {
                 if (response.status === 404) {
@@ -27,7 +26,6 @@ class TAccountManager {
                 throw new Error('Failed to fetch accounts');
             }
             const accountsData = await response.json();
-            console.log('Received accounts data:', accountsData);
             
             const tAccountGrid = document.querySelector('.t-account-grid');
             if (!tAccountGrid) {
@@ -37,7 +35,6 @@ class TAccountManager {
             tAccountGrid.innerHTML = ''; // Clear loading state
             
             accountsData.forEach(account => {
-                console.log('Processing account:', account);
                 const accountElement = document.createElement('div');
                 accountElement.className = 't-account';
                 accountElement.dataset.accountId = account.accountId;
@@ -50,7 +47,6 @@ class TAccountManager {
                 const credits = account.records
                     .filter(r => (r.CreditorId === account.accountId || r.creditorId === account.accountId))
                     .reduce((sum, r) => sum + parseFloat(r.Amount || r.amount), 0);
-                console.log(`Account ${account.accountName} totals:`, { debits, credits });
                 // Determine outline color and behavior symbol based on account behavior
                 const outlineColor = account.accountBehaviour === 'D' ? '#4CAF50' : '#F44336';
                 const behaviorSymbol = account.accountBehaviour === 'D' ? '+' : '-';
@@ -70,9 +66,7 @@ class TAccountManager {
                                 .filter(r => r.DebitorId === account.accountId || r.debitorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description || r.description || ''}</span>
                                         <span class="amount">${this.formatAmount(Math.abs(r.Amount || r.amount))}</span>
-                                        <span class="date">${new Date(r.Date || r.date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('') || '<div class="entry"><span>No debit entries</span></div>'}
                         </div>
@@ -82,9 +76,7 @@ class TAccountManager {
                                 .filter(r => r.CreditorId === account.accountId || r.creditorId === account.accountId)
                                 .map(r => `
                                     <div class="entry">
-                                        <span>${r.Description || r.description || ''}</span>
                                         <span class="amount">${this.formatAmount(Math.abs(r.Amount || r.amount))}</span>
-                                        <span class="date">${new Date(r.Date || r.date).toLocaleDateString()}</span>
                                     </div>
                                 `).join('') || '<div class="entry"><span>No credit entries</span></div>'}
                         </div>
