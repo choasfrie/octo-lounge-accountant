@@ -16,6 +16,7 @@ class TAccountManager {
     async loadAccounts() {
         try {
             const userId = this.getCurrentUserId();
+            console.log('Loading accounts for user:', userId);
             const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${userId}`);
             if (!response.ok) {
                 if (response.status === 404) {
@@ -26,15 +27,30 @@ class TAccountManager {
                 throw new Error('Failed to fetch accounts');
             }
             const accountsData = await response.json();
+            console.log('Received accounts data:', accountsData);
             
             const tAccountGrid = document.querySelector('.t-account-grid');
+            if (!tAccountGrid) {
+                console.error('T-account grid element not found');
+                return;
+            }
             tAccountGrid.innerHTML = ''; // Clear loading state
             
             accountsData.forEach(account => {
+                console.log('Processing account:', account);
                 const accountElement = document.createElement('div');
                 accountElement.className = 't-account';
                 accountElement.dataset.accountId = account.accountId;
                 accountElement.dataset.behavior = account.accountBehaviour;
+                
+                // Calculate totals for debugging
+                const debits = account.records
+                    .filter(r => r.DebitorId === account.accountId)
+                    .reduce((sum, r) => sum + parseFloat(r.Amount), 0);
+                const credits = account.records
+                    .filter(r => r.CreditorId === account.accountId)
+                    .reduce((sum, r) => sum + parseFloat(r.Amount), 0);
+                console.log(`Account ${account.accountName} totals:`, { debits, credits });
                 // Determine outline color and behavior symbol based on account behavior
                 const outlineColor = account.accountBehaviour === 'D' ? '#4CAF50' : '#F44336';
                 const behaviorSymbol = account.accountBehaviour === 'D' ? '+' : '-';
