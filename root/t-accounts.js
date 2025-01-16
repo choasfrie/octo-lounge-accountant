@@ -42,10 +42,9 @@ class TAccountManager {
                 accountElement.innerHTML = `
                     <h3>
                         ${account.accountName} (${account.accountNumber})
-                        <i class="fas fa-book" 
-                           style="margin-left: 8px; font-size: 0.8em; color: #666;"
-                           title="${account.accountBehaviour === 'D' ? 'Active Account (Debit behavior)' : 'Passive Account (Credit behavior)'}">
-                        </i>
+                        <span data-tooltip="${account.accountBehaviour === '+' ? 'Active Account (Debit behavior)' : 'Passive Account (Credit behavior)'}">
+                            <i class="fas fa-book" style="margin-left: 8px; font-size: 0.8em; color: #666;"></i>
+                        </span>
                     </h3>
                     <div class="t-account-content">
                         <div class="debit-side">

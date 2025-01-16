@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("octo-lounge-accountant-test")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c6d375ac1d0529ac67f639492a16d7967bf61bb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9fe29f7ff92ff9dca9f70bb0b125ff7430829170")]
 [assembly: System.Reflection.AssemblyProductAttribute("octo-lounge-accountant-test")]
 [assembly: System.Reflection.AssemblyTitleAttribute("octo-lounge-accountant-test")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
