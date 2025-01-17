@@ -1,6 +1,7 @@
 import { recordService } from './services/recordService.js';
 import { authManager } from './auth.js';
 import { ModalUtils } from './utils/modalUtils.js';
+import { accountService } from './services/accountService.js';
 
 export class TransactionManager {
 
@@ -454,18 +455,40 @@ export class TransactionManager {
             const fromInput = document.getElementById('new-transaction-from');
             const toInput = document.getElementById('new-transaction-to');
             
-            [fromInput, toInput].forEach(input => {
-                input.addEventListener('input', (e) => this.showSuggestions(e.target));
-                input.addEventListener('blur', () => {
-                    // Delay hiding suggestions
-                    setTimeout(() => {
-                        const suggestionsList = input.nextElementSibling;
-                        if (suggestionsList) {
-                            suggestionsList.style.display = 'none';
+            if (fromInput && toInput) {
+                [fromInput, toInput].forEach(input => {
+                    // Remove existing listeners
+                    const newInput = input.cloneNode(true);
+                    input.parentNode.replaceChild(newInput, input);
+                    
+                    // Store accounts data for quick access
+                    newInput.addEventListener('focus', async (e) => {
+                        if (!newInput.dataset.accountsLoaded) {
+                            const accounts = await this.getAccountsList();
+                            newInput.dataset.accounts = JSON.stringify(accounts);
+                            newInput.dataset.accountsLoaded = 'true';
+                            this.showSuggestions(newInput, '');
+                        } else {
+                            this.showSuggestions(newInput, newInput.value);
                         }
-                    }, 200);
+                    });
+
+                    // Filter suggestions on input
+                    newInput.addEventListener('input', (e) => {
+                        this.showSuggestions(newInput, e.target.value);
+                    });
+
+                    // Handle blur with delay to allow clicks on suggestions
+                    newInput.addEventListener('blur', () => {
+                        setTimeout(() => {
+                            const suggestionsList = newInput.nextElementSibling;
+                            if (suggestionsList) {
+                                suggestionsList.style.display = 'none';
+                            }
+                        }, 200);
+                    });
                 });
-            });
+            }
         }
 
         const editForm = document.getElementById('edit-transaction-form');
@@ -548,23 +571,23 @@ export class TransactionManager {
 
     async addTransaction(form) {
         try {
-            const fromAccountName = form.fromAccount.value;
-            const toAccountName = form.toAccount.value;
-            
-            const accounts = await accountService.getAccountsByOwner(authManager.currentUser.id);
-            const fromAccount = accounts.find(acc => acc.name === fromAccountName);
-            const toAccount = accounts.find(acc => acc.name === toAccountName);
+            const fromAccountId = form.fromAccount.dataset.accountId;
+            const toAccountId = form.toAccount.dataset.accountId;
 
-            if (!fromAccount || !toAccount) {
-                throw new Error('Invalid accounts');
+            if (!fromAccountId || !toAccountId) {
+                throw new Error('Please select accounts from the suggestions');
             }
+
+            const fromAccountText = form.fromAccount.value;
+            const toAccountText = form.toAccount.value;
 
             const recordData = {
                 date: new Date(form.date.value).toISOString(),
                 amount: parseFloat(form.amount.value),
-                description: `${fromAccountName} → ${toAccountName}`,
-                creditorId: toAccount.id,
-                debitorId: fromAccount.id
+                description: `${fromAccountText} → ${toAccountText}`,
+                creditorId: parseInt(toAccountId),
+                debitorId: parseInt(fromAccountId),
+                accountType: null
             };
 
             const newRecord = await recordService.createRecord(recordData);
@@ -735,9 +758,11 @@ export class TransactionManager {
             if (!response.ok) throw new Error('Failed to fetch accounts');
             const accounts = await response.json();
             
-            return accounts.map(account => 
-                `${account.name} (${account.accountNumber})`
-            );
+            return accounts.map(account => ({
+                display: `${account.name} (${account.accountNumber})`,
+                id: account.id,
+                name: account.name
+            }));
         } catch (error) {
             console.error('Error fetching accounts:', error);
             return [];
@@ -745,21 +770,21 @@ export class TransactionManager {
     }
 
     // Display autocomplete suggestions
-    showSuggestions(input) {
+    showSuggestions(input, searchValue = '') {
         try {
             const suggestionsList = input.nextElementSibling;
-            const accounts = this.getAccountsList(); 
-            const inputValue = input.value.toLowerCase();
+            const accounts = JSON.parse(input.dataset.accounts || '[]');
+            const inputValue = searchValue.toLowerCase();
 
             // Filter accounts based on input
             const filteredAccounts = accounts.filter(account => 
-                account.toLowerCase().includes(inputValue)
+                !inputValue || account.display.toLowerCase().includes(inputValue)
             );
 
-            // Show/hide suggestions container
-            if (inputValue && filteredAccounts.length > 0) {
+            // Show suggestions if we have accounts
+            if (filteredAccounts.length > 0) {
                 suggestionsList.innerHTML = filteredAccounts
-                    .map(account => `<div class="suggestion-item">${account}</div>`)
+                    .map(account => `<div class="suggestion-item" data-account-id="${account.id}">${account.display}</div>`)
                     .join('');
                 suggestionsList.style.display = 'block';
 
@@ -768,6 +793,7 @@ export class TransactionManager {
                 Array.from(suggestions).forEach(suggestion => {
                     suggestion.addEventListener('click', () => {
                         input.value = suggestion.textContent;
+                        input.dataset.accountId = suggestion.dataset.accountId;
                         suggestionsList.style.display = 'none';
                     });
                 });
