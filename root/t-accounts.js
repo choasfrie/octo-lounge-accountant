@@ -17,7 +17,11 @@ class TAccountManager {
     async loadAccounts() {
         try {
             const userId = this.getCurrentUserId();
-            const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${userId}`);
+            const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('jwt')}`
+                }
+            });
             if (!response.ok) {
                 if (response.status === 404) {
                     const tAccountGrid = document.querySelector('.t-account-grid');

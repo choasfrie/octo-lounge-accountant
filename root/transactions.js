@@ -24,7 +24,11 @@ export class TransactionManager {
             }
 
             // Get all accounts with their records
-            const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${authManager.currentUser.id}`);
+            const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${authManager.currentUser.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('jwt')}`
+                }
+            });
             const accountsWithRecords = await response.json();
             this.accountsWithRecords = accountsWithRecords; // Store it once
             if (!response.ok) {
@@ -45,26 +49,17 @@ export class TransactionManager {
                 }
                 throw new Error('Failed to fetch accounts and records');
             }
-            // Get account names from accountsWithRecords array
-            const accounts = await this.getAccountsList();
-            console.log('1. Raw API Response:', accounts);
-            console.log('2. Available accounts for lookup:', accounts);
-            
             // Calculate balances and collect all records
             const accountBalances = new Map();
             const allRecords = [];
             
             accountsWithRecords.forEach(account => {
-                console.log('4. Processing Account:', account);
                 let balance = 0;
                 account.records.forEach(record => {
-                    console.log('5. Processing Record:', record);
                     if (record.CreditorId === account.accountId) {
                         balance -= record.Amount;
-                        console.log('6. Credit Transaction:', { accountId: account.accountId, amount: record.Amount, newBalance: balance });
                     } else if (record.DebitorId === account.accountId) {
                         balance += record.Amount;
-                        console.log('7. Debit Transaction:', { accountId: account.accountId, amount: record.Amount, newBalance: balance });
                     }
                 });
 
@@ -78,10 +73,8 @@ export class TransactionManager {
                 allRecords.push(...account.records);
             });
 
-            console.log('8. All Records Collected:', allRecords);
             // Sort records by date
             allRecords.sort((a, b) => new Date(b.Date) - new Date(a.Date));
-            console.log('9. Sorted Records:', allRecords);
 
             // Update UI
             this.displayAccounts(accountBalances);
@@ -171,8 +164,6 @@ export class TransactionManager {
     }
 
     displayRecords(accounts, accountsWithRecords) {
-        console.log('10. Starting displayRecords with:', accounts);
-        console.log('11. Using accountsWithRecords:', accountsWithRecords);
         const allRecords = [];
         
         // Handle if accounts is a single record
@@ -715,21 +706,11 @@ export class TransactionManager {
         const dateParts = dateText.split('.');
         const formattedDate = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
 
-        // Get accounts list and find matching accounts
-        accountService.getAccountsByOwner(authManager.currentUser.id)
-            .then(accounts => {
-                const fromAccountObj = accounts.find(acc => acc.id === parseInt(fromAccount.replace('Account ', '')));
-                const toAccountObj = accounts.find(acc => acc.id === parseInt(toAccount.split(':')[0].replace('Account ', '')));
-
-                // Set form values using actual account names
-                form.date.value = formattedDate;
-                form.fromAccount.value = fromAccountObj ? fromAccountObj.name : '';
-                form.toAccount.value = toAccountObj ? toAccountObj.name : '';
-                form.amount.value = parseFloat(amount);
-            })
-            .catch(error => {
-                console.error('Error fetching accounts:', error);
-            });
+        // Set form values directly from the description text
+        form.date.value = formattedDate;
+        form.fromAccount.value = fromAccount.trim();
+        form.toAccount.value = toAccount.split(':')[0].trim();
+        form.amount.value = parseFloat(amount);
         
         // Set the selected option in the dropdown
         const selectElement = document.getElementById('edit-transaction-select');
