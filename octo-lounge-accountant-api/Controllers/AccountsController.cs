@@ -109,6 +109,7 @@ namespace octo_lounge_accountant_api.Controllers
                     .Where(r => r.CreditorId == account.Id)
                     .Select(r => new RecordDTO
                     {
+                        Id = r.Id,
                         Date = r.Date,
                         Amount = r.Amount,
                         Description = r.Description,

@@ -201,7 +201,7 @@ export class TransactionManager {
         }
 
         transactionList.innerHTML = allRecords.map(record => `
-            <div class="transaction" data-record-id="${record.recordId || ''}">
+            <div class="transaction" data-record-id="${record.id || record.Id || ''}">
                 <span class="date">${record.date.toLocaleDateString()}</span>
                 <span class="description">
                     ${record.debitorName} → ${record.creditorName}
