@@ -1,7 +1,0 @@
-C:\Users\sprudello\Documents\GitHub\octo-lounge-accountant\octo-lounge-accountant-test\bin\Debug\net8.0\.msCoverageSourceRootsMapping_octo-lounge-accountant-test
-C:\Users\sprudello\Documents\GitHub\octo-lounge-accountant\octo-lounge-accountant-test\obj\Debug\net8.0\octo-lounge-accountant-test.csproj.AssemblyReference.cache
-C:\Users\sprudello\Documents\GitHub\octo-lounge-accountant\octo-lounge-accountant-test\obj\Debug\net8.0\octo-lounge-accountant-test.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\sprudello\Documents\GitHub\octo-lounge-accountant\octo-lounge-accountant-test\obj\Debug\net8.0\octo-lounge-accountant-test.AssemblyInfoInputs.cache
-C:\Users\sprudello\Documents\GitHub\octo-lounge-accountant\octo-lounge-accountant-test\obj\Debug\net8.0\octo-lounge-accountant-test.AssemblyInfo.cs
-C:\Users\sprudello\Documents\GitHub\octo-lounge-accountant\octo-lounge-accountant-test\obj\Debug\net8.0\octo-lounge-accountant-test.csproj.CoreCompileInputs.cache
-C:\Users\sprudello\Documents\GitHub\octo-lounge-accountant\octo-lounge-accountant-test\obj\Debug\net8.0\octo-lounge-accountant-test.sourcelink.json
