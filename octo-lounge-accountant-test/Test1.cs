@@ -26,7 +26,7 @@ namespace octo_lounge_accountant_test
             _connection.Open();
 
             var options = new DbContextOptionsBuilder<DataContext>()
-                .UseSqlite(_connection)
+                //.UseSqlite(_connection)
                 .Options;
 
             _context = new DataContext(options);

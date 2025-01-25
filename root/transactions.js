@@ -571,25 +571,26 @@ export class TransactionManager {
 
     async addTransaction(form) {
         try {
-            const fromAccountId = form.fromAccount.dataset.accountId;
-            const toAccountId = form.toAccount.dataset.accountId;
+            const formData = new FormData(form);
+            
+            // Get account IDs from the selected values
+            const fromAccountId = formData.get('fromAccount').match(/\((\d+)\)/)[1];
+            const toAccountId = formData.get('toAccount').match(/\((\d+)\)/)[1];
 
             if (!fromAccountId || !toAccountId) {
-                throw new Error('Please select accounts from the suggestions');
+                throw new Error('Please select valid accounts');
             }
 
-            const fromAccountText = form.fromAccount.value;
-            const toAccountText = form.toAccount.value;
-
             const recordData = {
-                date: new Date(form.date.value).toISOString(),
-                amount: parseFloat(form.amount.value),
-                description: `${fromAccountText} → ${toAccountText}`,
+                date: new Date(formData.get('date')).toISOString(),
+                amount: parseFloat(formData.get('amount')),
+                description: formData.get('notes') || '',
                 creditorId: parseInt(toAccountId),
-                debitorId: parseInt(fromAccountId),
-                accountType: null
+                debitorId: parseInt(fromAccountId)
             };
 
+            console.log('Creating record with data:', recordData);
+            
             const newRecord = await recordService.createRecord(recordData);
             
             // Update UI
@@ -598,12 +599,14 @@ export class TransactionManager {
             newTransaction.className = 'transaction';
             newTransaction.dataset.recordId = newRecord.id;
             newTransaction.innerHTML = `
-                <span class="date">${new Date(newRecord.Date).toLocaleDateString()}</span>
+                <span class="date">${new Date(recordData.date).toLocaleDateString()}</span>
                 <span class="description">
-                    ${newRecord.Description}
-                    ${recordData.Notes ? `<i class="fas fa-book notes-icon" data-notes="${recordData.Notes}"></i>` : ''}
+                    ${recordData.description}
+                    ${recordData.description ? `<i class="fas fa-book notes-icon" data-notes="${recordData.description}"></i>` : ''}
                 </span>
-                <span class="amount expense">${this.formatAmount(newRecord.Amount)}</span>
+                <span class="amount ${recordData.amount >= 0 ? 'income' : 'expense'}">
+                    ${this.formatAmount(recordData.amount)}
+                </span>
             `;
             transactionList.insertBefore(newTransaction, transactionList.firstChild);
         } catch (error) {

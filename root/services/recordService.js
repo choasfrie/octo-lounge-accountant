@@ -21,7 +21,13 @@ class RecordService {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
-                body: JSON.stringify(recordData)
+                body: JSON.stringify({
+                    date: recordData.date,
+                    amount: recordData.amount,
+                    description: recordData.description,
+                    creditorId: recordData.creditorId,
+                    debitorId: recordData.debitorId
+                })
             });
             const data = await handleApiResponse(response, 'Failed to create record');
             this.loadingState.end();
@@ -52,7 +58,13 @@ class RecordService {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(recordData)
+                body: JSON.stringify({
+                    date: recordData.date,
+                    amount: recordData.amount,
+                    description: recordData.description,
+                    creditorId: recordData.creditorId,
+                    debitorId: recordData.debitorId
+                })
             });
             if (!response.ok) throw new Error('Failed to edit record');
             return await response.json();

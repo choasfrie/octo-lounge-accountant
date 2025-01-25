@@ -12,10 +12,29 @@ export const validateAccountData = (data) => {
 
 export const validateRecordData = (data) => {
     const errors = [];
-    if (!data.Date) errors.push('Date is required');
-    if (typeof data.Amount !== 'number') errors.push('Amount must be a number');
-    if (!data.CreditorId) errors.push('Creditor account is required');
-    if (!data.DebitorId) errors.push('Debitor account is required');
+    
+    // Validate date
+    if (!data.date) {
+        errors.push('Date is required');
+    } else if (isNaN(new Date(data.date).getTime())) {
+        errors.push('Invalid date format');
+    }
+
+    // Validate amount
+    if (typeof data.amount !== 'number' || isNaN(data.amount)) {
+        errors.push('Amount must be a valid number');
+    }
+
+    // Validate creditor
+    if (!data.creditorId || isNaN(parseInt(data.creditorId))) {
+        errors.push('Creditor account is required and must be a valid ID');
+    }
+
+    // Validate debitor
+    if (!data.debitorId || isNaN(parseInt(data.debitorId))) {
+        errors.push('Debitor account is required and must be a valid ID');
+    }
+
     return errors;
 };
 

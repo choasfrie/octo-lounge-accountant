@@ -14,17 +14,18 @@ namespace octo_lounge_accountant_api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Record>()
-                .HasOne(r => r.Creditor)
-                .WithMany()
-                .HasForeignKey(r => r.CreditorId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Record>(entity =>
+            {
+                entity.HasOne(r => r.Creditor)
+                    .WithMany()
+                    .HasForeignKey(r => r.CreditorId)
+                    .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Record>()
-                .HasOne(r => r.Debitor)
-                .WithMany()
-                .HasForeignKey(r => r.DebitorId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(r => r.Debitor)
+                    .WithMany()
+                    .HasForeignKey(r => r.DebitorId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
 
             modelBuilder.Entity<Account>()
                 .HasOne(a => a.Owner)
