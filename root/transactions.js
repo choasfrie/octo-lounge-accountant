@@ -25,6 +25,8 @@ export class TransactionManager {
 
             // Get all accounts with their records
             const response = await fetch(`http://localhost:5116/api/Accounts/getAllAccountsAndRecords/${authManager.currentUser.id}`);
+            const accountsWithRecords = await response.json();
+            this.accountsWithRecords = accountsWithRecords; // Store it once
             if (!response.ok) {
                 if (response.status === 404) {
                     // Clear the loading state and show the message
@@ -43,19 +45,26 @@ export class TransactionManager {
                 }
                 throw new Error('Failed to fetch accounts and records');
             }
-            const accountsWithRecords = await response.json();
-
+            // Get account names from accountsWithRecords array
+            const accounts = await this.getAccountsList();
+            console.log('1. Raw API Response:', accounts);
+            console.log('2. Available accounts for lookup:', accounts);
+            
             // Calculate balances and collect all records
             const accountBalances = new Map();
             const allRecords = [];
             
             accountsWithRecords.forEach(account => {
+                console.log('4. Processing Account:', account);
                 let balance = 0;
                 account.records.forEach(record => {
+                    console.log('5. Processing Record:', record);
                     if (record.CreditorId === account.accountId) {
                         balance -= record.Amount;
+                        console.log('6. Credit Transaction:', { accountId: account.accountId, amount: record.Amount, newBalance: balance });
                     } else if (record.DebitorId === account.accountId) {
                         balance += record.Amount;
+                        console.log('7. Debit Transaction:', { accountId: account.accountId, amount: record.Amount, newBalance: balance });
                     }
                 });
 
@@ -69,13 +78,15 @@ export class TransactionManager {
                 allRecords.push(...account.records);
             });
 
+            console.log('8. All Records Collected:', allRecords);
             // Sort records by date
             allRecords.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+            console.log('9. Sorted Records:', allRecords);
 
             // Update UI
             this.displayAccounts(accountBalances);
-            this.displayRecords(allRecords);
-            this.updateAccountFilter(accountsWithRecords);
+            this.displayRecords(allRecords, this.accountsWithRecords);
+            this.updateAccountFilter(this.accountsWithRecords);
         } catch (error) {
             console.error('Error loading records:', error);
         }
@@ -159,7 +170,9 @@ export class TransactionManager {
         }
     }
 
-    displayRecords(accounts) {
+    displayRecords(accounts, accountsWithRecords) {
+        console.log('10. Starting displayRecords with:', accounts);
+        console.log('11. Using accountsWithRecords:', accountsWithRecords);
         const allRecords = [];
         
         // Handle if accounts is a single record
@@ -169,20 +182,28 @@ export class TransactionManager {
 
         accounts.forEach(account => {
             if (account.creditorId !== undefined) {
+                // Get account names from accountsWithRecords array
+                const creditorAccount = accountsWithRecords.find(a => a.accountId === account.creditorId);
+                const debitorAccount = accountsWithRecords.find(a => a.accountId === account.debitorId);
+                
                 allRecords.push({
                     ...account,
                     date: new Date(account.date),
-                    creditorName: 'Account ' + account.creditorId,
-                    debitorName: 'Account ' + account.debitorId
+                    creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${account.creditorId})`,
+                    debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${account.debitorId})`
                 });
             }
             // If it's an account with records
             else if (account.records && account.records.length > 0) {
                 account.records.forEach(record => {
+                    // Find account names directly from accountsWithRecords array
+                    const creditorAccount = accountsWithRecords.find(a => a.accountId === record.creditorId);
+                    const debitorAccount = accountsWithRecords.find(a => a.accountId === record.debitorId);
+                    
                     allRecords.push({
                         ...record,
-                        creditorName: 'Account ' + record.creditorId,
-                        debitorName: 'Account ' + record.debitorId,
+                        creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${record.creditorId})`,
+                        debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${record.debitorId})`,
                         date: new Date(record.date)
                     });
                 });
@@ -315,6 +336,11 @@ export class TransactionManager {
             `;
             tAccountsGrid.appendChild(tAccount);
         });
+    }
+
+    findAccountNameById(accountsWithRecords, id) {
+        const account = accountsWithRecords.find(a => a.accountId === id);
+        return account ? account.accountName : `Unknown Account (${id})`;
     }
 
     formatAmount(amount) {
@@ -493,6 +519,14 @@ export class TransactionManager {
 
         const editForm = document.getElementById('edit-transaction-form');
         if (editForm) {
+            // Add change event listener to transaction select dropdown
+            const transactionSelect = editForm.querySelector('#edit-transaction-select');
+            if (transactionSelect) {
+                transactionSelect.addEventListener('change', (e) => {
+                    this.populateEditForm(e.target.value);
+                });
+            }
+
             editForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.editTransaction(e.target);
@@ -627,11 +661,19 @@ export class TransactionManager {
                 const fromAccountName = form.fromAccount.value;
                 const toAccountName = form.toAccount.value;
                 
+                console.log('Editing transaction with accounts:', { fromAccountName, toAccountName });
                 const accounts = await accountService.getAccountsByOwner(authManager.currentUser.id);
+                console.log('Retrieved accounts:', accounts);
                 const fromAccount = accounts.find(acc => acc.name === fromAccountName);
                 const toAccount = accounts.find(acc => acc.name === toAccountName);
+                console.log('Found accounts:', { fromAccount, toAccount });
 
                 if (!fromAccount || !toAccount) {
+                    console.log('Account lookup failed:', { 
+                        fromAccountFound: !!fromAccount, 
+                        toAccountFound: !!toAccount,
+                        availableAccounts: accounts.map(a => a.name)
+                    });
                     throw new Error('Invalid accounts');
                 }
 
@@ -665,15 +707,29 @@ export class TransactionManager {
         const [fromAccount, toAccount] = description.split(' → ');
         const amount = transaction.querySelector('.amount').textContent
             .replace('CHF ', '')
-            .replace(',', '')
-            .replace('.00', '');
-        const date = transaction.querySelector('.date').textContent;
+            .replace(/,/g, '')
+            .replace(/\.00$/, '');
+        const dateText = transaction.querySelector('.date').textContent;
+        
+        // Convert date to YYYY-MM-DD format for input
+        const dateParts = dateText.split('.');
+        const formattedDate = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
 
-        // Set form values
-        form.date.value = date;
-        form.fromAccount.value = fromAccount;
-        form.toAccount.value = toAccount;
-        form.amount.value = parseFloat(amount);
+        // Get accounts list and find matching accounts
+        accountService.getAccountsByOwner(authManager.currentUser.id)
+            .then(accounts => {
+                const fromAccountObj = accounts.find(acc => acc.id === parseInt(fromAccount.replace('Account ', '')));
+                const toAccountObj = accounts.find(acc => acc.id === parseInt(toAccount.split(':')[0].replace('Account ', '')));
+
+                // Set form values using actual account names
+                form.date.value = formattedDate;
+                form.fromAccount.value = fromAccountObj ? fromAccountObj.name : '';
+                form.toAccount.value = toAccountObj ? toAccountObj.name : '';
+                form.amount.value = parseFloat(amount);
+            })
+            .catch(error => {
+                console.error('Error fetching accounts:', error);
+            });
         
         // Set the selected option in the dropdown
         const selectElement = document.getElementById('edit-transaction-select');
