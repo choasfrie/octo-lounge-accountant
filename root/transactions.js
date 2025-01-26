@@ -646,46 +646,40 @@ export class TransactionManager {
             const transactions = document.querySelectorAll('#records .transaction');
             const transaction = transactions[selectedIndex];
 
-            if (transaction) {
-                const recordId = transaction.dataset.recordId;
-                
-                const fromAccountName = form.fromAccount.value;
-                const toAccountName = form.toAccount.value;
-                
-                console.log('Editing transaction with accounts:', { fromAccountName, toAccountName });
-                const accounts = await accountService.getAccountsByOwner(authManager.currentUser.id);
-                console.log('Retrieved accounts:', accounts);
-                const fromAccount = accounts.find(acc => acc.name === fromAccountName);
-                const toAccount = accounts.find(acc => acc.name === toAccountName);
-                console.log('Found accounts:', { fromAccount, toAccount });
-
-                if (!fromAccount || !toAccount) {
-                    console.log('Account lookup failed:', { 
-                        fromAccountFound: !!fromAccount, 
-                        toAccountFound: !!toAccount,
-                        availableAccounts: accounts.map(a => a.name)
-                    });
-                    throw new Error('Invalid accounts');
-                }
-
-                const recordData = {
-                    date: new Date(form.date.value).toISOString(),
-                    amount: parseFloat(form.amount.value),
-                    description: `${fromAccountName} → ${toAccountName}`,
-                    creditorId: toAccount.id,
-                    debitorId: fromAccount.id
-                };
-
-                const updatedRecord = await recordService.editRecord(recordId, recordData);
-
-                // Update UI
-                transaction.querySelector('.date').textContent = new Date(updatedRecord.date).toLocaleDateString();
-                transaction.querySelector('.description').textContent = updatedRecord.description;
-                transaction.querySelector('.amount').textContent = this.formatAmount(updatedRecord.amount);
+            if (!transaction) {
+                throw new Error('No transaction selected');
             }
+
+            const recordId = transaction.dataset.recordId;
+            
+            // Find the accounts from accountsWithRecords
+            const fromAccountName = form.fromAccount.value.trim();
+            const toAccountName = form.toAccount.value.trim();
+            
+            const fromAccount = this.accountsWithRecords.find(a => a.accountName === fromAccountName);
+            const toAccount = this.accountsWithRecords.find(a => a.accountName === toAccountName);
+            
+            if (!fromAccount || !toAccount) {
+                throw new Error('Invalid accounts selected');
+            }
+
+            const recordData = {
+                date: new Date(form.querySelector('[name="date"]').value + 'T00:00:00.000Z').toISOString(),
+                amount: parseFloat(form.querySelector('[name="amount"]').value),
+                description: form.querySelector('[name="notes"]')?.value || `${fromAccountName} → ${toAccountName}`,
+                creditorId: toAccount.accountId,
+                debitorId: fromAccount.accountId
+            };
+
+            const updatedRecord = await recordService.editRecord(recordId, recordData);
+
+            // Refresh the records display
+            await this.loadExistingRecords();
+            
+            return updatedRecord;
         } catch (error) {
             console.error('Error editing transaction:', error);
-            alert('Failed to edit transaction. Please try again.');
+            throw error;
         }
     }
 

@@ -53,6 +53,15 @@ class RecordService {
 
     async editRecord(recordId, recordData) {
         try {
+            console.log('Edit Record Request Body:', {
+                recordId,
+                recordData
+            });
+            console.log('EditRecord API Request:', {
+                endpoint: `${API_BASE_URL}/editRecord/${recordId}`,
+                method: 'PUT',
+                body: recordData
+            });
             const response = await fetch(`${API_BASE_URL}/editRecord/${recordId}`, {
                 method: 'PUT',
                 headers: {
