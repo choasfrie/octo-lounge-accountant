@@ -443,6 +443,10 @@ export class TransactionManager {
                             <label for="edit-transaction-amount">Amount (CHF)</label>
                             <input type="number" id="edit-transaction-amount" name="amount" step="0.01" required>
                         </div>
+                        <div class="form-group">
+                            <label for="edit-transaction-notes">Description</label>
+                            <textarea id="edit-transaction-notes" name="notes" rows="3"></textarea>
+                        </div>
                         <button type="submit" class="auth-button">Update Transaction</button>
                     </form>
                 </div>
@@ -700,11 +704,15 @@ export class TransactionManager {
         const dateParts = dateText.split('.');
         const formattedDate = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
 
-        // Set form values directly from the description text
+        // Get description text
+        const descriptionText = description.split(':')[1]?.trim() || '';
+
+        // Set form values
         form.date.value = formattedDate;
         form.fromAccount.value = fromAccount.trim();
         form.toAccount.value = toAccount.split(':')[0].trim();
         form.amount.value = parseFloat(amount);
+        form.querySelector('[name="notes"]').value = descriptionText;
         
         // Set the selected option in the dropdown
         const selectElement = document.getElementById('edit-transaction-select');
