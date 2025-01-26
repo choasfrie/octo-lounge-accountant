@@ -236,16 +236,27 @@ export class TransactionManager {
             filter.addEventListener('change', async () => {
                 const selectedAccount = filter.value;
                 if (selectedAccount === 'all') {
-                    await this.loadAccounts();
+                    // Reset filter and show all records
+                    await this.loadExistingRecords();
                     return;
                 }
 
                 try {
-                    const records = selectedAccount.startsWith('debitor-') 
-                        ? await recordService.getRecordsByDebitorId(selectedAccount.replace('debitor-', ''))
-                        : await recordService.getRecordsByCreditorId(selectedAccount.replace('creditor-', ''));
+                    const accountId = selectedAccount.split('-')[1];
+                    const isDebitor = selectedAccount.startsWith('debitor-');
                     
-                    this.displayRecords(records);
+                    // Filter the existing records instead of fetching new ones
+                    const filteredRecords = this.accountsWithRecords.reduce((records, account) => {
+                        account.records.forEach(record => {
+                            if ((isDebitor && record.debitorId === parseInt(accountId)) ||
+                                (!isDebitor && record.creditorId === parseInt(accountId))) {
+                                records.push(record);
+                            }
+                        });
+                        return records;
+                    }, []);
+                    
+                    this.displayRecords(filteredRecords, this.accountsWithRecords);
                 } catch (error) {
                     console.error('Error filtering records:', error);
                 }
