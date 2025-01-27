@@ -33,6 +33,7 @@ namespace octo_lounge_accountant_api.Controllers
                 Name = accountDto.Name,
                 AccountBehaviour = accountDto.Behaviour,
                 AccountTypeId = accountDto.AccountType,
+                AccountNumber = accountDto.AccountNumber,
                 OwnerId = accountDto.OwnerId
             };
 
@@ -73,6 +74,7 @@ namespace octo_lounge_accountant_api.Controllers
             account.AccountBehaviour = accountDto.Behaviour;
             account.AccountTypeId = accountDto.AccountType;
             account.OwnerId = accountDto.OwnerId;
+            account.AccountNumber = accountDto.AccountNumber;
 
             _context.Accounts.Update(account);
             _context.SaveChanges();
