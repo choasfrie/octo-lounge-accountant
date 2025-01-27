@@ -45,12 +45,12 @@ class TAccountManager {
                 accountElement.dataset.accountId = account.accountId;
                 accountElement.dataset.behavior = account.accountBehaviour;
                 
-                // Calculate totals for debugging - handle both camelCase and PascalCase
+                // Calculate totals - handle both camelCase and PascalCase
                 const debits = account.records
-                    .filter(r => (r.DebitorId === account.accountId || r.debitorId === account.accountId))
+                    .filter(r => r.DebitorId === account.accountId || r.debitorId === account.accountId)
                     .reduce((sum, r) => sum + parseFloat(r.Amount || r.amount), 0);
                 const credits = account.records
-                    .filter(r => (r.CreditorId === account.accountId || r.creditorId === account.accountId))
+                    .filter(r => r.CreditorId === account.accountId || r.creditorId === account.accountId)
                     .reduce((sum, r) => sum + parseFloat(r.Amount || r.amount), 0);
                 // Determine outline color and behavior symbol based on account behavior
                 const outlineColor = account.accountBehaviour === '+' ? '#F44336' : '#4CAF50';
