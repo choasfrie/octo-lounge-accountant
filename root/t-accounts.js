@@ -96,10 +96,10 @@ class TAccountManager {
     }
 
     formatAmount(amount) {
-        return new Intl.NumberFormat('de-CH', { 
-            style: 'currency', 
-            currency: 'CHF' 
-        }).format(amount);
+        const num = parseFloat(amount).toFixed(2);
+        const [whole, decimal] = num.split('.');
+        const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+        return `CHF ${formattedWhole}.${decimal}`;
     }
 
     initializeButtons() {

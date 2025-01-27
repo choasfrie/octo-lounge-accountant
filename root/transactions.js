@@ -367,7 +367,7 @@ export class TransactionManager {
     formatAmount(amount) {
         const num = parseFloat(amount).toFixed(2);
         const [whole, decimal] = num.split('.');
-        const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
         return `CHF ${formattedWhole}.${decimal}`;
     }
 
