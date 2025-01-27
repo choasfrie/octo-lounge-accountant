@@ -53,19 +53,19 @@ class TAccountManager {
                     .filter(r => (r.CreditorId === account.accountId || r.creditorId === account.accountId))
                     .reduce((sum, r) => sum + parseFloat(r.Amount || r.amount), 0);
                 // Determine outline color and behavior symbol based on account behavior
-                const outlineColor = account.accountBehaviour === '+' ? '#4CAF50' : '#F44336';
+                const outlineColor = account.accountBehaviour === '+' ? '#F44336' : '#4CAF50';
                 const behaviorSymbol = account.accountBehaviour;
                 
                 accountElement.innerHTML = `
                     <h3>
                         ${account.accountName} (${account.accountNumber})
-                        <span data-tooltip="${account.accountBehaviour === '+' ? 'Active Account (Debit behavior)' : 'Passive Account (Credit behavior)'}">
+                        <span data-tooltip="${account.accountBehaviour === '+' ? 'Active Account (Credit behavior)' : 'Passive Account (Debit behavior)'}">
                             <i class="fas fa-book" style="margin-left: 8px; font-size: 0.8em; color: #666;"></i>
                         </span>
                     </h3>
                     <div class="t-account-content">
                         <div class="debit-side">
-                            <h4>Debit (+)</h4>
+                            <h4>Debit (-)</h4>
                             ${account.records
                                 .filter(r => r.DebitorId === account.accountId || r.debitorId === account.accountId)
                                 .map(r => `
@@ -75,7 +75,7 @@ class TAccountManager {
                                 `).join('') || '<div class="entry"><span>No debit entries</span></div>'}
                         </div>
                         <div class="credit-side">
-                            <h4>Credit (-)</h4>
+                            <h4>Credit (+)</h4>
                             ${account.records
                                 .filter(r => r.CreditorId === account.accountId || r.creditorId === account.accountId)
                                 .map(r => `
@@ -132,8 +132,8 @@ class TAccountManager {
                         <div class="form-group">
                             <label for="new-account-behavior">Account Behavior</label>
                             <select id="new-account-behavior" name="accountBehavior" required>
-                                <option value="+">Active (Debit)</option>
-                                <option value="-">Passive (Credit)</option>
+                                <option value="+">Active (Credit)</option>
+                                <option value="-">Passive (Debit)</option>
                             </select>
                         </div>
                         <button type="submit" class="auth-button">Add Account</button>
@@ -156,8 +156,8 @@ class TAccountManager {
                         <div class="form-group">
                             <label for="edit-account-behavior">Account Behavior</label>
                             <select id="edit-account-behavior" name="accountBehavior" required>
-                                <option value="+">Active (Debit)</option>
-                                <option value="-">Passive (Credit)</option>
+                                <option value="+">Active (Credit)</option>
+                                <option value="-">Passive (Debit)</option>
                             </select>
                         </div>
                         <button type="submit" class="auth-button">Update Account</button>

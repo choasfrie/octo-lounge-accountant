@@ -320,7 +320,7 @@ export class TransactionManager {
                 <h3>${account.accountName} (${account.accountNumber})</h3>
                 <div class="t-account-content">
                     <div class="debit-side">
-                        <h4>Debit (+)</h4>
+                        <h4>Debit (-)</h4>
                         ${account.records
                             .filter(r => r.DebitorId === account.accountId)
                             .map(entry => `
@@ -331,7 +331,7 @@ export class TransactionManager {
                         <div class="total">Total Debits: ${this.formatAmount(debits)}</div>
                     </div>
                     <div class="credit-side">
-                        <h4>Credit (-)</h4>
+                        <h4>Credit (+)</h4>
                         ${account.records
                             .filter(r => r.CreditorId === account.accountId)
                             .map(entry => `

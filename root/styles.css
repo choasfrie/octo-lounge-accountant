@@ -654,7 +654,7 @@ h2 {
     --outline-color: #4CAF50;
 }
 
-.t-account[data-behavior="-s"] {
+.t-account[data-behavior="-"] {
     --outline-color: #F44336;
 }
 
