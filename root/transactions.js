@@ -105,10 +105,10 @@ export class TransactionManager {
             account.records.forEach(record => {
                 const amount = parseFloat(record.amount || record.Amount);
                 if (record.debitorId === id || record.DebitorId === id) {
-                    balance += amount;
+                    balance -= amount; // Debit (-) decreases balance
                 }
                 if (record.creditorId === id || record.CreditorId === id) {
-                    balance -= amount;
+                    balance += amount; // Credit (+) increases balance
                 }
             });
             
