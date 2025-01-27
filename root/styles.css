@@ -480,13 +480,14 @@ h2 {
 
 .transaction {
     display: grid;
-    grid-template-columns: 100px 1fr 120px;
+    grid-template-columns: 100px minmax(200px, 1fr) minmax(120px, auto);
     padding: 15px;
     border-bottom: 1px solid #444;
     background-color: #2a2a2a;
     margin: 8px 0;
     border-radius: 6px;
     transition: all 0.3s ease;
+    gap: 10px;
 }
 
 .transaction:hover {
@@ -509,6 +510,11 @@ h2 {
     font-family: monospace;
     font-size: 1.1em;
     font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    padding-left: 10px;
 }
 
 #recent-transactions .transaction .amount.income {
@@ -691,9 +697,11 @@ h2 {
     border-bottom: 1px solid #444;
     font-size: 0.9em;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     cursor: pointer;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
 .entry:hover {
@@ -703,6 +711,10 @@ h2 {
 .entry .amount {
     font-family: monospace;
     font-weight: bold;
+    padding-left: 10px;
+    word-break: break-word;
+    text-align: right;
+    min-width: 100px;
 }
 
 .entry .date {
