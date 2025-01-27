@@ -331,24 +331,24 @@ export class TransactionManager {
                     <div class="debit-side">
                         <h4>Debit (-)</h4>
                         ${account.records
-                            .filter(r => r.DebitorId === account.accountId)
-                            .map(entry => `
-                                <div class="entry">
-                                    <span>CHF ${this.formatWholeNumber(entry.Amount)}</span>
-                                </div>
-                            `).join('')}
-                        <div class="total">Total Debits: CHF ${this.formatWholeNumber(debits)}</div>
-                    </div>
-                    <div class="credit-side">
-                        <h4>Credit (+)</h4>
-                        ${account.records
                             .filter(r => r.CreditorId === account.accountId)
                             .map(entry => `
                                 <div class="entry">
                                     <span>CHF ${this.formatWholeNumber(entry.Amount)}</span>
                                 </div>
                             `).join('')}
-                        <div class="total">Total Credits: CHF ${this.formatWholeNumber(credits)}</div>
+                        <div class="total">Total Debits: CHF ${this.formatWholeNumber(credits)}</div>
+                    </div>
+                    <div class="credit-side">
+                        <h4>Credit (+)</h4>
+                        ${account.records
+                            .filter(r => r.DebitorId === account.accountId)
+                            .map(entry => `
+                                <div class="entry">
+                                    <span>CHF ${this.formatWholeNumber(entry.Amount)}</span>
+                                </div>
+                            `).join('')}
+                        <div class="total">Total Credits: CHF ${this.formatWholeNumber(debits)}</div>
                     </div>
                 </div>
                 <div class="balance ${balance >= 0 ? 'positive' : 'negative'}">
