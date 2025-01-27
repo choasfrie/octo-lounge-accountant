@@ -613,12 +613,12 @@ export class TransactionManager {
         try {
             const formData = new FormData(form);
             
-            // Get account IDs from the selected values
-            const fromAccountId = formData.get('fromAccount').match(/\((\d+)\)/)[1];
-            const toAccountId = formData.get('toAccount').match(/\((\d+)\)/)[1];
+            // Get account IDs from the data attributes set during suggestion selection
+            const fromAccountId = form.fromAccount.dataset.accountId;
+            const toAccountId = form.toAccount.dataset.accountId;
 
             if (!fromAccountId || !toAccountId) {
-                throw new Error('Please select valid accounts');
+                throw new Error('Please select valid accounts from the suggestions');
             }
 
             const recordData = {

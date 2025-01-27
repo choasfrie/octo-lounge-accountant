@@ -143,13 +143,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
       // Send button click
-      sendButton.addEventListener("click", sendMessage);
+      sendButton.addEventListener("click", async (e) => {
+        e.preventDefault();
+        if (userInput.value.trim()) {
+          await sendMessage();
+        }
+      });
 
       // Enter key press (with shift+enter for new line)
-      userInput.addEventListener("keydown", (e) => {
+      userInput.addEventListener("keydown", async (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
-          sendMessage();
+          if (userInput.value.trim()) {
+            await sendMessage();
+          }
         }
       });
     };
