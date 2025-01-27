@@ -164,7 +164,7 @@ export class TransactionManager {
     }
 
     displayRecords(accounts, accountsWithRecords) {
-        const allRecords = [];
+        const allRecords = new Map(); // Use Map to track unique records by ID
         
         // Handle if accounts is a single record
         if (!Array.isArray(accounts)) {
@@ -179,50 +179,59 @@ export class TransactionManager {
                 const creditorAccount = accountsWithRecords.find(a => a.accountId === creditorId);
                 const debitorAccount = accountsWithRecords.find(a => a.accountId === debitorId);
                 
-                allRecords.push({
-                    ...account,
-                    id: account.Id || account.id,
-                    date: new Date(account.Date || account.date),
-                    amount: account.Amount || account.amount,
-                    description: account.Description || account.description || '',
-                    creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${creditorId})`,
-                    debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${debitorId})`
-                });
+                const recordId = account.Id || account.id;
+                if (!allRecords.has(recordId)) {
+                    allRecords.set(recordId, {
+                        ...account,
+                        id: recordId,
+                        date: new Date(account.Date || account.date),
+                        amount: account.Amount || account.amount,
+                        description: account.Description || account.description || '',
+                        creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${creditorId})`,
+                        debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${debitorId})`
+                    });
+                }
             }
             // If it's an account with records
             else if (account.records && account.records.length > 0) {
                 account.records.forEach(record => {
-                    // Find account names directly from accountsWithRecords array
-                    const creditorId = record.CreditorId || record.creditorId;
-                    const debitorId = record.DebitorId || record.debitorId;
-                    const creditorAccount = accountsWithRecords.find(a => a.accountId === creditorId);
-                    const debitorAccount = accountsWithRecords.find(a => a.accountId === debitorId);
-                    
-                    allRecords.push({
-                        ...record,
-                        id: record.Id || record.id,
-                        creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${creditorId})`,
-                        debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${debitorId})`,
-                        date: new Date(record.Date || record.date),
-                        amount: record.Amount || record.amount,
-                        description: record.Description || record.description || ''
-                    });
+                    const recordId = record.Id || record.id;
+                    if (!allRecords.has(recordId)) {
+                        // Find account names directly from accountsWithRecords array
+                        const creditorId = record.CreditorId || record.creditorId;
+                        const debitorId = record.DebitorId || record.debitorId;
+                        const creditorAccount = accountsWithRecords.find(a => a.accountId === creditorId);
+                        const debitorAccount = accountsWithRecords.find(a => a.accountId === debitorId);
+                        
+                        allRecords.set(recordId, {
+                            ...record,
+                            id: recordId,
+                            creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${creditorId})`,
+                            debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${debitorId})`,
+                            date: new Date(record.Date || record.date),
+                            amount: record.Amount || record.amount,
+                            description: record.Description || record.description || ''
+                        });
+                    }
                 });
             }
         });
 
+        // Convert Map values to array
+        const uniqueRecords = Array.from(allRecords.values());
+
         // Sort records by date (most recent first)
-        allRecords.sort((a, b) => b.date - a.date);
+        uniqueRecords.sort((a, b) => b.date - a.date);
         // Update the transaction list in the UI
         const transactionList = document.querySelector('#records .transaction-list');
         if (!transactionList) return;
 
-        if (allRecords.length === 0) {
+        if (uniqueRecords.length === 0) {
             transactionList.innerHTML = '<div class="error">No transactions found.</div>';
             return;
         }
 
-        transactionList.innerHTML = allRecords.map(record => `
+        transactionList.innerHTML = uniqueRecords.map(record => `
             <div class="transaction" data-record-id="${record.id || record.Id || ''}">
                 <span class="date">${record.date.toLocaleDateString()}</span>
                 <span class="description">
