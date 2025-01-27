@@ -106,7 +106,7 @@ namespace octo_lounge_accountant_api.Controllers
             foreach (var account in accounts)
             {
                 var records = _context.Records
-                    .Where(r => r.CreditorId == account.Id)
+                    .Where(r => r.CreditorId == account.Id || r.DebitorId == account.Id)
                     .Select(r => new RecordDTO
                     {
                         Id = r.Id,
