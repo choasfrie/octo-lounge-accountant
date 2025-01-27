@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const initAIChat = () => {
-    // Wait for components to be loaded
+    // Immediately attempt initialization
     const tryInit = () => {
       const aiSidebar = document.getElementById("ai-sidebar");
       const toggleButton = document.getElementById("toggle-ai-sidebar");
@@ -58,19 +58,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       ];
 
       // Toggle sidebar
-      toggleButton.addEventListener("click", () => {
-        aiSidebar.classList.toggle("collapsed");
+      toggleButton.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevent default button behavior
+        e.stopPropagation(); // Stop event bubbling
+        
+        if (aiSidebar) {
+          aiSidebar.classList.toggle("collapsed");
 
-        // If opening the sidebar, add random example message
-        if (!aiSidebar.classList.contains("collapsed")) {
-          // Clear previous
-          chatMessages.innerHTML = "";
+          // If opening the sidebar, add random example message
+          if (!aiSidebar.classList.contains("collapsed")) {
+            // Clear previous
+            chatMessages.innerHTML = "";
 
-          // Example message placeholder
-          chatMessages.setAttribute(
-            "data-placeholder",
-            exampleMessages[Math.floor(Math.random() * exampleMessages.length)]
-          );
+            // Example message placeholder
+            chatMessages.setAttribute(
+              "data-placeholder",
+              exampleMessages[Math.floor(Math.random() * exampleMessages.length)]
+            );
+          }
         }
       });
 
@@ -145,22 +150,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Send button click
       sendButton.addEventListener("click", async (e) => {
         e.preventDefault();
-        if (userInput.value.trim()) {
-          await sendMessage();
-        }
+        await sendMessage();
       });
 
       // Enter key press (with shift+enter for new line)
       userInput.addEventListener("keydown", async (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
-          if (userInput.value.trim()) {
-            await sendMessage();
-          }
+          await sendMessage();
         }
       });
     };
+
+    tryInit();
   };
+
   // Start the initialization
   await loadComponents();
 });
