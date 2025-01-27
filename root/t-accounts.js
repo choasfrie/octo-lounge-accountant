@@ -64,16 +64,6 @@ class TAccountManager {
                         </span>
                     </h3>
                     <div class="t-account-content">
-                        <div class="debit-side">
-                            <h4>Debit (-)</h4>
-                            ${account.records
-                                .filter(r => r.DebitorId === account.accountId || r.debitorId === account.accountId)
-                                .map(r => `
-                                    <div class="entry">
-                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount || r.amount))}</span>
-                                    </div>
-                                `).join('') || '<div class="entry"><span>No debit entries</span></div>'}
-                        </div>
                         <div class="credit-side">
                             <h4>Credit (+)</h4>
                             ${account.records
@@ -83,6 +73,16 @@ class TAccountManager {
                                         <span class="amount">${this.formatAmount(Math.abs(r.Amount || r.amount))}</span>
                                     </div>
                                 `).join('') || '<div class="entry"><span>No credit entries</span></div>'}
+                        </div>
+                        <div class="debit-side">
+                            <h4>Debit (-)</h4>
+                            ${account.records
+                                .filter(r => r.DebitorId === account.accountId || r.debitorId === account.accountId)
+                                .map(r => `
+                                    <div class="entry">
+                                        <span class="amount">${this.formatAmount(Math.abs(r.Amount || r.amount))}</span>
+                                    </div>
+                                `).join('') || '<div class="entry"><span>No debit entries</span></div>'}
                         </div>
                     </div>
                 `;
