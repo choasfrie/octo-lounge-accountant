@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  // Initialize Sidebar
+document.addEventListener("DOMContentLoaded", () => {
   const loadComponents = async () => {
     try {
       // Check if components are already loaded
       const existingSidebar = document.getElementById("ai-sidebar");
       if (existingSidebar) {
+        console.log("AI Sidebar already exists, initializing chat...");
         initAIChat();
         return;
       }
@@ -19,9 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       const aiSidebar = doc.querySelector(".ai-sidebar");
       if (aiSidebar) {
         document.body.appendChild(aiSidebar.cloneNode(true));
-        // Dispatch event when components are loaded
-        document.dispatchEvent(new Event("componentsLoaded"));
+        console.log("AI Sidebar added to document, initializing chat...");
         initAIChat();
+      } else {
+        console.error("AI Sidebar element not found in components.html");
       }
     } catch (error) {
       console.error("Error loading components:", error);
@@ -59,23 +60,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Toggle sidebar
       toggleButton.addEventListener("click", (e) => {
-        e.preventDefault(); // Prevent default button behavior
-        e.stopPropagation(); // Stop event bubbling
+        e.preventDefault();
+        e.stopPropagation();
         
-        if (aiSidebar) {
-          aiSidebar.classList.toggle("collapsed");
+        aiSidebar.classList.toggle("collapsed");
 
-          // If opening the sidebar, add random example message
-          if (!aiSidebar.classList.contains("collapsed")) {
-            // Clear previous
-            chatMessages.innerHTML = "";
+        // If opening the sidebar, add random example message
+        if (!aiSidebar.classList.contains("collapsed")) {
+          // Clear previous
+          chatMessages.innerHTML = "";
 
-            // Example message placeholder
-            chatMessages.setAttribute(
-              "data-placeholder",
-              exampleMessages[Math.floor(Math.random() * exampleMessages.length)]
-            );
-          }
+          // Example message placeholder
+          chatMessages.setAttribute(
+            "data-placeholder",
+            exampleMessages[Math.floor(Math.random() * exampleMessages.length)]
+          );
         }
       });
 
@@ -87,63 +86,60 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Handle messages
       const sendMessage = async () => {
         const message = userInput.value.trim();
-        if (message) {
-          try {
-            // Add user message to chat
-            const userMessageDiv = document.createElement("div");
-            userMessageDiv.className = "message user-message";
-            userMessageDiv.textContent = message;
-            chatMessages.appendChild(userMessageDiv);
+        if (!message) return;
 
-            // Clear input
-            userInput.value = "";
+        try {
+          // Add user message to chat
+          const userMessageDiv = document.createElement("div");
+          userMessageDiv.className = "message user-message";
+          userMessageDiv.textContent = message;
+          chatMessages.appendChild(userMessageDiv);
 
-            // Get current user ID from session storage
-            const userId = sessionStorage.getItem("userId");
-            if (!userId) {
-              throw new Error("User not authenticated");
-            }
+          // Clear input
+          userInput.value = "";
 
-            // Call the API
-            const response = await fetch(
-              `http://localhost:5116/api/Records/createRecordGPT/${userId}`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(message),
-              }
-            );
-
-            // Create AI response message
-            const aiMessageDiv = document.createElement("div");
-            aiMessageDiv.className = "message ai-message";
-
-            if (response.ok) {
-              aiMessageDiv.textContent =
-                "Code 200: Successfully created Record.";
-              // Reload the page after a short delay to show the message
-              setTimeout(() => {
-                window.location.reload();
-              }, 1500);
-            } else {
-              const errorData = await response
-                .json()
-                .catch(() => ({ message: "Unknown error" }));
-              aiMessageDiv.textContent = `[Error ${response.status}: ${errorData.message}]`;
-            }
-
-            chatMessages.appendChild(aiMessageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-          } catch (error) {
-            // Handle errors
-            const aiMessageDiv = document.createElement("div");
-            aiMessageDiv.className = "message ai-message";
-            aiMessageDiv.textContent = `[Error: ${error.message}]`;
-            chatMessages.appendChild(aiMessageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+          // Get current user ID from session storage
+          const userId = sessionStorage.getItem("userId");
+          if (!userId) {
+            throw new Error("User not authenticated");
           }
+
+          // Call the API
+          const response = await fetch(
+            `http://localhost:5116/api/Records/createRecordGPT/${userId}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(message),
+            }
+          );
+
+          // Create AI response message
+          const aiMessageDiv = document.createElement("div");
+          aiMessageDiv.className = "message ai-message";
+
+          if (response.ok) {
+            aiMessageDiv.textContent = "Code 200: Successfully created Record.";
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          } else {
+            const errorData = await response
+              .json()
+              .catch(() => ({ message: "Unknown error" }));
+            aiMessageDiv.textContent = `[Error ${response.status}: ${errorData.message}]`;
+          }
+
+          chatMessages.appendChild(aiMessageDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        } catch (error) {
+          const aiMessageDiv = document.createElement("div");
+          aiMessageDiv.className = "message ai-message";
+          aiMessageDiv.textContent = `[Error: ${error.message}]`;
+          chatMessages.appendChild(aiMessageDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
         }
       };
 
@@ -153,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await sendMessage();
       });
 
-      // Enter key press (with shift+enter for new line)
+      // Enter key press
       userInput.addEventListener("keydown", async (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
@@ -165,6 +161,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     tryInit();
   };
 
-  // Start the initialization
-  await loadComponents();
+  // Initial load
+  loadComponents();
+
+  // Toggle button handler
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#toggle-ai-sidebar")) {
+      loadComponents();
+    }
+  });
 });

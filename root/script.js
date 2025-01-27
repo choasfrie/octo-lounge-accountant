@@ -1,3 +1,8 @@
+// Add event listener for componentsLoaded
+document.addEventListener('componentsLoaded', () => {
+    console.log('componentsLoaded event caught');
+});
+
 document.addEventListener('DOMContentLoaded', async function() {
     let parsedDoc;
     try {
@@ -32,28 +37,19 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
             
             // Dispatch event when components are loaded
+            console.log('Dispatching componentsLoaded event from script.js');
             document.dispatchEvent(new Event('componentsLoaded'));
         }
 
         // Re-initialize user menu after components are loaded
         initializeUserMenu();
 
-        // Show/hide and initialize AI assistant button
+        // Show/hide AI assistant menu item
         const aiAssistantMenuItem = document.getElementById('ai-assistant-menu-item');
-        const toggleAiButton = document.getElementById('toggle-ai-sidebar');
-        if (aiAssistantMenuItem && toggleAiButton) {
+        if (aiAssistantMenuItem) {
             const isBookkeepingPage = window.location.pathname.endsWith('bookkeeping.html');
             const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
             aiAssistantMenuItem.style.display = (isBookkeepingPage && isAuthenticated) ? 'block' : 'none';
-            
-            // Initialize toggle button
-            toggleAiButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                const aiSidebar = document.getElementById('ai-sidebar');
-                if (aiSidebar) {
-                    aiSidebar.classList.toggle('collapsed');
-                }
-            });
         }
 
         // Insert footer
