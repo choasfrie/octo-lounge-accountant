@@ -172,30 +172,40 @@ export class TransactionManager {
         }
 
         accounts.forEach(account => {
-            if (account.creditorId !== undefined) {
+            if (account.CreditorId !== undefined || account.creditorId !== undefined) {
                 // Get account names from accountsWithRecords array
-                const creditorAccount = accountsWithRecords.find(a => a.accountId === account.creditorId);
-                const debitorAccount = accountsWithRecords.find(a => a.accountId === account.debitorId);
+                const creditorId = account.CreditorId || account.creditorId;
+                const debitorId = account.DebitorId || account.debitorId;
+                const creditorAccount = accountsWithRecords.find(a => a.accountId === creditorId);
+                const debitorAccount = accountsWithRecords.find(a => a.accountId === debitorId);
                 
                 allRecords.push({
                     ...account,
-                    date: new Date(account.date),
-                    creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${account.creditorId})`,
-                    debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${account.debitorId})`
+                    id: account.Id || account.id,
+                    date: new Date(account.Date || account.date),
+                    amount: account.Amount || account.amount,
+                    description: account.Description || account.description || '',
+                    creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${creditorId})`,
+                    debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${debitorId})`
                 });
             }
             // If it's an account with records
             else if (account.records && account.records.length > 0) {
                 account.records.forEach(record => {
                     // Find account names directly from accountsWithRecords array
-                    const creditorAccount = accountsWithRecords.find(a => a.accountId === record.creditorId);
-                    const debitorAccount = accountsWithRecords.find(a => a.accountId === record.debitorId);
+                    const creditorId = record.CreditorId || record.creditorId;
+                    const debitorId = record.DebitorId || record.debitorId;
+                    const creditorAccount = accountsWithRecords.find(a => a.accountId === creditorId);
+                    const debitorAccount = accountsWithRecords.find(a => a.accountId === debitorId);
                     
                     allRecords.push({
                         ...record,
-                        creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${record.creditorId})`,
-                        debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${record.debitorId})`,
-                        date: new Date(record.date)
+                        id: record.Id || record.id,
+                        creditorName: creditorAccount ? creditorAccount.accountName : `Unknown Account (${creditorId})`,
+                        debitorName: debitorAccount ? debitorAccount.accountName : `Unknown Account (${debitorId})`,
+                        date: new Date(record.Date || record.date),
+                        amount: record.Amount || record.amount,
+                        description: record.Description || record.description || ''
                     });
                 });
             }
@@ -633,22 +643,8 @@ export class TransactionManager {
             
             const newRecord = await recordService.createRecord(recordData);
             
-            // Update UI
-            const transactionList = document.querySelector('#records .transaction-list');
-            const newTransaction = document.createElement('div');
-            newTransaction.className = 'transaction';
-            newTransaction.dataset.recordId = newRecord.id;
-            newTransaction.innerHTML = `
-                <span class="date">${new Date(recordData.date).toLocaleDateString()}</span>
-                <span class="description">
-                    ${recordData.description}
-                    ${recordData.description ? `<i class="fas fa-book notes-icon" data-notes="${recordData.description}"></i>` : ''}
-                </span>
-                <span class="amount ${recordData.amount >= 0 ? 'income' : 'expense'}">
-                    ${this.formatAmount(recordData.amount)}
-                </span>
-            `;
-            transactionList.insertBefore(newTransaction, transactionList.firstChild);
+            // Reload the entire page
+            window.location.reload();
         } catch (error) {
             console.error('Error adding transaction:', error);
             alert('Failed to add transaction. Please try again.');
