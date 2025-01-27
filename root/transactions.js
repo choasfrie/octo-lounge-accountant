@@ -652,8 +652,8 @@ export class TransactionManager {
                 date: new Date(formData.get('date')).toISOString(),
                 amount: parseFloat(formData.get('amount')),
                 description: formData.get('notes') || '',
-                creditorId: parseInt(toAccountId),
-                debitorId: parseInt(fromAccountId)
+                creditorId: parseInt(fromAccount),
+                debitorId: parseInt(toAccountId)
             };
 
             console.log('Creating record with data:', recordData);
