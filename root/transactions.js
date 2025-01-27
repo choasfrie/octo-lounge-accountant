@@ -235,7 +235,7 @@ export class TransactionManager {
             <div class="transaction" data-record-id="${record.id || record.Id || ''}">
                 <span class="date">${record.date.toLocaleDateString()}</span>
                 <span class="description">
-                    ${record.debitorName} → ${record.creditorName}
+                    ${record.creditorName} → ${record.debitorName}
                     ${record.description ? `: ${record.description}` : ''}
                     ${record.notes ? `<i class="fas fa-book notes-icon" data-notes="${record.notes}"></i>` : ''}
                 </span>
