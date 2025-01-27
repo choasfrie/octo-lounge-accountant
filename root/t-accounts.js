@@ -96,10 +96,11 @@ class TAccountManager {
     }
 
     formatAmount(amount) {
-        const num = parseFloat(amount).toFixed(2);
-        const [whole, decimal] = num.split('.');
-        const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
-        return `CHF ${formattedWhole}.${decimal}`;
+        const num = parseFloat(amount);
+        const whole = Math.floor(num);
+        const decimal = Math.round((num - whole) * 100);
+        const formattedWhole = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+        return `CHF ${formattedWhole}${decimal > 0 ? '.' + decimal.toString().padStart(2, '0') : ''}`;
     }
 
     initializeButtons() {

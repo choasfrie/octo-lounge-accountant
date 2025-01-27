@@ -334,10 +334,10 @@ export class TransactionManager {
                             .filter(r => r.DebitorId === account.accountId)
                             .map(entry => `
                                 <div class="entry">
-                                    <span>${this.formatAmount(entry.Amount)}</span>
+                                    <span>CHF ${this.formatWholeNumber(entry.Amount)}</span>
                                 </div>
                             `).join('')}
-                        <div class="total">Total Debits: ${this.formatAmount(debits)}</div>
+                        <div class="total">Total Debits: CHF ${this.formatWholeNumber(debits)}</div>
                     </div>
                     <div class="credit-side">
                         <h4>Credit (+)</h4>
@@ -345,14 +345,14 @@ export class TransactionManager {
                             .filter(r => r.CreditorId === account.accountId)
                             .map(entry => `
                                 <div class="entry">
-                                    <span>${this.formatAmount(entry.Amount)}</span>
+                                    <span>CHF ${this.formatWholeNumber(entry.Amount)}</span>
                                 </div>
                             `).join('')}
-                        <div class="total">Total Credits: ${this.formatAmount(credits)}</div>
+                        <div class="total">Total Credits: CHF ${this.formatWholeNumber(credits)}</div>
                     </div>
                 </div>
                 <div class="balance ${balance >= 0 ? 'positive' : 'negative'}">
-                    Balance: ${this.formatAmount(Math.abs(balance))} ${balance >= 0 ? 'DR' : 'CR'}
+                    Balance: CHF ${this.formatWholeNumber(Math.abs(balance))} ${balance >= 0 ? 'DR' : 'CR'}
                 </div>
             `;
             tAccountsGrid.appendChild(tAccount);
@@ -365,10 +365,18 @@ export class TransactionManager {
     }
 
     formatAmount(amount) {
-        const num = parseFloat(amount).toFixed(2);
-        const [whole, decimal] = num.split('.');
-        const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
-        return `CHF ${formattedWhole}.${decimal}`;
+        const num = parseFloat(amount);
+        const whole = Math.floor(num);
+        const decimal = Math.round((num - whole) * 100);
+        const formattedWhole = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+        return `CHF ${formattedWhole}${decimal > 0 ? '.' + decimal.toString().padStart(2, '0') : ''}`;
+    }
+
+    formatWholeNumber(amount) {
+        const num = parseFloat(amount);
+        const whole = Math.floor(num);
+        const decimal = Math.round((num - whole) * 100);
+        return whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'") + (decimal > 0 ? '.' + decimal.toString().padStart(2, '0') : '');
     }
 
     formatDateForInput(dateString) {
