@@ -652,7 +652,7 @@ export class TransactionManager {
                 date: new Date(formData.get('date')).toISOString(),
                 amount: parseFloat(formData.get('amount')),
                 description: formData.get('notes') || '',
-                creditorId: parseInt(fromAccount),
+                creditorId: parseInt(fromAccountId),
                 debitorId: parseInt(toAccountId)
             };
 
