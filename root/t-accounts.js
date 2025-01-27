@@ -193,6 +193,30 @@ class TAccountManager {
             this.loadAccounts(); // Refresh the accounts view
         });
 
+        // Add change event listener to account select dropdown
+        const accountSelect = document.getElementById('edit-account-select');
+        if (accountSelect) {
+            accountSelect.addEventListener('change', (e) => {
+                const selectedAccount = e.target.value;
+                const accountElement = Array.from(document.querySelectorAll('.t-account'))
+                    .find(acc => acc.querySelector('h3').textContent === selectedAccount);
+                
+                if (accountElement) {
+                    // Extract account name and number from the h3 text which is in format "Name (Number)"
+                    const match = accountElement.querySelector('h3').textContent.match(/(.*?)\s*\((\d+)\)/);
+                    if (match) {
+                        const [_, accountName, accountNumber] = match;
+                        const accountBehavior = accountElement.dataset.behavior;
+                        
+                        // Set form values
+                        document.getElementById('edit-account-name').value = accountName.trim();
+                        document.getElementById('edit-account-number').value = accountNumber;
+                        document.getElementById('edit-account-behavior').value = accountBehavior;
+                    }
+                }
+            });
+        }
+
         document.getElementById('edit-account-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             await this.editAccount(e.target);
